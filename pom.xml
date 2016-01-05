@@ -7,8 +7,8 @@
 
 	<parent>
 		<groupId>net.imagej</groupId>
-		<artifactId>brennanlab-imagej</artifactId>
-		<version>1.0.0</version>
+		<artifactId>pom-imagej</artifactId>
+		<version>7.0.0</version>
 		<relativePath />
 	</parent>
 
