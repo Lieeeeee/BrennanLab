@@ -43,7 +43,7 @@ public class waveFrontTracker implements PlugInFilter {
     int firstslice;
     int gridwidth = 5;// reduce the dimensions down to 2x2 blocks
     int gridheight = 5;
-    int bandwidth = 30; // band for interpolation, all outside is set to
+    int bandwidth = 30; // band for interpoldation, all outside is set to
 
     double initialLengthPenalty = 20;
     double lengthPenalty = 12;

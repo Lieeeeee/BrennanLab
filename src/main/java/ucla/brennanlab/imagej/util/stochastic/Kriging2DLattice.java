@@ -2,7 +2,6 @@ package ucla.brennanlab.imagej.util.stochastic;
 
 import org.ujmp.core.Matrix;
 import org.ujmp.core.doublematrix.SparseDoubleMatrix;
-import org.ujmp.core.matrix.SparseMatrix;
 
 import ucla.brennanlab.imagej.util.levelsets.ImplicitShape2D;
 
@@ -75,7 +74,7 @@ public class Kriging2DLattice {
 		/**
 		 * 5x5 GMRF
 		 */
-		this.spatialPrecision = SparseDoubleMatrix.factory
+		this.spatialPrecision = SparseDoubleMatrix.Factory
 				.zeros(this.n, this.n);
 		this.betaPrior = betaprior;
 		// Set the correlation matrix
@@ -109,7 +108,7 @@ public class Kriging2DLattice {
 			Matrix response) {
 		
 		
-		Matrix withinPrecision = SparseMatrix.factory.zeros(locations
+		Matrix withinPrecision = SparseDoubleMatrix.Factory.zeros(locations
 				.getRowCount(), locations.getRowCount());
 
 		long rows = locations.getRowCount();
@@ -260,7 +259,7 @@ public class Kriging2DLattice {
 		 * }
 		 */
 
-		Matrix partialPrecision = SparseMatrix.factory.zeros(locations
+		Matrix partialPrecision = SparseDoubleMatrix.Factory.zeros(locations
 				.getRowCount(), this.locations.getRowCount());
 		long columns = this.locations.getRowCount();
 		long rows = locations.getRowCount();
@@ -276,7 +275,7 @@ public class Kriging2DLattice {
 		}
 		//partialPrecision.showGUI();
 		// compute within correlations
-		Matrix withinPrecision = SparseMatrix.factory.zeros(locations
+		Matrix withinPrecision = SparseDoubleMatrix.Factory.zeros(locations
 				.getRowCount(), locations.getRowCount());
 
 		for (int column = 0; column < rows; column++) {

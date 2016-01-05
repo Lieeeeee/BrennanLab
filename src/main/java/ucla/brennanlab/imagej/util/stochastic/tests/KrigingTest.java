@@ -5,7 +5,7 @@ package ucla.brennanlab.imagej.util.stochastic.tests;
  */
 
 import org.ujmp.core.*;
-import org.ujmp.core.matrix.DenseMatrix;
+import org.ujmp.core.doublematrix.DenseDoubleMatrix;
 
 import ij.IJ;
 import ij.ImagePlus;
@@ -82,11 +82,11 @@ public class KrigingTest implements PlugInFilter {
 
 	IJ.log("Predicting using " + inside + " points");
 	IJ.log("Interpolating " + outside + " points");
-	Matrix locations = DenseMatrix.factory.zeros(inside, 2);
-	Matrix response = DenseMatrix.factory.zeros(inside, 1);
-	Matrix covariates = DenseMatrix.factory.zeros(inside, 1);
-	Matrix interpolationLocations = DenseMatrix.factory.zeros(outside, 2);
-	Matrix interpolationCovariates = DenseMatrix.factory.zeros(outside, 1);
+	Matrix locations = DenseMatrix.Factory.zeros(inside, 2);
+	Matrix response = DenseMatrix.Factory.zeros(inside, 1);
+	Matrix covariates = DenseMatrix.Factory.zeros(inside, 1);
+	Matrix interpolationLocations = DenseMatrix.Factory.zeros(outside, 2);
+	Matrix interpolationCovariates = DenseMatrix.Factory.zeros(outside, 1);
 
 	int locationpred = 0;
 	int locationinterp = 0;
@@ -125,8 +125,8 @@ public class KrigingTest implements PlugInFilter {
 	// locations.showGUI();
 	// interpolationLocations.showGUI();
 
-	Matrix betaprior = DenseMatrix.factory.zeros(1, 1);
-	Matrix V = DenseMatrix.factory.ones(1, 1);
+	Matrix betaprior = DenseMatrix.Factory.zeros(1, 1);
+	Matrix V = DenseMatrix.Factory.ones(1, 1);
 	V.setAsDouble(Double.MIN_VALUE, 0, 0);
 
 	long startTime = System.nanoTime();
@@ -191,7 +191,7 @@ public class KrigingTest implements PlugInFilter {
 
 	// plug in the interpolated values
 
-	Matrix interpolationMatrix = DenseMatrix.factory.zeros(newWidth,
+	Matrix interpolationMatrix = DenseMatrix.Factory.zeros(newWidth,
 		newHeight);
 	// interpolationMatrix.showGUI();
 	double mean = krig.getBeta().doubleValue();

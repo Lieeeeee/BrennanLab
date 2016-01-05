@@ -42,16 +42,48 @@
 		<url>https://github.com/joshchang/BrennanLab</url>
 	</scm>
 
-	<!--properties>
-		<main-class>Process_Pixels</main-class>
-	</properties-->
+	<properties>
+		<main-class>waveFrontTracker</main-class>
+	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>ij</artifactId>
 		</dependency>
-	</dependencies>
+
+		<dependency>
+			<groupId>colt</groupId>
+			<artifactId>colt</artifactId>
+			<version>1.2.0</version>
+		</dependency>
+
+        <dependency>
+            <groupId>org.ujmp</groupId>
+            <artifactId>ujmp-core</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ujmp</groupId>
+            <artifactId>ujmp-gui</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ujmp</groupId>
+            <artifactId>ujmp-complete</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.jchart2d</groupId>
+            <artifactId>jchart2d</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+
+    </dependencies>
+
 
 	<build>
 		<plugins>
