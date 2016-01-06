@@ -3,10 +3,13 @@ package ucla.brennanlab.imagej.util.stochastic;
 import ij.ImageStack;
 import ij.process.ImageProcessor;
 
+import ij.ImageStack;
+import ij.process.ImageProcessor;
+
 public interface IntensityModel {
     void Infer(ImageProcessor ip,boolean[][] labels);
     void Infer(ImageProcessor ip, boolean[][] labels,boolean updatePrior);
-    
+
     /**
      * For inference on a stack
      * @param is
@@ -21,5 +24,5 @@ public interface IntensityModel {
     public double getPosteriorPrecision(boolean in);
     void Infer(ImageStack stack, boolean[][][] mask, boolean updatePrior);
     void multiplyPrecision(double d);
-    
+
 }

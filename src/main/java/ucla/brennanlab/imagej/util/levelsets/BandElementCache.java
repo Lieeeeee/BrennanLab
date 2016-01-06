@@ -8,42 +8,35 @@ import java.util.Stack;
  * objects in algorithms that do frequent allocations/deallocations of this
  * type (which is straining for the Java virtual machine).
  */
-public class BandElementCache
-{
-   final private Stack<BandElement> element_cache = new Stack<BandElement>();
-   
-   /** Creates a new instance of BandElementCache */
-   public BandElementCache(final int capacity)
-   {
-      element_cache.ensureCapacity(capacity);
-   }
-   
-   final public void recycleBandElement(final BandElement elem)
-   {
-      if (element_cache.size() < element_cache.capacity())
-      {
-         element_cache.push(elem);
-      }
-   }
-   
-   final public BandElement getRecycledBandElement(final int x, final int y, final double value)
-   {
-      if (element_cache.size() == 0)
-      {
-         return new BandElement(x, y,value);
-      }
-      else
-      {
-         final BandElement elem = element_cache.pop();
-         elem.setX(x);
-         elem.setY(y);
-         elem.setValue(value);
-         return elem;
-      }
-   }
-   
-   final public BandElement getRecycledBandElement()
-   {
-      return getRecycledBandElement(0, 0,  0);
-   }
+public class BandElementCache {
+    final private Stack<BandElement> element_cache = new Stack<BandElement>();
+
+    /**
+     * Creates a new instance of BandElementCache
+     */
+    public BandElementCache(final int capacity) {
+        element_cache.ensureCapacity(capacity);
+    }
+
+    final public void recycleBandElement(final BandElement elem) {
+        if (element_cache.size() < element_cache.capacity()) {
+            element_cache.push(elem);
+        }
+    }
+
+    final public BandElement getRecycledBandElement(final int x, final int y, final double value) {
+        if (element_cache.size() == 0) {
+            return new BandElement(x, y, value);
+        } else {
+            final BandElement elem = element_cache.pop();
+            elem.setX(x);
+            elem.setY(y);
+            elem.setValue(value);
+            return elem;
+        }
+    }
+
+    final public BandElement getRecycledBandElement() {
+        return getRecycledBandElement(0, 0, 0);
+    }
 }
