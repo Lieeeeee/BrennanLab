@@ -1,65 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9146a087-db9e-416b-a869-f251a8e384d1" name="Default" comment="more maven dependencies">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/fijigraphcuts/GraphCutSegmenter.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/csdWavefrontMotionSegmentation.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/fijigraphcuts/graphCutSegmenter.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/graphcuts/tests/graphCutSegmentationTest.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/shapeKernelDensityEstimation.java" afterPath="" />
+    <list default="true" id="a5bf183d-1396-41ce-991c-2727a9b2c97b" name="Default" comment="">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/fijigraphcuts/Edge.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/fijigraphcuts/GraphCut.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/fijigraphcuts/GraphCutSegmenter.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/fijigraphcuts/Node.java" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/CSD_multi_montager.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/CSD_multi_montager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/CSD_peak_isolator.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/CSD_peak_isolator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/SelectionToText.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/SelectionToText.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/SignedDistancetoRoi.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/SignedDistancetoRoi.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/waveFrontTracker.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/waveFrontTracker.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/Edge.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/Edge.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCut.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCut.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/Node.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/Node.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Blur_And_Threshold.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Blur_And_Threshold.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Change_from_baseline.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Change_from_baseline.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Cumulative_sum.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Cumulative_sum.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Fit_Polynomial.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Fit_Polynomial.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Interactive_ZAxisProfiler.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Interactive_ZAxisProfiler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Multiple_Substack_Opener.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Multiple_Substack_Opener.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Pixel_scatterplot.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Pixel_scatterplot.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/SegmentationError.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/SegmentationError.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Sign_of_difference.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Sign_of_difference.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/TIFF_Substack_Opener.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/TIFF_Substack_Opener.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Threshold_vs_Baseline.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Threshold_vs_Baseline.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Z_Axis_Profile_Without_Opening.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Z_Axis_Profile_Without_Opening.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/fijigraphcuts/Edge.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/fijigraphcuts/Edge.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/fijigraphcuts/GraphCut.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/fijigraphcuts/GraphCut.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/fijigraphcuts/Node.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/fijigraphcuts/Node.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/laggedDifferenceCalculator.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/laggedDifferenceCalculator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/BandElement.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/BandElement.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/BandElementCache.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/BandElementCache.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/Coordinate.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/Coordinate.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/DeferredByteArray2D.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/DeferredByteArray2D.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/DeferredDoubleArray2D.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/DeferredDoubleArray2D.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/DeferredObjectArray2D.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/DeferredObjectArray2D.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/FastMarchingBandElement.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/FastMarchingBandElement.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/GenericLevelSet.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/GenericLevelSet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ImplicitShape2D.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ImplicitShape2D.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ROItoSignedDistance.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ROItoSignedDistance.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/RoiImageLevelSet.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/RoiImageLevelSet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ShapePrior.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ShapePrior.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/fastMarchingSolver.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/fastMarchingSolver.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/tests/fastMarchingTest.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/tests/fastMarchingTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/tests/levelsetTest.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/tests/levelsetTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/GaussianMixture.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/GaussianMixture.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/Gibbs_MRF_sampler.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/Gibbs_MRF_sampler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/ImageStats.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/ImageStats.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/IntensityModel.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/IntensityModel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/Kriging2DLattice.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/Kriging2DLattice.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/LaplaceMixture.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/LaplaceMixture.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/SpeedField.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/SpeedField.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/tests/KrigingTest.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/tests/KrigingTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/util/jchart2d/PointPainterCircle.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/util/jchart2d/PointPainterCircle.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/util/jchart2d/SelectionTrace.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/util/jchart2d/SelectionTrace.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/util/jchart2d/TracePainterCircle.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/util/jchart2d/TracePainterCircle.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/util/jchart2d/ZoomableChartWithPointSelection.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/util/jchart2d/ZoomableChartWithPointSelection.java" />
     </list>
     <ignored path="Brennan_Lab.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -80,65 +31,22 @@
     <favorites_list name="Brennan_Lab" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="ShapePrior.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ShapePrior.java">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="pom.xml" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.1481482">
-              <caret line="48" column="29" selection-start-line="48" selection-start-column="16" selection-end-line="48" selection-end-column="29" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#1465#1466#0" expanded="true" />
-                <element signature="e#1504#1505#0" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="0.4806071">
+              <caret line="19" column="31" selection-start-line="19" selection-start-column="31" selection-end-line="19" selection-end-column="31" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LaplaceMixture.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/LaplaceMixture.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.97244734">
-              <caret line="56" column="35" selection-start-line="56" selection-start-column="35" selection-end-line="56" selection-end-column="35" />
-              <folding>
-                <element signature="e#859#866#0" expanded="true" />
-                <element signature="e#915#922#0" expanded="true" />
-                <element signature="e#2724#2725#0" expanded="true" />
-                <element signature="e#2771#2772#0" expanded="true" />
-                <element signature="e#3009#3010#0" expanded="true" />
-                <element signature="e#3057#3058#0" expanded="true" />
-                <element signature="e#3288#3289#0" expanded="true" />
-                <element signature="e#3329#3330#0" expanded="true" />
-                <element signature="e#3359#3360#0" expanded="true" />
-                <element signature="e#3400#3401#0" expanded="true" />
-                <element signature="e#3835#3842#0" expanded="true" />
-                <element signature="e#3891#3898#0" expanded="true" />
-                <element signature="e#5994#5995#0" expanded="true" />
-                <element signature="e#6044#6045#0" expanded="true" />
-                <element signature="e#6091#6092#0" expanded="true" />
-                <element signature="e#6141#6142#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SpeedField.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/SpeedField.java">
+      <file leaf-file-name="CSD_multi_montager.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/CSD_multi_montager.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="58" column="70" selection-start-line="58" selection-start-column="70" selection-end-line="58" selection-end-column="70" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Blur_And_Threshold.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Blur_And_Threshold.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="33" column="35" selection-start-line="33" selection-start-column="35" selection-end-line="33" selection-end-column="35" />
+              <caret line="33" column="34" selection-start-line="33" selection-start-column="34" selection-end-line="33" selection-end-column="34" />
               <folding />
             </state>
           </provider>
@@ -147,30 +55,20 @@
       <file leaf-file-name="GraphCutSegmenter.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-4.6666665">
-              <caret line="119" column="32" selection-start-line="119" selection-start-column="16" selection-end-line="119" selection-end-column="32" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="22" column="23" selection-start-line="22" selection-start-column="23" selection-end-line="22" selection-end-column="23" />
               <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="imports" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="waveFrontTracker.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/waveFrontTracker.java">
+      <file leaf-file-name="ShapePrior.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ShapePrior.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="448" column="41" selection-start-line="448" selection-start-column="41" selection-end-line="448" selection-end-column="41" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Threshold_vs_Baseline.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Threshold_vs_Baseline.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="63" column="47" selection-start-line="63" selection-start-column="47" selection-end-line="63" selection-end-column="47" />
+              <caret line="24" column="28" selection-start-line="24" selection-start-column="28" selection-end-line="24" selection-end-column="28" />
               <folding />
             </state>
           </provider>
@@ -189,24 +87,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/Kriging2DLattice.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/tests/KrigingTest.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/fastMarchingSolver.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/tests/levelsetTest.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/tests/fastMarchingTest.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ImplicitShape2D.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/RoiImageLevelSet.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Blur_And_Threshold.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Threshold_vs_Baseline.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/SpeedField.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/IntensityModel.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/fijigraphcuts/graphCutSegmenter.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/LaplaceMixture.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/csdWavefrontMotionSegmentation.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ShapePrior.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/graphcuts/tests/graphCutSegmentationTest.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/waveFrontTracker.java" />
       </list>
     </option>
   </component>
@@ -216,26 +98,18 @@
         <option name="mavenHome" value="Bundled (Maven 3)" />
       </MavenGeneralSettings>
     </option>
-    <option name="importingSettings">
-      <MavenImportingSettings>
-        <option name="importAutomatically" value="true" />
-      </MavenImportingSettings>
-    </option>
     <option name="enabledProfiles">
       <list>
-        <option value="build-javadoc" />
-        <option value="dev.scijava" />
-        <option value="exec" />
-        <option value="deploy-to-imagej" />
-        <option value="dev.imglib2" />
         <option value="dev.imagej" />
-        <option value="run-its" />
+        <option value="exec" />
+        <option value="jdb" />
+        <option value="deploy-to-imagej" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="14" />
-    <option name="y" value="43" />
+    <option name="x" value="24" />
+    <option name="y" value="23" />
     <option name="width" value="1256" />
     <option name="height" value="737" />
   </component>
@@ -264,7 +138,9 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="Scratches" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -272,10 +148,6 @@
               <option name="myItemId" value="Brennan_Lab" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="External Libraries" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
-            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -311,24 +183,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="target" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="classes" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Brennan_Lab" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Brennan_Lab-plugin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="src" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -360,10 +214,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="brennanlab" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="jchart2d" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -398,44 +248,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="util" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Brennan_Lab" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Brennan_Lab-plugin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="brennanlab" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="imagej" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="util" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="stochastic" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -511,7 +323,11 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="fijigraphcuts" />
+              <option name="myItemId" value="levelsets" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tests" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -543,6 +359,48 @@
             <PATH_ELEMENT>
               <option name="myItemId" value="imagej" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="graphcuts" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Brennan_Lab" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Brennan_Lab-plugin" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="brennanlab" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="imagej" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="graphcuts" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="GraphCut.java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -581,11 +439,24 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
-  <component name="RunManager">
+  <component name="PropertiesComponent">
+    <property name="project.structure.last.edited" value="SDKs" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="last_opened_file_path" value="/Applications/Fiji.app/jars/ij-1.50e.jar" />
+  </component>
+  <component name="RunManager" selected="JAR Application.Fiji">
+    <configuration default="false" name="Fiji" type="JarApplication" factoryName="JAR Application" editBeforeRun="true" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="JAR_PATH" value="/Applications/Fiji.app/jars/ij-1.50e.jar" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
+      <envs />
+      <module name="Brennan_Lab" />
+      <method />
+    </configuration>
     <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
       <module name="" />
       <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
@@ -661,10 +532,10 @@
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="MAIN_CLASS_NAME" value="" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="ENABLE_SWING_INSPECTOR" value="false" />
@@ -830,89 +701,65 @@
       <listeners />
       <method />
     </configuration>
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue="JAR Application.Fiji" />
+    </list>
+    <recent_temporary>
+      <list size="1">
+        <item index="0" class="java.lang.String" itemvalue="JAR Application.Fiji" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="9146a087-db9e-416b-a869-f251a8e384d1" name="Default" comment="" />
-      <created>1452014653967</created>
+      <changelist id="a5bf183d-1396-41ce-991c-2727a9b2c97b" name="Default" comment="" />
+      <created>1452091341704</created>
       <option name="number" value="Default" />
-      <updated>1452014653967</updated>
+      <updated>1452091341704</updated>
     </task>
     <servers />
   </component>
-  <component name="TodoView">
-    <todo-panel id="selected-file">
-      <is-autoscroll-to-source value="true" />
-    </todo-panel>
-    <todo-panel id="all">
-      <are-packages-shown value="true" />
-      <is-autoscroll-to-source value="true" />
-    </todo-panel>
-  </component>
   <component name="ToolWindowManager">
-    <frame x="14" y="43" width="1256" height="737" extended-state="0" />
+    <frame x="24" y="23" width="1256" height="737" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32868218" sideWeight="0.49505767" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32868218" sideWeight="0.48682043" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32868218" sideWeight="0.5131796" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32868218" sideWeight="0.4967051" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32868218" sideWeight="0.4967051" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32868218" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32868218" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32766616" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24958813" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24958813" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
-    <layout-to-restore>
-      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32868218" sideWeight="0.49505767" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32868218" sideWeight="0.48682043" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32868218" sideWeight="0.5131796" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32868218" sideWeight="0.4967051" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32868218" sideWeight="0.4967051" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24958813" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24958813" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-    </layout-to-restore>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="more maven dependencies" />
-    <option name="LAST_COMMIT_MESSAGE" value="more maven dependencies" />
+    <option name="LAST_COMMIT_MESSAGE" value="" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <option name="time" value="1" />
-    </breakpoint-manager>
+    <breakpoint-manager />
     <watches-manager />
   </component>
   <component name="antWorkspaceConfiguration">
@@ -920,28 +767,58 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/util/jchart2d/PointPainterCircle.java">
+    <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5">
-          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/Kriging2DLattice.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-5.428571">
-          <caret line="3" column="28" selection-start-line="3" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/tests/KrigingTest.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/CSD_multi_montager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.607143">
-          <caret line="190" column="0" selection-start-line="190" selection-start-column="0" selection-end-line="190" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="24" column="13" selection-start-line="24" selection-start-column="13" selection-end-line="24" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ShapePrior.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="24" column="28" selection-start-line="24" selection-start-column="28" selection-end-line="24" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCut.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.40549272">
+          <caret line="49" column="23" selection-start-line="49" selection-start-column="23" selection-end-line="49" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/Edge.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33279485">
+          <caret line="27" column="13" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/CSD_multi_montager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="33" column="34" selection-start-line="33" selection-start-column="34" selection-end-line="33" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="22" column="23" selection-start-line="22" selection-start-column="23" selection-end-line="22" selection-end-column="23" />
           <folding>
             <element signature="imports" expanded="false" />
           </folding>
@@ -950,190 +827,9 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.058441557">
-          <caret line="61" column="34" selection-start-line="61" selection-start-column="34" selection-end-line="61" selection-end-column="34" />
+        <state vertical-scroll-proportion="0.4806071">
+          <caret line="19" column="31" selection-start-line="19" selection-start-column="31" selection-end-line="19" selection-end-column="31" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/GenericLevelSet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-10.037037">
-          <caret line="255" column="0" selection-start-line="255" selection-start-column="0" selection-end-line="261" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/tests/fastMarchingTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.8148148">
-          <caret line="68" column="46" selection-start-line="68" selection-start-column="46" selection-end-line="68" selection-end-column="46" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/tests/levelsetTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.0049382">
-          <caret line="65" column="51" selection-start-line="65" selection-start-column="51" selection-end-line="65" selection-end-column="51" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/fastMarchingSolver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.48641977">
-          <caret line="129" column="56" selection-start-line="129" selection-start-column="56" selection-end-line="129" selection-end-column="56" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ImplicitShape2D.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.6666666">
-          <caret line="14" column="35" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#5487#5488#0" expanded="true" />
-            <element signature="e#5529#5530#0" expanded="true" />
-            <element signature="e#5570#5571#0" expanded="true" />
-            <element signature="e#5603#5604#0" expanded="true" />
-            <element signature="e#14089#14090#0" expanded="true" />
-            <element signature="e#14157#14158#0" expanded="true" />
-            <element signature="e#15194#15195#0" expanded="true" />
-            <element signature="e#15222#15223#0" expanded="true" />
-            <element signature="e#15245#15246#0" expanded="true" />
-            <element signature="e#15274#15275#0" expanded="true" />
-            <element signature="e#20047#20048#0" expanded="true" />
-            <element signature="e#20093#20094#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/RoiImageLevelSet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="92" column="41" selection-start-line="92" selection-start-column="10" selection-end-line="92" selection-end-column="41" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Threshold_vs_Baseline.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="63" column="47" selection-start-line="63" selection-start-column="47" selection-end-line="63" selection-end-column="47" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/ImageStats.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33333334">
-          <caret line="11" column="13" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/IntensityModel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5925926">
-          <caret line="21" column="32" selection-start-line="21" selection-start-column="32" selection-end-line="21" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/util/jchart2d/SelectionTrace.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.14814815">
-          <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-4.6666665">
-          <caret line="119" column="32" selection-start-line="119" selection-start-column="16" selection-end-line="119" selection-end-column="32" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/fijigraphcuts/GraphCutSegmenter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.4237288">
-          <caret line="87" column="33" selection-start-line="87" selection-start-column="23" selection-end-line="87" selection-end-column="33" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/Blur_And_Threshold.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="33" column="35" selection-start-line="33" selection-start-column="35" selection-end-line="33" selection-end-column="35" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/SpeedField.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="58" column="70" selection-start-line="58" selection-start-column="70" selection-end-line="58" selection-end-column="70" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ShapePrior.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.1481482">
-          <caret line="48" column="29" selection-start-line="48" selection-start-column="16" selection-end-line="48" selection-end-column="29" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1465#1466#0" expanded="true" />
-            <element signature="e#1504#1505#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/waveFrontTracker.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="448" column="41" selection-start-line="448" selection-start-column="41" selection-end-line="448" selection-end-column="41" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/LaplaceMixture.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.97244734">
-          <caret line="56" column="35" selection-start-line="56" selection-start-column="35" selection-end-line="56" selection-end-column="35" />
-          <folding>
-            <element signature="e#859#866#0" expanded="true" />
-            <element signature="e#915#922#0" expanded="true" />
-            <element signature="e#2724#2725#0" expanded="true" />
-            <element signature="e#2771#2772#0" expanded="true" />
-            <element signature="e#3009#3010#0" expanded="true" />
-            <element signature="e#3057#3058#0" expanded="true" />
-            <element signature="e#3288#3289#0" expanded="true" />
-            <element signature="e#3329#3330#0" expanded="true" />
-            <element signature="e#3359#3360#0" expanded="true" />
-            <element signature="e#3400#3401#0" expanded="true" />
-            <element signature="e#3835#3842#0" expanded="true" />
-            <element signature="e#3891#3898#0" expanded="true" />
-            <element signature="e#5994#5995#0" expanded="true" />
-            <element signature="e#6044#6045#0" expanded="true" />
-            <element signature="e#6091#6092#0" expanded="true" />
-            <element signature="e#6141#6142#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>

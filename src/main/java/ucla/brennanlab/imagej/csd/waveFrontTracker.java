@@ -12,7 +12,6 @@ import ij.gui.Roi;
 import ij.plugin.filter.GaussianBlur;
 import ij.plugin.filter.PlugInFilter;
 import ij.plugin.frame.RoiManager;
-import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
@@ -229,7 +228,7 @@ public class waveFrontTracker implements PlugInFilter {
 
                     positions.get(i).advectUniformSpeed(speed, 1 / this.freq);
 
-                    Roi pred = (Roi) positions.get(i).getRoi(true);
+                    Roi pred = positions.get(i).getRoi(true);
 
                     if (pred == null)
                         continue;
@@ -285,7 +284,7 @@ public class waveFrontTracker implements PlugInFilter {
                     s.Infer(currentImageProcessor, gcs
                             .returnMask());
                     gcs.setEdgeWeights(skde, gcs.getLevelSet());
-                    long currentTime = startTime;
+                    long currentTime;
                     int i = 1;
             /*
 		     * Every 5 iterations or so, let's show the progress!!
@@ -378,7 +377,7 @@ public class waveFrontTracker implements PlugInFilter {
 
 
                     gSegmentStack.getProcessor(currentSlice - firstCSDslice + 1).setColor(this.roiColor);
-                    ((ColorProcessor) gSegmentStack
+                    (gSegmentStack
                             .getProcessor(currentSlice - firstCSDslice + 1))
                             .drawRoi(
                                     roisOfSegmentations.get(currentSlice
@@ -573,7 +572,7 @@ public class waveFrontTracker implements PlugInFilter {
         // Just some initial values
         for (int x = 0; x < ip.getWidth(); x++) {
             for (int y = 0; y < ip.getHeight(); y++) {
-                mask[x][y] = ip2.getPixelValue(x, y) > mean + sd ? true : false;
+                mask[x][y] = ip2.getPixelValue(x, y) > mean + sd;
             }
         }
 
@@ -643,4 +642,30 @@ public class waveFrontTracker implements PlugInFilter {
 
     }
 
+    /**
+     * Main method for debugging.
+     *
+     * For debugging, it is convenient to have a method that starts ImageJ, loads an
+     * image and calls the plugin, e.g. after setting breakpoints.
+     *
+     * @param args unused
+     */
+    public static void main(String[] args) {
+        // set the plugins.dir property to make the plugin appear in the Plugins menu
+        Class<?> clazz = waveFrontTracker.class;
+        String url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class").toString();
+        String pluginsDir = url.substring(5, url.length() - clazz.getName().length() - 6);
+        System.setProperty("plugins.dir", pluginsDir);
+
+        // start ImageJ
+        new IJ();
+
+        // open the Clown sample
+        ImagePlus image = IJ.openImage("http://imagej.net/images/clown.jpg");
+        image.show();
+
+        // run the plugin
+        IJ.runPlugIn(clazz.getName(), "");
+    }
 }
+
