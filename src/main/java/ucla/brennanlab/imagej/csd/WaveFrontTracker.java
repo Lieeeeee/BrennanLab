@@ -32,7 +32,7 @@ import java.util.ArrayList;
  *
  * @author Josh Chang
  */
-public class waveFrontTracker implements PlugInFilter {
+public class WaveFrontTracker implements PlugInFilter {
     /**
      * the number of importance samples is J*(2L+1). L is usually the dimension
      * of the stochastic state, here it will be the number of points at which we
@@ -121,17 +121,17 @@ public class waveFrontTracker implements PlugInFilter {
         /*********************************************************************
          * Initialize and display the ROI manager and log viewer
          *********************************************************************/
-        RoiManager rm = RoiManager.getInstance();
-        if (rm != null)
-            rm.setVisible(true);
+        RoiManager roiman = RoiManager.getInstance();
+        if (roiman != null)
+            roiman.setVisible(true);
         else
-            rm = new RoiManager();
+            roiman = new RoiManager();
 
-        GraphCutSegmenter gcs = new GraphCutSegmenter(ip);
+        GraphCutSegmenter gcSegmenter = new GraphCutSegmenter(ip);
 
         ImageStack gSegmentStack = imp.createEmptyStack();
-        ImagePlus gSegment = imp.createImagePlus();
-        gSegment.setTitle(imp.getTitle() + "_segmentation");
+        ImagePlus gSegmentImp = imp.createImagePlus();
+        gSegmentImp.setTitle(imp.getTitle() + "_segmentation");
 
         this.maxAposteriorSpd.setPriorMeanSpeed((float) this.priorSpeedMean);
         this.maxAposteriorSpd.setPriorVarSpeed((float) this.priorSpeedSD);
@@ -182,9 +182,9 @@ public class waveFrontTracker implements PlugInFilter {
 
             if (csdHasStarted) {
 
-                ImplicitShape2D prevLS = new ImplicitShape2D(gcs.returnMask());
-                if (gcs.fractionInner() < 10.0 / width / height) {
-                    //prevLS =
+                ImplicitShape2D prevLS = new ImplicitShape2D(gcSegmenter.returnMask());
+                if (gcSegmenter.fractionInner() < 10.0 / width / height) {
+                    // have less than 10 pixels
                 }
 
                 /****************************************************************
@@ -213,7 +213,7 @@ public class waveFrontTracker implements PlugInFilter {
                 imp.setRoi(nextRoi);
 
                 nextRoi.setName("Predicted mean position " + currentSlice);
-                rm.addRoi(nextRoi);
+                roiman.addRoi(nextRoi);
 
                 SpeedField sfield = new SpeedField(this.width, this.height);
 
@@ -238,7 +238,7 @@ public class waveFrontTracker implements PlugInFilter {
                                 .setName("Sample " + (i + 1)
                                         + " of predicted position of "
                                         + (currentSlice));
-                        rm.addRoi(pred);
+                        roiman.addRoi(pred);
                     }
 
                 }
@@ -262,12 +262,13 @@ public class waveFrontTracker implements PlugInFilter {
                 float minE;
                 float tempE;
                 long endTime;
-                IntensityModel s = new LaplaceMixture();
-                s.Infer(currentImageProcessor, meanNext
+                IntensityModel likelihood = new LaplaceMixture();
+                likelihood.Infer(currentImageProcessor, meanNext
                         .getMask());
 
-                gcs = new GraphCutSegmenter(currentImageProcessor);
-                gcs.setLengthPenalty((float) this.lengthPenalty);
+                gcSegmenter = new GraphCutSegmenter(currentImageProcessor);
+                gcSegmenter.setLengthPenalty((float) this.lengthPenalty);
+                gcSegmenter.setIntensityModel(likelihood);
 
                 /********************************************************************************
                  * Segment NOW
@@ -275,15 +276,15 @@ public class waveFrontTracker implements PlugInFilter {
 
 
                 try {
-                    gcs.setNodeWeights(skde, meanNext, s);
-                    gcs.setEdgeWeights(skde, meanNext);
-                    minE = gcs.relaxEnergy();
+                    gcSegmenter.setNodeWeights(skde, meanNext, likelihood);
+                    gcSegmenter.setEdgeWeights(skde, meanNext);
+                    minE = gcSegmenter.relaxEnergy();
                     /**
                      * MM iterations
                      */
-                    s.Infer(currentImageProcessor, gcs
+                    likelihood.Infer(currentImageProcessor, gcSegmenter
                             .returnMask());
-                    gcs.setEdgeWeights(skde, gcs.getLevelSet());
+                    gcSegmenter.setEdgeWeights(skde, gcSegmenter.getLevelSet());
                     long currentTime;
                     int i = 1;
             /*
@@ -296,10 +297,11 @@ public class waveFrontTracker implements PlugInFilter {
                             IJ.log("Aborted");
                             return;
                         }
-                        gcs.gc.reset();
-                        gcs.setNodeWeights(skde, gcs.getLevelSet(), s);
-                        gcs.setEdgeWeights(skde, gcs.getLevelSet());
-                        tempE = gcs.relaxEnergy();
+                        gcSegmenter.gc.reset(); // @TODO Don't remember what this does
+
+                        gcSegmenter.setNodeWeights(skde, gcSegmenter.getLevelSet(), likelihood);
+                        gcSegmenter.setEdgeWeights(skde, gcSegmenter.getLevelSet());
+                        tempE = gcSegmenter.relaxEnergy();
                         currentTime = System.nanoTime();
                         IJ.log("\t     Iter " + i + " Elapsed time: "
                                 + ((float) (currentTime - startTime) / 1000000)
@@ -316,14 +318,14 @@ public class waveFrontTracker implements PlugInFilter {
                         minE = tempE;
                         // if (i % 3 == 0) {
                         try {
-                            Roi currentProgress = (Roi) gcs.getLevelSet().getRoi(
+                            Roi currentProgress = (Roi) gcSegmenter.getLevelSet().getRoi(
                                     false).clone();
                             currentProgress.setStrokeColor(roiColor);
 
                             currentProgress.setName("Position_" + currentSlice
                                     + "_iteration_" + i);
                             imp.setRoi(currentProgress);
-                            rm.addRoi(currentProgress);
+                            roiman.addRoi(currentProgress);
 
                         } catch (NullPointerException e) {
                             csdHasStarted = false;
@@ -337,13 +339,10 @@ public class waveFrontTracker implements PlugInFilter {
                 } finally {
                     endTime = System.nanoTime();
                 }
-                Roi segmentedRoi = gcs.returnRoi();
+                Roi segmentedRoi = gcSegmenter.returnRoi();
                 segmentedRoi.setStrokeColor(roiColor);
 
-                if (segmentedRoi == null) {
-                    segmentedRoi = meanNext
-                            .getRoi(false);
-                }
+
                 if (segmentedRoi != null) {
                     if (currentSlice == firstCSDslice + 1) { // Draw first slice
                         gSegmentStack.addSlice("Slice_" + firstCSDslice, imp
@@ -359,10 +358,10 @@ public class waveFrontTracker implements PlugInFilter {
                     gSegmentStack.addSlice("Slice_" + currentSlice,
                             currentImageProcessor.duplicate().convertToRGB());
 
-                    gSegment.setStack(gSegmentStack);
-                    gSegment.show();
-                    gSegment.setSlice(gSegment.getStackSize());
-                    gSegment.updateAndDraw();
+                    gSegmentImp.setStack(gSegmentStack);
+                    gSegmentImp.show();
+                    gSegmentImp.setSlice(gSegmentImp.getStackSize());
+                    gSegmentImp.updateAndDraw();
 
                     roisOfSegmentations.add((Roi) segmentedRoi.clone());
                     roisOfSegmentations.get(currentSlice - firstCSDslice)
@@ -372,7 +371,7 @@ public class waveFrontTracker implements PlugInFilter {
                     roisOfSegmentations.get(currentSlice - firstCSDslice)
                             .setStrokeWidth(3);
 
-                    rm.addRoi(roisOfSegmentations.get(currentSlice
+                    roiman.addRoi(roisOfSegmentations.get(currentSlice
                             - firstCSDslice));
 
 
@@ -382,18 +381,19 @@ public class waveFrontTracker implements PlugInFilter {
                             .drawRoi(
                                     roisOfSegmentations.get(currentSlice
                                             - firstCSDslice));
-                    gSegment.setSlice(currentSlice - firstCSDslice + 1);
+                    gSegmentImp.setSlice(currentSlice - firstCSDslice + 1);
 
                 } else {
-                    IJ
-                            .log("Something went wrong, I was unable to obtain a segmentation...");
+                    segmentedRoi = meanNext
+                            .getRoi(false);
+                    IJ.log("Something went wrong, I was unable to obtain a segmentation...");
 
                     lastCSDslice = currentSlice - 1;
                     continue;
                 }
 
                 long duration = endTime - startTime;
-                double dist = skde.computeDistance(gcs.getLevelSet(), meanNext)
+                double dist = skde.computeDistance(gcSegmenter.getLevelSet(), meanNext)
                         * skde.tauSquared;
                 IJ.log("Computed maxflow energy of " + minE + " in "
                         + (float) duration / 1000000 + " ms");
@@ -406,7 +406,7 @@ public class waveFrontTracker implements PlugInFilter {
                     continue;
                 }
 
-                ImplicitShape2D currentPosition = gcs.getLevelSet();
+                ImplicitShape2D currentPosition = gcSegmenter.getLevelSet();
 
                 // perhaps do some sanity checks
 
@@ -416,7 +416,7 @@ public class waveFrontTracker implements PlugInFilter {
 
                 this.priorSpeedMean = 0.9 * this.maxAposteriorSpd.latestSpeed
                         + 0.1 * this.priorSpeedMean;
-                if (1 / s.getPosteriorPrecision(false) > s.getPosteriorMean(true)) {
+                if (1 / likelihood.getPosteriorPrecision(false) > likelihood.getPosteriorMean(true)) {
                     IJ
                             .log("\t\t Excessive variability in the image detected, may be movement");
                     this.priorSpeedMean = this.priorSpeedMean * 0.8;
@@ -435,7 +435,7 @@ public class waveFrontTracker implements PlugInFilter {
                 if (this.useManualInitializationPrior) {
                     this.userDrawnRoi.setName("User_drawn_template_slice_"
                             + currentSlice);
-                    rm.addRoi(this.userDrawnRoi);
+                    roiman.addRoi(this.userDrawnRoi);
                     ImplicitShape2D manualLS = (new ImplicitShape2D(
                             this.userDrawnRoi, width, height));
                     ArrayList<ImplicitShape2D> userDefinedShapes = new ArrayList<ImplicitShape2D>(
@@ -450,14 +450,14 @@ public class waveFrontTracker implements PlugInFilter {
                     IntensityModel s = new LaplaceMixture();
                     s.Infer(currentImageProcessor, manualLS.getMask());
 
-                    gcs = new GraphCutSegmenter(currentImageProcessor, 1);
+                    gcSegmenter = new GraphCutSegmenter(currentImageProcessor, 1);
 
-                    gcs.setIntensityModel(s);
-                    gcs.setEdgeWeights(userKDE, manualLS);
-                    gcs.setNodeWeights(userKDE, manualLS, s);
-                    double minE = gcs.relaxEnergy();
-                    IJ.log(minE + " " + gcs.fractionInner());
-                    s.Infer(currentImageProcessor, gcs.returnMask());
+                    gcSegmenter.setIntensityModel(s);
+                    gcSegmenter.setEdgeWeights(userKDE, manualLS);
+                    gcSegmenter.setNodeWeights(userKDE, manualLS, s);
+                    double minE = gcSegmenter.relaxEnergy();
+                    IJ.log(minE + " " + gcSegmenter.fractionInner());
+                    s.Infer(currentImageProcessor, gcSegmenter.returnMask());
 
                 } else {
                     IJ.log("... computing naive maxflow for slice "
@@ -465,7 +465,7 @@ public class waveFrontTracker implements PlugInFilter {
                     long startTime = System.nanoTime();
                     long endTime;
                     try {
-                        gcs = this.naivelyFindSegmentation(
+                        gcSegmenter = this.naivelyFindSegmentation(
                                 currentImageProcessor, 3);
 
                     } finally {
@@ -474,26 +474,26 @@ public class waveFrontTracker implements PlugInFilter {
 
                     long duration = endTime - startTime;
 
-                    IJ.log("Computed maxflow energy of " + gcs.Energy + " in "
+                    IJ.log("Computed maxflow energy of " + gcSegmenter.Energy + " in "
                             + (float) duration / 1000000 + " ms");
                 }
                 // double inner = gcs.getS().innerarea;
-                if (gcs.fractionInner() > 0.01) {
+                if (gcSegmenter.fractionInner() > 0.01) {
                     /**
                      * Provisionally say that the CSD has been initialized, but
                      * we might get kicked back here again if the subsequent
                      * frames yield inadmissible wave speed profiles
                      */
                     csdHasStarted = true;
-                    IJ.log("Found a " + fmt.format(gcs.fractionInner() * 100)
+                    IJ.log("Found a " + fmt.format(gcSegmenter.fractionInner() * 100)
                             + "% blob that might be the start of CSD at slice "
                             + currentSlice + "...");
-                    Roi initialROI = gcs.returnRoi();
+                    Roi initialROI = gcSegmenter.returnRoi();
                     initialROI.setName("Position_" + currentSlice);
-                    rm.addRoi(initialROI);
+                    roiman.addRoi(initialROI);
                     firstCSDslice = currentSlice;
                     roisOfSegmentations.add((Roi) initialROI.clone());
-                    this.maxAposteriorSpd.addArrival(gcs.getLevelSet());
+                    this.maxAposteriorSpd.addArrival(gcSegmenter.getLevelSet());
 
                 } else {
                     csdHasStarted = false;
@@ -508,7 +508,7 @@ public class waveFrontTracker implements PlugInFilter {
 
         IJ.setSlice(currentSlice);
 
-        gSegment.setOverlay(null);
+        gSegmentImp.setOverlay(null);
         imp.setOverlay(null);
 
         IJ.log("Done segmenting, check out the output!");
@@ -555,14 +555,14 @@ public class waveFrontTracker implements PlugInFilter {
 
     public GraphCutSegmenter naivelyFindSegmentation(ImageProcessor ip,
                                                      int iterations) {
-        IntensityModel s = new LaplaceMixture();
-        GraphCutSegmenter gcs = new GraphCutSegmenter(ip);
-        gcs.setIntensityModel(s);
+
+
         boolean[][] mask = new boolean[ip.getWidth()][ip.getHeight()];
-        ImageProcessor ip2 = ip.duplicate();
+        ImageProcessor ipCopy = ip.duplicate();
         GaussianBlur gb = new GaussianBlur();
-        gb.blurGaussian(ip2, 3,3,0.01);
-        ImageStatistics is = ImageStatistics.getStatistics(ip2,
+        gb.blurGaussian(ipCopy, 3,3,0.01);
+
+        ImageStatistics is = ImageStatistics.getStatistics(ipCopy,
                 ij.measure.Measurements.MEAN + ij.measure.Measurements.STD_DEV,
                 null);
 
@@ -572,20 +572,30 @@ public class waveFrontTracker implements PlugInFilter {
         // Just some initial values
         for (int x = 0; x < ip.getWidth(); x++) {
             for (int y = 0; y < ip.getHeight(); y++) {
-                mask[x][y] = ip2.getPixelValue(x, y) > mean + sd;
+                mask[x][y] = ipCopy.getPixelValue(x, y) > mean + 2*sd;
             }
         }
 
-        s.Infer(ip2, mask);
-        gcs.setLengthPenalty((float) this.initialLengthPenalty);
+        IntensityModel likelihood = new LaplaceMixture();
+        likelihood.Infer(ipCopy, mask);
+
+        GraphCutSegmenter gcSegmenter = new GraphCutSegmenter(ipCopy);
+        gcSegmenter.setIntensityModel(likelihood);
+        gcSegmenter.setLengthPenalty((float) this.initialLengthPenalty);
         int i = 1;
-        gcs.setEdgeWeights();
+        gcSegmenter.setEdgeWeights((float)this.initialLengthPenalty);
+
+
         while (i++ < iterations) {
-            gcs.setNodeWeights(s);
-            IJ.log("Energy " + gcs.relaxEnergy());
-            s.Infer(ip, gcs.returnMask());
+            IJ.log(""+i);
+            gcSegmenter.setNodeWeights(likelihood);
+            IJ.log("Energy " + gcSegmenter.relaxEnergy());
+            likelihood.Infer(ipCopy, gcSegmenter.returnMask());
+
+            IJ.log("\\mu_in " + likelihood.getPosteriorMean(true) + " \\mu_out"+ likelihood.getPosteriorMean(false));
+            IJ.log("\\s_in " + likelihood.getPosteriorPrecision(true) + " \\s_out" + likelihood.getPosteriorPrecision(false));
         }
-        return gcs;
+        return gcSegmenter;
 
     }
 
@@ -652,7 +662,7 @@ public class waveFrontTracker implements PlugInFilter {
      */
     public static void main(String[] args) {
         // set the plugins.dir property to make the plugin appear in the Plugins menu
-        Class<?> clazz = waveFrontTracker.class;
+        Class<?> clazz = WaveFrontTracker.class;
         String url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class").toString();
         String pluginsDir = url.substring(5, url.length() - clazz.getName().length() - 6);
         System.setProperty("plugins.dir", pluginsDir);

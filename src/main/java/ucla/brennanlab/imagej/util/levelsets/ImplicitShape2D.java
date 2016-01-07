@@ -17,19 +17,28 @@ import java.awt.*;
  */
 
 public class ImplicitShape2D {
-    final int d = 2; // Dimension... need to rewrite a few things for 3D
     public float[][] signedDistance;
-    public double mass;
+
     double inertialScale;
     double[] inertialOrientation;
     double inertialAngle; // inertialAngle of the inertialOrientation
     double[] inertialCenter;
     public double lambda = 2;
     double alighmentlambda = 2; // use this for alignment
+    final int d = 2; // Dimension... need to rewrite a few things for 3D
+    public double mass;
     int width;
     int height;
 
     double epsilon = 0.5; // for delta and heaviside function approx
+
+    public void setAlignmentlambda(double val) {
+        this.alighmentlambda = val;
+    }
+
+    public void setlambda(double val) {
+        this.lambda = val;
+    }
 
     public ImplicitShape2D(Roi r, int width, int height) {
         boolean[][] mask = new boolean[width][height];
@@ -51,138 +60,6 @@ public class ImplicitShape2D {
 
     }
 
-    /**
-     * Exact distance transformation in 1D taken from the Fiji project
-     *
-     * @param f
-     * @return
-     */
-    public static float[] EDTTransform1D(float[] f) {
-        float d[] = new float[f.length];
-        float[] fNeg = new float[f.length + 1];
-        float[] zNeg = new float[f.length + 1];
-        int[] yNeg = new int[f.length + 1];
-        float[] fPos = new float[f.length + 1];
-        float[] zPos = new float[f.length + 1];
-        int[] yPos = new int[f.length + 1];
-
-        fNeg[0] = -Float.MAX_VALUE;
-        yNeg[0] = -1;
-        zNeg[0] = Float.MAX_VALUE;
-        int kNeg = 0, kPos = 0;
-        fPos[0] = Float.MAX_VALUE;
-        yPos[0] = -1;
-        zPos[0] = Float.MAX_VALUE;
-
-        float fval, fvalNeg, fvalPos, s;
-
-        for (int q = 0; q < f.length; q++) {
-            fval = f[q];
-            fvalNeg = fval < 0 ? fval : 0f;
-            s = ((fvalNeg - q * q) - (fNeg[kNeg] - yNeg[kNeg] * yNeg[kNeg]))
-                    / -2 / (q - yNeg[kNeg]);
-            for (; ; ) {
-                // calculate the intersection
-                s = ((fvalNeg - q * q) - (fNeg[kNeg] - yNeg[kNeg] * yNeg[kNeg]))
-                        / -2 / (q - yNeg[kNeg]);
-                if (s > zNeg[kNeg])
-                    break;
-                if (--kNeg < 0)
-                    break;
-            }
-
-            kNeg++;
-            yNeg[kNeg] = q;
-            fNeg[kNeg] = fvalNeg;
-            zNeg[kNeg] = s;
-            fvalPos = fval > 0 ? fval : 0f;
-            for (; ; ) {
-                // calculate the intersection
-                s = ((fvalPos + q * q) - (fPos[kPos] + yPos[kPos] * yPos[kPos]))
-                        / 2 / (q - yPos[kPos]);
-                if (s > zPos[kPos])
-                    break;
-                if (--kPos < 0)
-                    break;
-            }
-            kPos++;
-            yPos[kPos] = q;
-            fPos[kPos] = fvalPos;
-            zPos[kPos] = s;
-        }
-        zNeg[++kNeg] = Float.MAX_VALUE;
-        zPos[++kPos] = Float.MAX_VALUE;
-
-        int iNeg = 0, iPos = 0;
-        for (int q = 0; q < f.length; q++) {
-            while (zNeg[iNeg + 1] < q)
-                iNeg++;
-            while (zPos[iPos + 1] < q)
-                iPos++;
-
-            d[q] = f[q] < 0 ? -(q - yNeg[iNeg]) * (q - yNeg[iNeg]) + fNeg[iNeg]
-                    : (q - yPos[iPos]) * (q - yPos[iPos]) + fPos[iPos];
-            // d[q] = d[q]<0? 0.5f - (float)Math.sqrt(-d[q]): -0.5f + (float)
-            // Math.sqrt(d[q]);
-        }
-
-        return d;
-
-    }
-
-    /**
-     * Perform the exact distance transformation given a signed distance
-     *
-     * @param grid
-     * @return
-     */
-    public static float[][] ExactDistanceTransform(float[][] grid) {
-        // Restore the signed distance
-
-        float[][] newgrid = new float[grid.length][grid[0].length];
-
-        float[] c = new float[grid.length];
-        float[] r = new float[grid[0].length];
-        for (int x = 0; x < grid.length; x++) {
-            for (int y = 0; y < grid[0].length; y++) {
-                r[y] = grid[x][y] < 0 ? -Float.MAX_VALUE : Float.MAX_VALUE;
-            }
-            float[] d1 = EDTTransform1D(r);
-            for (int y = 0; y < grid[0].length; y++) {
-                newgrid[x][y] = d1[y];
-            }
-        }
-
-        for (int y = 0; y < grid[0].length; y++) {
-            for (int x = 0; x < grid.length; x++) {
-                c[x] = newgrid[x][y];
-            }
-            float[] d2 = EDTTransform1D(c);
-            for (int x = 0; x < grid.length; x++) {
-                newgrid[x][y] = d2[x];
-            }
-        }
-
-        for (int x = 0; x < grid.length; x++) {
-            for (int y = 0; y < grid[0].length; y++) {
-                newgrid[x][y] = (float) (newgrid[x][y] < 0 ? 0.5f - Math
-                        .sqrt(-newgrid[x][y]) : -0.5f
-                        + Math.sqrt(newgrid[x][y]));
-            }
-        }
-
-        return newgrid;
-
-    }
-
-    public void setAlignmentlambda(double val) {
-        this.alighmentlambda = val;
-    }
-
-    public void setlambda(double val) {
-        this.lambda = val;
-    }
-
     /*
      * Calculate inertialCenter of mass
      */
@@ -202,7 +79,7 @@ public class ImplicitShape2D {
                 }
             }
         }
-        double[] center = {xc / normal, yc / normal};
+        double[] center = { xc / normal, yc / normal };
         this.mass = normal;
         return center;
     }
@@ -222,7 +99,7 @@ public class ImplicitShape2D {
         // double q3=0;
         double q4 = 0;
 
-        double[] normGradPhi = new double[]{0, 0};
+        double[] normGradPhi = new double[] { 0, 0 };
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
                 if (in(x, y)) {
@@ -355,14 +232,6 @@ public class ImplicitShape2D {
 
     }
 
-    public void advectUniformSpeed(double speed, double time) {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                this.signedDistance[x][y] -= speed * time;
-            }
-        }
-    }
-
     /**
      * Use this is the two templates have already been aligned
      *
@@ -385,8 +254,15 @@ public class ImplicitShape2D {
 
         }
 
-        return d / Math.pow(this.inertialScale, this.lambda);
+        return d / Math.pow(this.inertialScale,this.lambda);
 
+    }
+    public void advectUniformSpeed(double speed, double time) {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                this.signedDistance[x][y] += speed * time;
+            }
+        }
     }
 
     /**
@@ -398,9 +274,9 @@ public class ImplicitShape2D {
     double distance(ImplicitShape2D Lambda) {
         // First step is to get the transform coords for the other shape
         double[] alignment = alignByNewton(Lambda);
-        double[][] R = new double[][]{
-                new double[]{Math.cos(alignment[3]), -Math.sin(alignment[3])},
-                new double[]{Math.sin(alignment[3]), Math.cos(alignment[3])}};
+        double[][] R = new double[][] {
+                new double[] { Math.cos(alignment[3]), -Math.sin(alignment[3]) },
+                new double[] { Math.sin(alignment[3]), Math.cos(alignment[3]) } };
         // now calculate the distance
         double[] sprime;
         double d = 0;
@@ -408,13 +284,13 @@ public class ImplicitShape2D {
         double mass = 0;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                sprime = new double[]{
+                sprime = new double[] {
                         alignment[0]
                                 * (R[0][0] * (x - alignment[1]) + R[0][1]
                                 * (y - alignment[2])),
                         alignment[0]
                                 * (R[1][0] * (x - alignment[1]) + R[1][1]
-                                * (y - alignment[2]))};
+                                * (y - alignment[2])) };
 
                 d += (Math.abs(heaviside(x, y)
                         - Lambda.heaviside((int) Math.round(sprime[0]),
@@ -426,7 +302,7 @@ public class ImplicitShape2D {
 
         }
 
-        return d / Math.pow(this.inertialScale, this.lambda);
+        return d / Math.pow(this.inertialScale,this.lambda);
 
     }
 
@@ -451,6 +327,130 @@ public class ImplicitShape2D {
 
         }
         return (ExactDistanceTransform(grid));
+    }
+
+    /**
+     * Exact distance transformation in 1D taken from the Fiji project
+     *
+     * @param f
+     * @return
+     */
+    public static float[] EDTTransform1D(float[] f) {
+        float d[] = new float[f.length];
+        float[] fNeg = new float[f.length + 1];
+        float[] zNeg = new float[f.length + 1];
+        int[] yNeg = new int[f.length + 1];
+        float[] fPos = new float[f.length + 1];
+        float[] zPos = new float[f.length + 1];
+        int[] yPos = new int[f.length + 1];
+
+        fNeg[0] = -Float.MAX_VALUE;
+        yNeg[0] = -1;
+        zNeg[0] = Float.MAX_VALUE;
+        int kNeg = 0, kPos = 0;
+        fPos[0] = Float.MAX_VALUE;
+        yPos[0] = -1;
+        zPos[0] = Float.MAX_VALUE;
+
+        float fval, fvalNeg, fvalPos, s;
+
+        for (int q = 0; q < f.length; q++) {
+            fval = f[q];
+            fvalNeg = fval < 0 ? fval : 0f;
+            s = ((fvalNeg - q * q) - (fNeg[kNeg] - yNeg[kNeg] * yNeg[kNeg]))
+                    / -2 / (q - yNeg[kNeg]);
+            for (;;) {
+                // calculate the intersection
+                s = ((fvalNeg - q * q) - (fNeg[kNeg] - yNeg[kNeg] * yNeg[kNeg]))
+                        / -2 / (q - yNeg[kNeg]);
+                if (s > zNeg[kNeg])
+                    break;
+                if (--kNeg < 0)
+                    break;
+            }
+
+            kNeg++;
+            yNeg[kNeg] = q;
+            fNeg[kNeg] = fvalNeg;
+            zNeg[kNeg] = s;
+            fvalPos = fval > 0 ? fval : 0f;
+            for (;;) {
+                // calculate the intersection
+                s = ((fvalPos + q * q) - (fPos[kPos] + yPos[kPos] * yPos[kPos]))
+                        / 2 / (q - yPos[kPos]);
+                if (s > zPos[kPos])
+                    break;
+                if (--kPos < 0)
+                    break;
+            }
+            kPos++;
+            yPos[kPos] = q;
+            fPos[kPos] = fvalPos;
+            zPos[kPos] = s;
+        }
+        zNeg[++kNeg] = Float.MAX_VALUE;
+        zPos[++kPos] = Float.MAX_VALUE;
+
+        int iNeg = 0, iPos = 0;
+        for (int q = 0; q < f.length; q++) {
+            while (zNeg[iNeg + 1] < q)
+                iNeg++;
+            while (zPos[iPos + 1] < q)
+                iPos++;
+
+            d[q] = f[q] < 0 ? -(q - yNeg[iNeg]) * (q - yNeg[iNeg]) + fNeg[iNeg]
+                    : (q - yPos[iPos]) * (q - yPos[iPos]) + fPos[iPos];
+            // d[q] = d[q]<0? 0.5f - (float)Math.sqrt(-d[q]): -0.5f + (float)
+            // Math.sqrt(d[q]);
+        }
+
+        return d;
+
+    }
+
+    /**
+     * Perform the exact distance transformation given a signed distance
+     *
+     * @param grid
+     * @return
+     */
+    public static float[][] ExactDistanceTransform(float[][] grid) {
+        // Restore the signed distance
+
+        float[][] newgrid = new float[grid.length][grid[0].length];
+
+        float[] c = new float[grid.length];
+        float[] r = new float[grid[0].length];
+        for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[0].length; y++) {
+                r[y] = grid[x][y] < 0 ? -Float.MAX_VALUE : Float.MAX_VALUE;
+            }
+            float[] d1 = EDTTransform1D(r);
+            for (int y = 0; y < grid[0].length; y++) {
+                newgrid[x][y] = d1[y];
+            }
+        }
+
+        for (int y = 0; y < grid[0].length; y++) {
+            for (int x = 0; x < grid.length; x++) {
+                c[x] = newgrid[x][y];
+            }
+            float[] d2 = EDTTransform1D(c);
+            for (int x = 0; x < grid.length; x++) {
+                newgrid[x][y] = d2[x];
+            }
+        }
+
+        for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[0].length; y++) {
+                newgrid[x][y] = (float) (newgrid[x][y] < 0 ? 0.5f - Math
+                        .sqrt(-newgrid[x][y]) : -0.5f
+                        + Math.sqrt(newgrid[x][y]));
+            }
+        }
+
+        return newgrid;
+
     }
 
     public double getFast(double x, double y) {
@@ -519,6 +519,7 @@ public class ImplicitShape2D {
     }
 
     /**
+     *
      * @return FloatProcessor with pixels set to the signed distance
      */
     public FloatProcessor getLSFloatProcessor() {
@@ -543,14 +544,15 @@ public class ImplicitShape2D {
     /**
      * Get the ROI of the current level set
      *
-     * @param reset Reset the signed distance function after obtaining the ROI
+     * @param reset
+     *            Reset the signed distance function after obtaining the ROI
      * @return
      */
     public PolygonRoi getRoi(boolean reset) {
         // Returns the ROI corresponding to the zero level set
         ImageProcessor ip2 = this.getLSFloatProcessor();
-        int maxpt[] = {0, 0};
-    /*
+        int maxpt[] = { 0, 0 };
+	/*
 	 * Find location of maximum point
 	 */
         for (int x = 0; x < width; x++) {
@@ -677,7 +679,7 @@ public class ImplicitShape2D {
     public double[] getGradient(int x, int y) {
         double dphiX = (get(x + 1, y) - get(x - 1, y)) / 2;
         double dphiY = (get(x, y + 1) - get(x, y - 1)) / 2;
-        return new double[]{dphiX, dphiY};
+        return new double[] { dphiX, dphiY };
     }
 
     /**
@@ -692,8 +694,8 @@ public class ImplicitShape2D {
         double dphiY = (get(x, y + 1) - get(x, y - 1)) / 2;
         double norm = Math.sqrt(dphiY * dphiY + dphiX * dphiX);
         if (norm == 0)
-            return new double[]{0, 0};
-        return new double[]{dphiX / norm, dphiY / norm};
+            return new double[] { 0, 0 };
+        return new double[] { dphiX / norm, dphiY / norm };
     }
 
     public double length() {
@@ -723,8 +725,9 @@ public class ImplicitShape2D {
     /**
      * Align using Newton-Raphson to minimize the energy
      *
-     * @param Lambda The shape to align to this shape. It finds the parameters for
-     *               the transformation alpha R(s-c)
+     * @param Lambda
+     *            The shape to align to this shape. It finds the parameters for
+     *            the transformation alpha R(s-c)
      */
     public double[] alignByNewton(ImplicitShape2D Lambda) {
         double alpha = Lambda.inertialScale / this.inertialScale;//
@@ -738,16 +741,16 @@ public class ImplicitShape2D {
             else
                 omega += 2 * Math.PI;
         }
-        double[][] R = new double[][]{
-                new double[]{Math.cos(omega), -Math.sin(omega)},
-                new double[]{Math.sin(omega), Math.cos(omega)}};
-        double[] c = new double[]{
+        double[][] R = new double[][] {
+                new double[] { Math.cos(omega), -Math.sin(omega) },
+                new double[] { Math.sin(omega), Math.cos(omega) } };
+        double[] c = new double[] {
                 -(R[0][0] * Lambda.inertialCenter[0] - R[0][1]
                         * Lambda.inertialCenter[1])
                         / alpha + this.inertialCenter[0],
                 -(-R[1][0] * Lambda.inertialCenter[0] + R[1][1]
                         * Lambda.inertialCenter[1])
-                        / alpha + this.inertialCenter[1]};
+                        / alpha + this.inertialCenter[1] };
         return (alignByNewton(Lambda, alpha, c, omega));
 
     }
@@ -765,7 +768,7 @@ public class ImplicitShape2D {
 
         double alpha = alpha0;
         double omega = omega0;
-        double[] c = new double[]{c0[0], c0[1]};
+        double[] c = new double[] { c0[0], c0[1] };
         while (iter++ < 15) {
             grad = getTransformGradient(Lambda, alpha, c, omega);
             invhes = getInverseTransformHessian(Lambda, alpha, c, omega);
@@ -774,7 +777,7 @@ public class ImplicitShape2D {
 
             // Hgrad -- the problem is that this becomes singular near the
             // minimum!
-            change = new double[]{
+            change = new double[] {
                     invhes[0][0] * grad[0] + invhes[0][1] * grad[1]
                             + invhes[0][2] * grad[2] + invhes[0][3] * grad[3],
                     invhes[1][0] * grad[0] + invhes[1][1] * grad[1]
@@ -782,7 +785,7 @@ public class ImplicitShape2D {
                     invhes[2][0] * grad[0] + invhes[2][1] * grad[1]
                             + invhes[2][2] * grad[2] + invhes[2][3] * grad[3],
                     invhes[3][0] * grad[0] + invhes[3][1] * grad[1]
-                            + invhes[3][2] * grad[2] + invhes[3][3] * grad[3]};
+                            + invhes[3][2] * grad[2] + invhes[3][3] * grad[3] };
 
             //
             gap = Math.sqrt(change[0] * change[0] * 100 * 100 + change[1]
@@ -832,7 +835,7 @@ public class ImplicitShape2D {
         IJ.log("Completed shape aignment in " + iter + " iterations");
         // IJ.log("Parameters: alpha  " + alpha + "  sx  " + c[0] + "  sy  "
         // + c[1] + "  omega  " + omega);
-        return new double[]{alpha, c[0], c[1], omega};
+        return new double[] { alpha, c[0], c[1], omega };
 
     }
 
@@ -853,8 +856,8 @@ public class ImplicitShape2D {
         double d2xy = 0.25 * (get(x + 1, y + 1) - get(x + 1, y - 1)
                 - get(x - 1, y + 1) + get(x - 1, y - 1));
 
-        return new double[][]{new double[]{d2x2, d2xy},
-                new double[]{d2xy, d2y2}}; // row major
+        return new double[][] { new double[] { d2x2, d2xy },
+                new double[] { d2xy, d2y2 } }; // row major
     }
 
     /**
@@ -871,9 +874,9 @@ public class ImplicitShape2D {
         /**
          * Rotation matrix
          */
-        double[][] R = new double[][]{
-                new double[]{Math.cos(omega), -Math.sin(omega)},
-                new double[]{Math.sin(omega), Math.cos(omega)}};
+        double[][] R = new double[][] {
+                new double[] { Math.cos(omega), -Math.sin(omega) },
+                new double[] { Math.sin(omega), Math.cos(omega) } };
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 int newx = (int) Math.round(alpha
@@ -903,15 +906,15 @@ public class ImplicitShape2D {
 
     public void affineTransform2(double alpha, double[] c, double omega,
                                  int width, int height) {
-        this.width = width;
-        this.height = height;
+        this.width=width;
+        this.height=height;
         boolean[][] mask = new boolean[width][height];
         /**
          * Rotation matrix
          */
-        double[][] R = new double[][]{
-                new double[]{Math.cos(omega), Math.sin(omega)},
-                new double[]{-Math.sin(omega), Math.cos(omega)}};
+        double[][] R = new double[][] {
+                new double[] { Math.cos(omega), Math.sin(omega) },
+                new double[] { -Math.sin(omega), Math.cos(omega) } };
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 int newx = (int) Math.round(1 / alpha
@@ -957,9 +960,9 @@ public class ImplicitShape2D {
         /**
          * Rotation matrix
          */
-        double[][] R = new double[][]{
-                new double[]{Math.cos(omega), -Math.sin(omega)},
-                new double[]{Math.sin(omega), Math.cos(omega)}};
+        double[][] R = new double[][] {
+                new double[] { Math.cos(omega), -Math.sin(omega) },
+                new double[] { Math.sin(omega), Math.cos(omega) } };
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -1028,7 +1031,7 @@ public class ImplicitShape2D {
             // IJ.log("grad isNAN");
         }
 
-        return new double[]{gradalpha, gradc1, gradc2, gradomega};
+        return new double[] { gradalpha, gradc1, gradc2, gradomega };
     }
 
     /**
@@ -1056,9 +1059,9 @@ public class ImplicitShape2D {
         /**
          * Rotation matrix
          */
-        double[][] R = new double[][]{
-                new double[]{Math.cos(omega), -Math.sin(omega)},
-                new double[]{Math.sin(omega), Math.cos(omega)}};
+        double[][] R = new double[][] {
+                new double[] { Math.cos(omega), -Math.sin(omega) },
+                new double[] { Math.sin(omega), Math.cos(omega) } };
         double mult1, mult2, mult3, mult4;
         double mult5 = 0;
         for (int x = 0; x < width; x++) {
@@ -1090,11 +1093,11 @@ public class ImplicitShape2D {
                 double[] gradphiLambda = Lambda.getGradient(newx, newy);
                 double[][] hes = Lambda.HessianMatrix(newx, newy);
 
-                double[] Rprimesc = new double[]{
+                double[] Rprimesc = new double[] {
                         -Math.sin(omega) * (x - c[0]) - Math.cos(omega)
                                 * (y - c[1]),
                         Math.cos(omega) * (x - c[0]) - Math.sin(omega)
-                                * (y - c[1])};
+                                * (y - c[1]) };
 
                 /**
                  * first and second terms are outer products wrt first
@@ -1282,11 +1285,11 @@ public class ImplicitShape2D {
         // IJ.log("           ["+d2alphaomega + " " + d2omegac1 + " " +
         // d2omegac2 + " " + d2omega+"]");
 
-        double[][] hes = new double[][]{
-                new double[]{d2alpha, d2alphac1, d2alphac2, d2alphaomega},
-                new double[]{d2alphac1, d2cc11, d2cc12, d2omegac1},
-                new double[]{d2alphac2, d2cc12, d2cc22, d2omegac2},
-                new double[]{d2alphaomega, d2omegac1, d2omegac2, d2omega}};
+        double[][] hes = new double[][] {
+                new double[] { d2alpha, d2alphac1, d2alphac2, d2alphaomega },
+                new double[] { d2alphac1, d2cc11, d2cc12, d2omegac1 },
+                new double[] { d2alphac2, d2cc12, d2cc22, d2omegac2 },
+                new double[] { d2alphaomega, d2omegac1, d2omegac2, d2omega } };
 
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
@@ -1392,16 +1395,16 @@ public class ImplicitShape2D {
 
         if (det < 0) {
             // IJ.log("Determinant " + det);
-            return new double[][]{new double[]{0, 0, 0, 0},
-                    new double[]{0, 0, 0, 0}, new double[]{0, 0, 0, 0},
-                    new double[]{0, 0, 0, 0}};
+            return new double[][] { new double[] { 0, 0, 0, 0 },
+                    new double[] { 0, 0, 0, 0 }, new double[] { 0, 0, 0, 0 },
+                    new double[] { 0, 0, 0, 0 } };
         }
 
-        return new double[][]{
-                new double[]{b00 / det, b01 / det, b02 / det, b03 / det},
-                new double[]{b01 / det, b11 / det, b12 / det, b13 / det},
-                new double[]{b02 / det, b12 / det, b22 / det, b23 / det},
-                new double[]{b03 / det, b13 / det, b23 / det, b33 / det}};
+        return new double[][] {
+                new double[] { b00 / det, b01 / det, b02 / det, b03 / det },
+                new double[] { b01 / det, b11 / det, b12 / det, b13 / det },
+                new double[] { b02 / det, b12 / det, b22 / det, b23 / det },
+                new double[] { b03 / det, b13 / det, b23 / det, b33 / det } };
 
     }
 
@@ -1432,7 +1435,7 @@ public class ImplicitShape2D {
     /**
      * Find the location with the largest value in
      *
-     * @return (x, y)
+     * @return (x,y)
      */
     public int[] getPeak() {
         int maxx = 0;
@@ -1447,7 +1450,7 @@ public class ImplicitShape2D {
                 }
             }
         }
-        return new int[]{maxx, maxy};
+        return new int[] { maxx, maxy };
     }
 
 }

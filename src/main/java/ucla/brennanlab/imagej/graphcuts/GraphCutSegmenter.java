@@ -64,7 +64,7 @@ public class GraphCutSegmenter {
         boolean[][] mask = new boolean[width][height];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                mask[x][y] = gc.getTerminal(y * width + x) == Terminal.FOREGROUND ? true
+                mask[x][y] = this.gc.getTerminal(y * width + x) == Terminal.FOREGROUND ? true
                         : false;
             }
         }
@@ -78,7 +78,7 @@ public class GraphCutSegmenter {
         int inner = 0;
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                if (gc.getTerminal(y * width + x) == Terminal.FOREGROUND)
+                if (this.gc.getTerminal(y * width + x) == Terminal.FOREGROUND)
                     inner++;
             }
         }
@@ -89,7 +89,7 @@ public class GraphCutSegmenter {
         boolean[][] mask = new boolean[width][height];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                mask[x][y] = gc.getTerminal(y * width + x) == Terminal.FOREGROUND ? true
+                mask[x][y] = this.gc.getTerminal(y * width + x) == Terminal.FOREGROUND ? true
                         : false;
             }
         }
@@ -106,7 +106,7 @@ public class GraphCutSegmenter {
                 * height], null);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                mask[x][y] = gc.getTerminal(y * width + x) == Terminal.FOREGROUND ? 0
+                mask[x][y] = this.gc.getTerminal(y * width + x) == Terminal.FOREGROUND ? 0
                         : 255;
                 ip1.putPixel(x, y, mask[x][y]);
             }
@@ -127,28 +127,28 @@ public class GraphCutSegmenter {
      * Set edge weights with no prior information other than length penalty
      * could just set a pointer maybe
      */
-    public void setEdgeWeights() {
+    public void setEdgeWeights(float penalty) {
         gc.resetEdgeNum();
 
         for (int y = 0; y < height - 1; y++) {
             for (int x = 0; x < width - 1; x++) {
                 gc.setEdgeWeight(y * width + x, y * width + x + 1,
-                        (float) (lengthPenalty * Math.PI / 8));
+                        (float) (penalty * Math.PI / 8));
                 gc.setEdgeWeight(y * width + x, (y + 1) * width + x,
-                        (float) (lengthPenalty * Math.PI / 8));
+                        (float) (penalty * Math.PI / 8));
                 gc.setEdgeWeight(y * width + x, (y + 1) * width + x + 1,
-                        (float) (lengthPenalty * Math.PI / 8 / Math.sqrt(2)));
+                        (float) (penalty * Math.PI / 8 / Math.sqrt(2)));
                 gc.setEdgeWeight(y * width + x + 1, (y + 1) * width + x,
-                        (float) (lengthPenalty * Math.PI / 8 / Math.sqrt(2)));
+                        (float) (penalty * Math.PI / 8 / Math.sqrt(2)));
 
             }
             gc.setEdgeWeight(y * width + width - 1,
-                    (y + 1) * width + width - 1, (float) (lengthPenalty
+                    (y + 1) * width + width - 1, (float) (penalty
                             * Math.PI / 8));
         }
         for (int x = 0; x < width - 1; x++) {
             gc.setEdgeWeight((height - 1) * width + x, (height - 1) * width + x
-                    + 1, (float) (lengthPenalty * Math.PI / 8));
+                    + 1, (float) (penalty * Math.PI / 8));
         }
     }
 
@@ -335,31 +335,28 @@ public class GraphCutSegmenter {
             weights[j]=kernelWeights[j]/weights[j];
         }
         weights = normalize(weights);
-        IJ.log("shape weights " + weights[0] + " , " + weights[1] + " , "
-                + weights[2] + " , " + weights[weights.length - 1]);
-        IJ.log("shape distances " + distances[0] + " , " + distances[1] + " , "
-                + distances[2] + " , " + distances[distances.length - 1]);
+
         return weights;
     }
 
     /**
      * Set the graph cut weights
      *
-     * @param priorShape
-     *            The prior probability of being in foreground
+     * @param referenceShape
+     *            The current shape
      * @param likelihood
      *            The image statistics
      * @param skde
      *            Shape kernel density estimate
      */
 
-    public void setNodeWeights(ShapePrior skde, ImplicitShape2D priorShape,
+    public void setNodeWeights(ShapePrior skde, ImplicitShape2D referenceShape,
                                IntensityModel likelihood) {
 
-        double[] weights = getShapeWeights(skde, priorShape);
+        double[] weights = getShapeWeights(skde, referenceShape);
         if(testLinear){
             for(int  j =0; j<skde.shapes.size();j++){
-                weights[j]=1/skde.shapes.size();
+                weights[j]=1.0/skde.shapes.size();
             }
         }
         float source, sink;
@@ -377,7 +374,7 @@ public class GraphCutSegmenter {
                 source = 0;
                 sink = 0;
 
-                float pixelval = ip.getPixelValue(x, y);
+                float pixelval = this.ip.getPixelValue(x, y);
                 if (Float.isNaN(source) || Float.isNaN(sink))
                     IJ.showMessage("NaN error for n-link at (" + x + "," + y
                             + ")");
@@ -394,11 +391,11 @@ public class GraphCutSegmenter {
                 for (int j = 0; j < skde.shapes.size(); j++) {
                     if (skde.shapes.get(j).in(x, y)) {
                         source += weights[j]
-                                * skde.shapes.get(j).rho(x, y) / 2
+                                * skde.shapes.get(j).rho(x, y) / 2.0
                                 * skde.getTauSquared(true);
                     } else
                         sink += weights[j]
-                                * skde.shapes.get(j).rho(x, y) / 2
+                                * skde.shapes.get(j).rho(x, y) / 2.0
                                 * skde.getTauSquared(true);
                 }
 
@@ -447,7 +444,7 @@ public class GraphCutSegmenter {
                 source = 0;
                 sink = 0;
 
-                float pixelval = ip.getPixelValue(x, y);
+                float pixelval = this.ip.getPixelValue(x, y);
                 source += likelihood.logpOut(pixelval);
                 sink += likelihood.logpIn(pixelval);
 
@@ -499,7 +496,7 @@ public class GraphCutSegmenter {
             sum += kernelWeights[i];
         }
         for (int i = 0; i < kernelWeights.length; i++) {
-            num[i] = sum == 0 ? (float) 1 / kernelWeights.length
+            num[i] = sum == 0 ? (float) 1.0 / kernelWeights.length
                     : kernelWeights[i] / sum;
         }
         return num;
@@ -514,7 +511,7 @@ public class GraphCutSegmenter {
             sum += kernelWeights[i];
         }
         for (int i = 0; i < kernelWeights.length; i++) {
-            num[i] = sum == 0 ? (double) 1 / kernelWeights.length
+            num[i] = sum == 0 ? (double) 1.0 / kernelWeights.length
                     : kernelWeights[i] / sum;
         }
         return num;

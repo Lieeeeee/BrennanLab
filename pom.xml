@@ -43,7 +43,7 @@
 	</scm>
 
 	<properties>
-		<main-class>ucla.brennanlab.imagej.csd.waveFrontTracker</main-class>
+		<main-class>ucla.brennanlab.imagej.csd.WaveFrontTracker</main-class>
 	</properties>
 
 	<dependencies>

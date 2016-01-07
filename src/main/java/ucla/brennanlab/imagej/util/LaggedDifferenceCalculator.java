@@ -8,7 +8,7 @@ import ij.plugin.filter.PlugInFilter;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 
-public class laggedDifferenceCalculator implements PlugInFilter {
+public class LaggedDifferenceCalculator implements PlugInFilter {
     ImagePlus imp; // input image
     ImagePlus difference;
     String arg;

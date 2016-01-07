@@ -5,7 +5,7 @@ import ij.ImagePlus;
 import ij.gui.Roi;
 import ij.plugin.filter.PlugInFilter;
 import ij.process.ImageProcessor;
-import ucla.brennanlab.imagej.util.levelsets.GenericLevelSet;
+import ucla.brennanlab.imagej.util.levelsets.ImplicitShape2D;
 
 public class SegmentationError implements PlugInFilter {
     Roi segmentation;
@@ -25,7 +25,7 @@ public class SegmentationError implements PlugInFilter {
             }
         }
 
-        GenericLevelSet rls = new GenericLevelSet(mask);
+        ImplicitShape2D rls = new ImplicitShape2D(mask);
 
         int mismatched = 0;
         double len = 0;

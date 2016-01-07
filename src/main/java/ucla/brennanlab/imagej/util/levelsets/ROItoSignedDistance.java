@@ -9,7 +9,7 @@ import ij.process.ImageProcessor;
 public class ROItoSignedDistance implements PlugInFilter {
     String arg;
     ImagePlus imp;
-    RoiImageLevelSet rp;
+    ImplicitShape2D rp;
 
     /**
      * Describe <code>run</code> method here.
@@ -22,12 +22,9 @@ public class ROItoSignedDistance implements PlugInFilter {
         // function map
         Roi r = imp.getRoi();
         imp.unlock();
-        RoiImageLevelSet rp;
-        try {
-            rp = new RoiImageLevelSet(r, ip);
-        } catch (Exception e) {
-            rp = new RoiImageLevelSet(ip, null);
-        }
+        ImplicitShape2D rp;
+        rp = new ImplicitShape2D(r, imp.getWidth(),imp.getHeight());
+
         ImagePlus impresult = rp.getLSImagePlus();
 
         if (r != null) {
