@@ -102,6 +102,28 @@ public class Graph {
         }
     }
 
+    public void reset(){
+        // re-initialise node data
+        for (int i = 0; i < numNodes; i++) {
+            firstOutgoings[i]         = NONE;
+            parents[i]                = NONE;
+            nextNodes[i]              = NONE;
+            timestamps[i]             = 0;
+            distances[i]              = 0;
+            inSink[i]                 = false;
+            marked[i]                 = false;
+            residualNodeCapacities[i] = 0;
+        }
+
+        // re-initialise edge data
+        for (int i = 0; i < 2*numEdges; i++) {
+            heads[i]                  = NONE;
+            nextEdges[i]              = NONE;
+            sisters[i]                = NONE;
+            residualEdgeCapacities[i] = 0;
+        }
+    }
+
     public final float getResidualNodeCapacity(int node) {
         return residualNodeCapacities[node];
     }

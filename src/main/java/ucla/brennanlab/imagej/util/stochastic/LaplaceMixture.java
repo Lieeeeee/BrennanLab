@@ -9,15 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import ij.IJ;
-import ij.ImageStack;
-import ij.process.ImageProcessor;
-
 public class LaplaceMixture implements IntensityModel {
 
     double[] posteriorparams; // [\mu_\Omega,\mu_\Delta,b_\Omega,b^2_\Delta]
@@ -105,7 +96,7 @@ public class LaplaceMixture implements IntensityModel {
     }
 
     public double logpIn(double value) {
-        return -(Math.log(getPosteriorPrecision(true) / 2) - getPosteriorPrecision(true)
+        return -Math.log(2) + (Math.log(getPosteriorPrecision(true) / 2) - getPosteriorPrecision(true)
                 * Math.abs(value - getPosteriorMean(true)));
     }
 
@@ -114,7 +105,7 @@ public class LaplaceMixture implements IntensityModel {
     }
 
     public double logpOut(double value) {
-        return -(Math.log(getPosteriorPrecision(false) / 2) - getPosteriorPrecision(false)
+        return -Math.log(2) + (Math.log(getPosteriorPrecision(false) / 2) - getPosteriorPrecision(false)
                 * Math.abs(value - getPosteriorMean(false)));
     }
 

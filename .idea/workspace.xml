@@ -4,7 +4,14 @@
     <list default="true" id="a5bf183d-1396-41ce-991c-2727a9b2c97b" name="Default" comment="Some prediction fixes. WaveFrontTracker.java will now implement the full Gaussian prediction model (or will soon).">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/WaveFrontTracker.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/WaveFrontTracker.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/Graph.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/Graph.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCut.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCut.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ImplicitShape2D.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ImplicitShape2D.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ShapePrior.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ShapePrior.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/GaussianMixture.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/GaussianMixture.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/LaplaceMixture.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/LaplaceMixture.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/SpeedField.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/SpeedField.java" />
     </list>
     <ignored path="Brennan_Lab.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -30,7 +37,40 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/LaplaceMixture.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="20" column="13" selection-start-line="20" selection-start-column="13" selection-end-line="20" selection-end-column="13" />
+              <caret line="109" column="5" selection-start-line="109" selection-start-column="5" selection-end-line="109" selection-end-column="5" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GaussianMixture.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/GaussianMixture.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="121" column="9" selection-start-line="121" selection-start-column="9" selection-end-line="121" selection-end-column="9" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GraphCut.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCut.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="867" column="21" selection-start-line="867" selection-start-column="21" selection-end-line="867" selection-end-column="21" />
+              <folding>
+                <element signature="e#30949#30950#0" expanded="true" />
+                <element signature="e#30981#30982#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Kriging2DLattice.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/Kriging2DLattice.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="14" column="13" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
               <folding />
             </state>
           </provider>
@@ -39,32 +79,22 @@
       <file leaf-file-name="ImplicitShape2D.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ImplicitShape2D.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-10.555555">
-              <caret line="98" column="0" selection-start-line="98" selection-start-column="0" selection-end-line="98" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="148" column="49" selection-start-line="148" selection-start-column="47" selection-end-line="148" selection-end-column="49" />
               <folding>
                 <element signature="e#940#941#0" expanded="true" />
                 <element signature="e#982#983#0" expanded="true" />
                 <element signature="e#1023#1024#0" expanded="true" />
                 <element signature="e#1056#1057#0" expanded="true" />
-                <element signature="e#14074#14075#0" expanded="true" />
-                <element signature="e#14142#14143#0" expanded="true" />
-                <element signature="e#15179#15180#0" expanded="true" />
-                <element signature="e#15207#15208#0" expanded="true" />
-                <element signature="e#15230#15231#0" expanded="true" />
-                <element signature="e#15259#15260#0" expanded="true" />
-                <element signature="e#20056#20057#0" expanded="true" />
-                <element signature="e#20102#20103#0" expanded="true" />
+                <element signature="e#14075#14076#0" expanded="true" />
+                <element signature="e#14143#14144#0" expanded="true" />
+                <element signature="e#15180#15181#0" expanded="true" />
+                <element signature="e#15208#15209#0" expanded="true" />
+                <element signature="e#15231#15232#0" expanded="true" />
+                <element signature="e#15260#15261#0" expanded="true" />
+                <element signature="e#20057#20058#0" expanded="true" />
+                <element signature="e#20103#20104#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SegmentationError.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/SegmentationError.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="42" column="3" selection-start-line="42" selection-start-column="3" selection-end-line="42" selection-end-column="3" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -72,11 +102,12 @@
       <file leaf-file-name="GraphCutSegmenter.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-9.518518">
-              <caret line="112" column="9" selection-start-line="112" selection-start-column="9" selection-end-line="112" selection-end-column="9" />
+            <state vertical-scroll-proportion="-7.259259">
+              <caret line="456" column="24" selection-start-line="456" selection-start-column="21" selection-end-line="456" selection-end-column="24" />
               <folding>
-                <element signature="e#18987#18988#0" expanded="true" />
-                <element signature="e#19024#19025#0" expanded="true" />
+                <element signature="imports" expanded="true" />
+                <element signature="e#18927#18928#0" expanded="true" />
+                <element signature="e#18964#18965#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -85,11 +116,21 @@
       <file leaf-file-name="WaveFrontTracker.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/WaveFrontTracker.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.21355931">
-              <caret line="206" column="50" selection-start-line="206" selection-start-column="50" selection-end-line="206" selection-end-column="50" />
+            <state vertical-scroll-proportion="-0.3220339">
+              <caret line="420" column="63" selection-start-line="420" selection-start-column="63" selection-end-line="420" selection-end-column="63" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ShapePrior.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ShapePrior.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="38.703705">
+              <caret line="10" column="26" selection-start-line="10" selection-start-column="26" selection-end-line="10" selection-end-column="26" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -98,8 +139,10 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/SpeedField.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="60" column="22" selection-start-line="60" selection-start-column="16" selection-end-line="60" selection-end-column="22" />
-              <folding />
+              <caret line="260" column="50" selection-start-line="260" selection-start-column="50" selection-end-line="260" selection-end-column="50" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -108,27 +151,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/Graph.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="0" column="41" selection-start-line="0" selection-start-column="41" selection-end-line="0" selection-end-column="41" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Edge.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/Edge.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="27" column="13" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ROItoSignedDistance.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ROItoSignedDistance.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="32" column="0" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
+              <caret line="117" column="14" selection-start-line="117" selection-start-column="14" selection-end-line="117" selection-end-column="14" />
               <folding />
             </state>
           </provider>
@@ -152,11 +175,15 @@
         <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/tests/fastMarchingTest.java" />
         <option value="$PROJECT_DIR$/src/main/resources/plugins.config" />
         <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ROItoSignedDistance.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java" />
         <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/SegmentationError.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/Graph.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCut.java" />
         <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ImplicitShape2D.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/SpeedField.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ShapePrior.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/GaussianMixture.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/LaplaceMixture.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCut.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/Graph.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java" />
         <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/WaveFrontTracker.java" />
       </list>
     </option>
@@ -912,7 +939,13 @@
       <option name="project" value="LOCAL" />
       <updated>1452198316983</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Some prediction fixes. WaveFrontTracker.java will now implement the full Gaussian prediction model (or will soon).">
+      <created>1452216736538</created>
+      <option name="number" value="00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1452216736538</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -965,6 +998,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_NEW_TODO" value="false" />
     <MESSAGE value="JMIV merge fixes" />
     <MESSAGE value="Merge upstream fiji graphcuts code" />
     <MESSAGE value="Some prediction fixes. WaveFrontTracker.java will now implement the full Gaussian prediction model (or will soon)." />
@@ -985,8 +1019,9 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#18987#18988#0" expanded="true" />
-            <element signature="e#19024#19025#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+            <element signature="e#18927#18928#0" expanded="true" />
+            <element signature="e#18964#18965#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1011,14 +1046,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="24" column="13" selection-start-line="24" selection-start-column="13" selection-end-line="24" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ShapePrior.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="24" column="28" selection-start-line="24" selection-start-column="28" selection-end-line="24" selection-end-column="28" />
           <folding />
         </state>
       </provider>
@@ -1071,90 +1098,112 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/LaplaceMixture.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="20" column="13" selection-start-line="20" selection-start-column="13" selection-end-line="20" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/Graph.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="41" selection-start-line="0" selection-start-column="41" selection-end-line="0" selection-end-column="41" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCut.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="2.6711864">
-          <caret line="200" column="20" selection-start-line="200" selection-start-column="20" selection-end-line="200" selection-end-column="20" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#12498#12499#0" expanded="true" />
-            <element signature="e#12540#12541#0" expanded="true" />
-            <element signature="e#12678#12679#0" expanded="true" />
-            <element signature="e#12720#12721#0" expanded="true" />
-            <element signature="e#30478#30479#0" expanded="true" />
-            <element signature="e#30510#30511#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ImplicitShape2D.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-10.555555">
-          <caret line="98" column="0" selection-start-line="98" selection-start-column="0" selection-end-line="98" selection-end-column="0" />
-          <folding>
-            <element signature="e#940#941#0" expanded="true" />
-            <element signature="e#982#983#0" expanded="true" />
-            <element signature="e#1023#1024#0" expanded="true" />
-            <element signature="e#1056#1057#0" expanded="true" />
-            <element signature="e#14074#14075#0" expanded="true" />
-            <element signature="e#14142#14143#0" expanded="true" />
-            <element signature="e#15179#15180#0" expanded="true" />
-            <element signature="e#15207#15208#0" expanded="true" />
-            <element signature="e#15230#15231#0" expanded="true" />
-            <element signature="e#15259#15260#0" expanded="true" />
-            <element signature="e#20056#20057#0" expanded="true" />
-            <element signature="e#20102#20103#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/SegmentationError.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
+        <state vertical-scroll-proportion="0.8995138">
           <caret line="42" column="3" selection-start-line="42" selection-start-column="3" selection-end-line="42" selection-end-column="3" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ShapePrior.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-9.518518">
-          <caret line="112" column="9" selection-start-line="112" selection-start-column="9" selection-end-line="112" selection-end-column="9" />
-          <folding>
-            <element signature="e#18987#18988#0" expanded="true" />
-            <element signature="e#19024#19025#0" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="38.703705">
+          <caret line="10" column="26" selection-start-line="10" selection-start-column="26" selection-end-line="10" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/LaplaceMixture.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="109" column="5" selection-start-line="109" selection-start-column="5" selection-end-line="109" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/GaussianMixture.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="121" column="9" selection-start-line="121" selection-start-column="9" selection-end-line="121" selection-end-column="9" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/SpeedField.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="60" column="22" selection-start-line="60" selection-start-column="16" selection-end-line="60" selection-end-column="22" />
+          <caret line="260" column="50" selection-start-line="260" selection-start-column="50" selection-end-line="260" selection-end-column="50" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/Graph.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="117" column="14" selection-start-line="117" selection-start-column="14" selection-end-line="117" selection-end-column="14" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ImplicitShape2D.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="148" column="49" selection-start-line="148" selection-start-column="47" selection-end-line="148" selection-end-column="49" />
+          <folding>
+            <element signature="e#940#941#0" expanded="true" />
+            <element signature="e#982#983#0" expanded="true" />
+            <element signature="e#1023#1024#0" expanded="true" />
+            <element signature="e#1056#1057#0" expanded="true" />
+            <element signature="e#14075#14076#0" expanded="true" />
+            <element signature="e#14143#14144#0" expanded="true" />
+            <element signature="e#15180#15181#0" expanded="true" />
+            <element signature="e#15208#15209#0" expanded="true" />
+            <element signature="e#15231#15232#0" expanded="true" />
+            <element signature="e#15260#15261#0" expanded="true" />
+            <element signature="e#20057#20058#0" expanded="true" />
+            <element signature="e#20103#20104#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/Kriging2DLattice.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="14" column="13" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCut.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="867" column="21" selection-start-line="867" selection-start-column="21" selection-end-line="867" selection-end-column="21" />
+          <folding>
+            <element signature="e#30949#30950#0" expanded="true" />
+            <element signature="e#30981#30982#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-7.259259">
+          <caret line="456" column="24" selection-start-line="456" selection-start-column="21" selection-end-line="456" selection-end-column="24" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#18927#18928#0" expanded="true" />
+            <element signature="e#18964#18965#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/WaveFrontTracker.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.21355931">
-          <caret line="206" column="50" selection-start-line="206" selection-start-column="50" selection-end-line="206" selection-end-column="50" />
+        <state vertical-scroll-proportion="-0.3220339">
+          <caret line="420" column="63" selection-start-line="420" selection-start-column="63" selection-end-line="420" selection-end-column="63" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

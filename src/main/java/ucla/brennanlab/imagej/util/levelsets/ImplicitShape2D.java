@@ -23,7 +23,7 @@ public class ImplicitShape2D {
     double[] inertialOrientation;
     double inertialAngle; // inertialAngle of the inertialOrientation
     double[] inertialCenter;
-    public double lambda = 2;
+    public double lambda = 1;
     double alighmentlambda = 2; // use this for alignment
     final int d = 2; // Dimension... need to rewrite a few things for 3D
     public double mass;
@@ -253,7 +253,7 @@ public class ImplicitShape2D {
 
         }
 
-        return d / Math.pow(this.inertialScale,this.lambda);
+        return d * Math.pow(this.inertialScale,-this.lambda);
 
     }
     public void advectUniformSpeed(double speed, double time) {

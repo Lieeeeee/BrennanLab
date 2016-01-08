@@ -27,18 +27,12 @@ public class GraphCutSegmenter {
     private ShapePrior shapeKernelDensityEstimate;
 
     public boolean[][] innermask;
-    public boolean[][] outermask;
-    private double edgeweight=10;
     final boolean testLinear=true;
 
     public GraphCutSegmenter(ImageProcessor ip, float mu) {
         this(ip);
         this.lengthPenalty = mu;
 
-    }
-
-    public void setInnerMask(boolean[][] im) {
-        this.innermask = im;
     }
 
     public GraphCutSegmenter(ImageProcessor ip) {
@@ -124,7 +118,7 @@ public class GraphCutSegmenter {
     }
 
     /**
-     * Set edge weights with no prior information other than length penalty
+     * Set edge priorWeights with no prior information other than length penalty
      * could just set a pointer maybe
      */
     public void setEdgeWeights(float penalty) {
@@ -155,7 +149,7 @@ public class GraphCutSegmenter {
     /**
      * The prior shape is a reference shape, or rather a prior guess at the true
      * segmentation that is used for determining weighting according to the MM
-     * algorithm. Setting these weights should be parallelizable
+     * algorithm. Setting these priorWeights should be parallelizable
      *
      * @param skde
      *            Shape kernel density estimation
@@ -163,8 +157,8 @@ public class GraphCutSegmenter {
      *            The segmentation guess
      */
     public void setEdgeWeights(ShapePrior skde, ImplicitShape2D priorShape) {
-        // what I would like to do is reset the shape weights rather
-        // than recompute and reset edge weights
+        // what I would like to do is reset the shape priorWeights rather
+        // than recompute and reset edge priorWeights
         gc.resetEdgeNum();
         float weight;
         /**
@@ -186,7 +180,7 @@ public class GraphCutSegmenter {
 
 
         ImplicitShape2D currentshape;
-        // weights are length penalty + shape penalty
+        // priorWeights are length penalty + shape penalty
         float[] weights = new float[] { 0, 0, 0, 0 };
 
         for (int y = 0; y < height - 1; y++) {
@@ -204,8 +198,8 @@ public class GraphCutSegmenter {
                             Math.abs(0.5 * currentshape.get(x, y) + 0.5
                                     * currentshape.get(x + 1, y)),
                             skde.shapes.get(0).lambda)
-                            * skde.getTauSquared(true) * Math.PI / 8 ;
-                    weights[0]+= this.edgeweight* Math.PI / 8 * Math.exp(-Math.pow( (ip.getPixelValue(x, y)-ip.getPixelValue(x+1,y)),2)/(40000));
+                            * skde.getBeta(true) * Math.PI / 8 ;
+                    //priorWeights[0]+= this.edgeweight* Math.PI / 8 * Math.exp(-Math.pow( (ip.getPixelValue(x, y)-ip.getPixelValue(x+1,y)),2)/(40000));
                     weights[1] += 0.5
                             * kernelWeights[j]
                             * Math.pow(
@@ -217,8 +211,8 @@ public class GraphCutSegmenter {
                                     * currentshape
                                     .get(x, y + 1)),
                             skde.shapes.get(0).lambda)
-                            * skde.getTauSquared(true) * Math.PI / 8 ;
-                    weights[1]+= this.edgeweight* Math.PI / 8* Math.exp(-Math.pow(ip.getPixelValue(x, y)-ip.getPixelValue(x,y+1),2)/40000);
+                            * skde.getBeta(true) * Math.PI / 8 ;
+                    //priorWeights[1]+= this.edgeweight* Math.PI / 8* Math.exp(-Math.pow(ip.getPixelValue(x, y)-ip.getPixelValue(x,y+1),2)/40000);
                     weights[2] += kernelWeights[j]
                             * Math.pow(
                             Math.abs(0.5 * currentshape.get(x, y) + 0.5
@@ -229,9 +223,9 @@ public class GraphCutSegmenter {
                                     * currentshape
                                     .get(x, y + 1)),
                             skde.shapes.get(0).lambda)
-                            * skde.getTauSquared(true) / Math.sqrt(2) * Math.PI
+                            * skde.getBeta(true) / Math.sqrt(2) * Math.PI
                             / 8 ;
-                    weights[2]+= this.edgeweight* Math.PI / 8 / Math.sqrt(2)* Math.exp(-Math.pow(ip.getPixelValue(x, y)-ip.getPixelValue(x+1,y+1),2)/40000);
+                    //priorWeights[2]+= this.edgeweight* Math.PI / 8 / Math.sqrt(2)* Math.exp(-Math.pow(ip.getPixelValue(x, y)-ip.getPixelValue(x+1,y+1),2)/40000);
                     weights[3] += kernelWeights[j]
                             * Math.pow(
                             Math.abs(0.5 * currentshape.get(x + 1, y)
@@ -242,9 +236,9 @@ public class GraphCutSegmenter {
                                     * currentshape
                                     .get(x, y + 1)),
                             skde.shapes.get(0).lambda)
-                            * skde.getTauSquared(true) / Math.sqrt(2) * Math.PI
+                            * skde.getBeta(true) / Math.sqrt(2) * Math.PI
                             / 8 ;
-                    weights[3]+= this.edgeweight* Math.PI / 8 / Math.sqrt(2)* Math.exp(-Math.pow(ip.getPixelValue(x+1, y)-ip.getPixelValue(x,y+1),2)/40000);
+                    //priorWeights[3]+= this.edgeweight* Math.PI / 8 / Math.sqrt(2)* Math.exp(-Math.pow(ip.getPixelValue(x+1, y)-ip.getPixelValue(x,y+1),2)/40000);
                 }
                 gc.setEdgeWeight(y * width + x, y * width + x + 1,
                         Float.isNaN(weights[0]) ? Float.MAX_VALUE : weights[0]);
@@ -269,7 +263,7 @@ public class GraphCutSegmenter {
                                 * skde.shapes.get(j).get(width - 1,
                                 y + 1)),
                         skde.shapes.get(0).lambda)
-                        * skde.getTauSquared(true) * Math.PI / 8 ;
+                        * skde.getBeta(true) * Math.PI / 8 ;
 
             }
             gc.setEdgeWeight(y * width + width - 1,
@@ -289,7 +283,7 @@ public class GraphCutSegmenter {
                                 * skde.shapes.get(j).get(x + 1,
                                 height - 1)),
                         skde.shapes.get(j).lambda)
-                        * skde.getTauSquared(true) * Math.PI / 8 ;
+                        * skde.getBeta(true) * Math.PI / 8 ;
 
             }
             gc.setEdgeWeight((height - 1) * width + x, (height - 1) * width + x
@@ -298,24 +292,23 @@ public class GraphCutSegmenter {
     }
 
     /**
-     * Get the shape weights
+     * Get the shape priorWeights
      *
      * @param skde
-     * @param shape
+     * @param priorShape
      * @return
      */
-    public double[] getShapeWeights(ShapePrior skde, ImplicitShape2D shape) {
+    public double[] getShapeWeights(ShapePrior skde, ImplicitShape2D priorShape) {
         double[] distances = new double[skde.shapes.size()];
         double[] weights = new double[skde.shapes.size()];
         double mindistance = Double.MAX_VALUE;
-        double[] kernelWeights = skde.weights;
+        double[] kernelWeights = skde.priorWeights;
 
+
+        // distances stores the distance between the priorShape and each shape within skde
         for (int j = 0; j < skde.shapes.size(); j++) {
-            // there is some sort of buffer overflow
-
-            distances[j] = skde.computeDistance(shape, skde.shapes.get(j))
-                    * skde.getTauSquared(true);
-
+            distances[j] = skde.computeDistance(priorShape, skde.shapes.get(j))
+                    * skde.getBeta(true);
             /**
              * If NaN, set to infinite distance
              */
@@ -332,7 +325,7 @@ public class GraphCutSegmenter {
             for(int k=0;k<skde.shapes.size();k++){
                 weights[j]+=kernelWeights[k]*Math.exp(distances[j]-distances[k]);
             }
-            weights[j]=kernelWeights[j]/weights[j];
+            weights[j]=kernelWeights[j]/weights[j]; // @TODO CHECK!!
         }
         weights = normalize(weights);
 
@@ -340,7 +333,7 @@ public class GraphCutSegmenter {
     }
 
     /**
-     * Set the graph cut weights
+     * Set the graph cut priorWeights
      *
      * @param referenceShape
      *            The current shape
@@ -363,7 +356,7 @@ public class GraphCutSegmenter {
 
         /**
          *
-         * Add shape edge weights
+         * Add shape edge priorWeights
          *
          *
          *
@@ -378,8 +371,8 @@ public class GraphCutSegmenter {
                 if (Float.isNaN(source) || Float.isNaN(sink))
                     IJ.showMessage("NaN error for n-link at (" + x + "," + y
                             + ")");
-                source += likelihood.logpOut(pixelval);
-                sink += likelihood.logpIn(pixelval);
+                source += -likelihood.logpOut(pixelval);
+                sink += -likelihood.logpIn(pixelval);
 
                 if (Float.isNaN(source)) {
                     source = Float.MAX_VALUE;
@@ -392,11 +385,11 @@ public class GraphCutSegmenter {
                     if (skde.shapes.get(j).in(x, y)) {
                         source += weights[j]
                                 * skde.shapes.get(j).rho(x, y) / 2.0
-                                * skde.getTauSquared(true);
+                                * skde.getBeta(true);
                     } else
                         sink += weights[j]
                                 * skde.shapes.get(j).rho(x, y) / 2.0
-                                * skde.getTauSquared(true);
+                                * skde.getBeta(true);
                 }
 
                 // Near image edges, adjust
@@ -409,7 +402,7 @@ public class GraphCutSegmenter {
                                 * Math.pow(Math.abs(skde.shapes.get(j)
                                         .get(x, y) + 0.5),
                                 skde.shapes.get(0).lambda) / 2
-                                * skde.getTauSquared(true) * Math.PI * 2
+                                * skde.getBeta(true) * Math.PI * 2
                                 * (1 + 2 * Math.pow(2, -0.5)) / 8;
                         ;
 
@@ -434,7 +427,7 @@ public class GraphCutSegmenter {
     }
 
     /**
-     * Chan - Vese node weights
+     * Chan - Vese node priorWeights
      */
     public void setNodeWeights(IntensityModel likelihood) {
 
@@ -445,8 +438,8 @@ public class GraphCutSegmenter {
                 sink = 0;
 
                 float pixelval = this.ip.getPixelValue(x, y);
-                source += likelihood.logpOut(pixelval);
-                sink += likelihood.logpIn(pixelval);
+                source += -likelihood.logpOut(pixelval);
+                sink += -likelihood.logpIn(pixelval);
 
                 gc.setTerminalWeights(y * width + x,
                         Float.isNaN(source) ? Float.MAX_VALUE : source,
@@ -533,5 +526,6 @@ public class GraphCutSegmenter {
     public ShapePrior getShapeKernelDensityEstimate() {
         return shapeKernelDensityEstimate;
     }
+
 
 }

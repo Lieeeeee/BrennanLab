@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * unitless, it is expected that there is 1 speed unit between each ROI passed
  * in
  *
- * @author Joshua Chang {@link mailto:joshchang@ucla.edu}
+ * @author Josh Chang
  */
 public class SpeedField {
     public int width, height;
@@ -27,7 +27,7 @@ public class SpeedField {
     Normal standardNormal;
     private float[][] speedField; // "response" associated with wavePositions
     private float[][] arrivalTimes; // arrival times of wavePositions
-    private Kriging2DLattice krig; // stores actual speeds that we will use
+    private Kriging2DLattice krigingLattice; // stores actual speeds that we will use
     private float priorMeanSpeed;
     private float priorVarSpeed;
 
@@ -202,13 +202,13 @@ public class SpeedField {
             }
         }
 
-        // IJ.showMessage("Mean linearly interpolated speed was "+ tot/n);
+        IJ.log("Mean linearly interpolated speed was "+ tot/n);
         return speeds;
     }
 
     public SpeedField clone() {
         SpeedField s = new SpeedField(width, height);
-        s.setKrigingObject(this.krig);
+        s.setKrigingObject(this.krigingLattice);
         s.setspeedField(this.speedField.clone());
         s.setarrivalTimes(this.arrivalTimes.clone());
         s.setPriorVarSpeed(priorVarSpeed);
@@ -218,11 +218,9 @@ public class SpeedField {
     }
 
     /**
-     * Calculates the coordinates of the center of an ROI TODO fix this when
-     * origin is probably not in the boundary of the image, in that case this
-     * should give a coordinate on the boundary at the very least
+     * Calculates the coordinates of the center of an ROI
      *
-     * @param r
+     * @param signedDistance
      * @return
      */
     public float[] getCenter(ImplicitShape2D signedDistance) {
@@ -252,16 +250,15 @@ public class SpeedField {
      */
 
     public Kriging2DLattice getKrigingObject() {
-        return krig;
+        return krigingLattice;
     }
 
     public void setKrigingObject(Kriging2DLattice krig) {
-        this.krig = krig;
+        this.krigingLattice = krig;
     }
 
     public float[][] getPosteriorMeanSpeedField() {
         // poll the kriging object to get the mean
-        // TODO Auto-generated method stub
 
         float[][] s = new float[width][height];
 
@@ -269,7 +266,7 @@ public class SpeedField {
          * If kriging object is null, we do not have any observations yet, so
          * draw according to the prior
          */
-        if (krig == null) {
+        if (krigingLattice == null) {
 
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
@@ -389,7 +386,6 @@ public class SpeedField {
      */
 
     public float[][] getArrivalTimes() {
-        // TODO Auto-generated method stub
         return this.arrivalTimes;
     }
 

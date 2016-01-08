@@ -128,7 +128,7 @@ public class GaussianMixture implements IntensityModel {
     }
 
     public double logpIn(double value) {
-        return 0.5 * (Math.log(2 * Math.PI / getPosteriorPrecision(true)) + getPosteriorPrecision(true) * Math.pow(value - getPosteriorMean(true), 2));
+        return -0.5 * (Math.log(2 * Math.PI / getPosteriorPrecision(true)) + getPosteriorPrecision(true) * Math.pow(value - getPosteriorMean(true), 2));
     }
 
     public double pOut(double value) {
@@ -136,7 +136,7 @@ public class GaussianMixture implements IntensityModel {
     }
 
     public double logpOut(double value) {
-        return 0.5 * (Math.log(2 * Math.PI / getPosteriorPrecision(false)) + getPosteriorPrecision(false) * Math.pow(value - getPosteriorMean(false), 2));
+        return -0.5 * (Math.log(2 * Math.PI / getPosteriorPrecision(false)) + getPosteriorPrecision(false) * Math.pow(value - getPosteriorMean(false), 2));
     }
 
     public double tauin() {

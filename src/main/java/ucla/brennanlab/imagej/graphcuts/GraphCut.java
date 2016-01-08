@@ -81,6 +81,9 @@ public class GraphCut {
     // counter for iterations of main loop
     private int time;
 
+    private int numNodes;
+    private int numEdges;
+
     /**
      * Initialises the graph cut implementation and allocates the memory needed
      * for the given number of nodes and edges.
@@ -98,6 +101,8 @@ public class GraphCut {
         activeQueueFirst = new int[2];
         activeQueueLast  = new int[2];
         orphans          = new LinkedList<Integer>();
+        numNodes         = numNodes;
+        numEdges         = numEdges;
     }
 
     /**
@@ -359,7 +364,7 @@ public class GraphCut {
     /**
      * Mark a node as being changed.
      *
-     * Use this method if the graph weights changed after a previous computation
+     * Use this method if the graph priorWeights changed after a previous computation
      * of the max-flow. The next computation will be faster by just considering
      * changed nodes.
      *
@@ -857,13 +862,21 @@ public class GraphCut {
         }
     }
 
-    public void resetEdgeNum() {
-        this.edgeNum = 0;
-    }
-
-
 
     public void reset() {
+        // Reset the graph
+        graph.reset();
 
+        // Reset everything else
+        edgeNum          = 0;
+        totalFlow        = 0;
+        maxflowIteration = 0;
+        activeQueueFirst = new int[2];
+        activeQueueLast  = new int[2];
+        orphans          = new LinkedList<Integer>();
+    }
+
+    public void resetEdgeNum(){
+        this.edgeNum = 0;
     }
 }

@@ -18,6 +18,7 @@ import ij.process.ImageStatistics;
 import ucla.brennanlab.imagej.graphcuts.GraphCutSegmenter;
 import ucla.brennanlab.imagej.util.levelsets.ImplicitShape2D;
 import ucla.brennanlab.imagej.util.levelsets.ShapePrior;
+import ucla.brennanlab.imagej.util.stochastic.GaussianMixture;
 import ucla.brennanlab.imagej.util.stochastic.IntensityModel;
 import ucla.brennanlab.imagej.util.stochastic.LaplaceMixture;
 import ucla.brennanlab.imagej.util.stochastic.SpeedField;
@@ -26,6 +27,7 @@ import java.awt.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+
 
 /**
  * Boundary segmentation using the kriging speed model
@@ -38,26 +40,18 @@ public class WaveFrontTracker implements PlugInFilter {
      * of the stochastic state, here it will be the number of points at which we
      * will estimate the speed, interpolating speeds using these points
      */
-    static final int numContourSamplesJ = 2;
-    final double lambda = 0.1;
     ImagePlus imp;
     int timesteps;
     int slices;
-    int firstslice;
-    int gridwidth = 5;// reduce the dimensions down to 2x2 blocks
-    int gridheight = 5;
-    int bandwidth = 30; // band for interpoldation, all outside is set to
-    double initialLengthPenalty = 20;
-    double lengthPenalty = 12;
+    int maxiters = 10;
+    double initialLengthPenalty = 1;
+    double lengthPenalty = 1;
     double alpha = 2;
-    boolean showProgress = true;
     boolean showPredictions = false;
-    boolean colorResult = true;
     boolean useManualInitializationPrior = false;
     Roi userDrawnRoi;
     int speedSamples = 16;
-    double conversion = 10, freq = 1, priorSpeedMean = 3, priorSpeedSD = 1;
-    boolean verbose = true;
+    double priorSpeedMean = 5, priorSpeedSD = 3;
     int width;
     int height;
     int innerBandWidth = 25;
@@ -65,13 +59,9 @@ public class WaveFrontTracker implements PlugInFilter {
     ArrayList<Roi> roisOfSegmentations;
     boolean csdHasStarted = false;
     Color roiColor = new Color(255, 105, 180, 255); // Color to draw the ROI
-
-    static float[][] deepCopy(float[][] original) {
-        float[][] copy = new float[original.length][];
-        for (int i = 0; i < original.length; i++)
-            copy[i] = original[i].clone();
-        return copy;
-    }
+    final String[] likelihoodmodels = {"Gaussian", "Laplacian"};
+    String likelihoodmodel;
+    String covariateImage;
 
     public void run(ImageProcessor ip) {
 
@@ -93,11 +83,14 @@ public class WaveFrontTracker implements PlugInFilter {
         alpha = gd.getNextNumber();
         lengthPenalty = gd.getNextNumber();
         initialLengthPenalty = gd.getNextNumber();
-        priorSpeedMean = 100 * inputspeed / 6 / conversion / freq;
-        priorSpeedSD = 100 * inputstder / 6 / conversion / freq;
+        priorSpeedMean = inputspeed;
+        priorSpeedSD = inputstder;
         this.speedSamples = (int) gd.getNextNumber();
         this.innerBandWidth = (int) gd.getNextNumber();
         this.showPredictions = gd.getNextBoolean();
+        this.likelihoodmodel = gd.getNextChoice();
+        this.covariateImage = gd.getNextChoice();
+
 
         if (userDrawnRoi != null)
             this.useManualInitializationPrior = gd.getNextBoolean();
@@ -212,8 +205,6 @@ public class WaveFrontTracker implements PlugInFilter {
                 nextRoi.setName("Predicted mean position " + currentSlice);
                 roiman.addRoi(nextRoi);
 
-                SpeedField sfield = new SpeedField(this.width, this.height);
-
                 double[] effectiveWeights = new double[this.speedSamples];
                 double speed;
                 for (int i = 0; i < this.speedSamples; i++) {
@@ -246,11 +237,10 @@ public class WaveFrontTracker implements PlugInFilter {
                  * Kernel density estimation on the shapes to determine prior
                  *************************************************************/
 
-                ShapePrior skde = new ShapePrior(
+                ShapePrior shapePriorDensity = new ShapePrior(
                         positions, effectiveWeights);
 
-                //skde.setAlpha(alpha);
-                IJ.log("Prediction distance variance " + skde.tauSquared);
+                IJ.log("Prediction distance variance " + shapePriorDensity.beta);
 
                 IJ.log("... done computing priors");
                 IJ.log("... computing maxflow for slice " + currentSlice
@@ -259,7 +249,14 @@ public class WaveFrontTracker implements PlugInFilter {
                 float minE;
                 float tempE;
                 long endTime;
-                IntensityModel likelihood = new LaplaceMixture();
+
+                IntensityModel likelihood;
+                if(this.likelihoodmodel=="Gaussian") {
+                    likelihood = new GaussianMixture();
+                }else{
+                    likelihood = new LaplaceMixture();
+                }
+
                 likelihood.Infer(currentImageProcessor, meanNext
                         .getMask());
 
@@ -274,15 +271,15 @@ public class WaveFrontTracker implements PlugInFilter {
                 float currentMeanSpeed =  (float)this.maxAposteriorSpd.latestSpeed;
 
                 try {
-                    gcSegmenter.setNodeWeights(skde, meanNext, likelihood);
-                    gcSegmenter.setEdgeWeights(skde, meanNext);
+                    gcSegmenter.setNodeWeights(shapePriorDensity, meanNext, likelihood);
+                    gcSegmenter.setEdgeWeights(shapePriorDensity, meanNext);
                     minE = gcSegmenter.relaxEnergy();
                     /**
                      * MM iterations
                      */
                     likelihood.Infer(currentImageProcessor, gcSegmenter
                             .returnMask());
-                    gcSegmenter.setEdgeWeights(skde, gcSegmenter.getLevelSet());
+                    gcSegmenter.setEdgeWeights(shapePriorDensity, gcSegmenter.getLevelSet());
                     long currentTime;
                     int i = 1;
             /*
@@ -295,17 +292,17 @@ public class WaveFrontTracker implements PlugInFilter {
                             IJ.log("Aborted");
                             return;
                         }
-                        gcSegmenter.gc.reset(); // @TODO Don't remember what this does
+                        gcSegmenter.gc.reset(); //  Don't remember what this does
 
-                        gcSegmenter.setNodeWeights(skde, gcSegmenter.getLevelSet(), likelihood);
-                        gcSegmenter.setEdgeWeights(skde, gcSegmenter.getLevelSet());
+                        gcSegmenter.setNodeWeights(shapePriorDensity, gcSegmenter.getLevelSet(), likelihood);
+                        gcSegmenter.setEdgeWeights(shapePriorDensity, gcSegmenter.getLevelSet());
                         tempE = gcSegmenter.relaxEnergy();
                         currentTime = System.nanoTime();
                         IJ.log("\t     Iter " + i + " Elapsed time: "
                                 + ((float) (currentTime - startTime) / 1000000)
                                 + " ms" + " Energy " + tempE);
                         if (minE - tempE < 1 && i > 2 || Double.isNaN(minE)
-                                || Double.isInfinite(minE)) {
+                                || Double.isInfinite(minE) || i> this.maxiters) {
                             minE = tempE;
                             if (Double.isNaN(minE) || Double.isInfinite(minE)) {
                                 IJ.log("Encountered invalid energy");
@@ -382,8 +379,6 @@ public class WaveFrontTracker implements PlugInFilter {
                     gSegmentImp.setSlice(currentSlice - firstCSDslice + 1);
 
                 } else {
-                    segmentedRoi = meanNext
-                            .getRoi(false);
                     IJ.log("Something went wrong, I was unable to obtain a segmentation...");
 
                     lastCSDslice = currentSlice - 1;
@@ -391,8 +386,8 @@ public class WaveFrontTracker implements PlugInFilter {
                 }
 
                 long duration = endTime - startTime;
-                double dist = skde.computeDistance(gcSegmenter.getLevelSet(), meanNext)
-                        * skde.tauSquared;
+                double dist = shapePriorDensity.computeDistance(gcSegmenter.getLevelSet(), meanNext)
+                        * shapePriorDensity.beta;
                 IJ.log("Computed maxflow energy of " + minE + " in "
                         + (float) duration / 1000000 + " ms");
                 IJ
@@ -431,9 +426,15 @@ public class WaveFrontTracker implements PlugInFilter {
                     weights[0] = 1;
                     ShapePrior userKDE = new ShapePrior(
                             userDefinedShapes, weights);
-                    userKDE.setMultiplier(2.0);
-                    userKDE.tauSquared = 1;
-                    IntensityModel s = new LaplaceMixture();
+                    userKDE.setMultiplier(1.0);
+                    userKDE.beta = 1.0;
+
+                    IntensityModel s;
+                    if(this.likelihoodmodel=="Gaussian") {
+                        s = new GaussianMixture();
+                    }else{
+                        s = new LaplaceMixture();
+                    }
                     s.Infer(currentImageProcessor, manualLS.getMask());
 
                     gcSegmenter = new GraphCutSegmenter(currentImageProcessor, 1);
@@ -518,8 +519,7 @@ public class WaveFrontTracker implements PlugInFilter {
 
         ImageProcessor speedIP = new FloatProcessor(speeds);
         speedIP.setMinAndMax(this.priorSpeedMean - this.priorSpeedSD / 2, this.priorSpeedMean * 1.5);
-        ImagePlus speedImage = new ImagePlus("Speed_field_mm_per_min", speedIP);
-        //gb.blur(speedIP, 1);
+        ImagePlus speedImage = new ImagePlus("Speed_field_pixels_per_slice", speedIP);
         speedImage.show();
 
     }
@@ -557,8 +557,12 @@ public class WaveFrontTracker implements PlugInFilter {
                 mask[x][y] = ipCopy.getPixelValue(x, y) > mean + 2*sd;
             }
         }
-
-        IntensityModel likelihood = new LaplaceMixture();
+        IntensityModel likelihood;
+        if(this.likelihoodmodel=="Gaussian") {
+            likelihood = new GaussianMixture();
+        }else{
+            likelihood = new LaplaceMixture();
+        }
         likelihood.Infer(ipCopy, mask);
 
         GraphCutSegmenter gcSegmenter = new GraphCutSegmenter(ipCopy);
@@ -616,6 +620,7 @@ public class WaveFrontTracker implements PlugInFilter {
                     .addMessage("Note: User-drawn ROI must be within 10 pixels of the true region boundaries");
 
         }
+        gd.addChoice("Likelihood model", likelihoodmodels, likelihoodmodels[0]);
 
         int[] wList = WindowManager.getIDList();
         String[] titles = new String[wList.length + 1];
@@ -628,6 +633,7 @@ public class WaveFrontTracker implements PlugInFilter {
                 titles[i + 1] = "";
         }
         gd.addChoice("Covariate image", titles, titles[0]);
+
 
         return gd;
 
