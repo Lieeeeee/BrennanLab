@@ -88,8 +88,6 @@ public class WaveFrontTracker implements PlugInFilter {
             return;
         }
 
-        conversion = gd.getNextNumber();
-        freq = gd.getNextNumber();
         double inputspeed = gd.getNextNumber();
         double inputstder = gd.getNextNumber();
         alpha = gd.getNextNumber();
@@ -177,14 +175,14 @@ public class WaveFrontTracker implements PlugInFilter {
 
             if (this.useManualInitializationPrior) {
                 // Adjust the length penalty perhaps as a function of time?
-                this.lengthPenalty = 4;
+                this.lengthPenalty = imp.getWidth()/40.0;
             }
 
             if (csdHasStarted) {
 
                 ImplicitShape2D prevLS = new ImplicitShape2D(gcSegmenter.returnMask());
                 if (gcSegmenter.fractionInner() < 10.0 / width / height) {
-                    // have less than 10 pixels
+                    IJ.log("Less than 10 pixels in the inner region");
                 }
 
                 /****************************************************************
@@ -204,12 +202,11 @@ public class WaveFrontTracker implements PlugInFilter {
 
                 ImplicitShape2D meanNext = new ImplicitShape2D(prevLS
                         .getMask());
-                meanNext.advectUniformSpeed(this.priorSpeedMean, 1 / this.freq);
+                meanNext.advectUniformSpeed(this.priorSpeedMean, 1.0);
 
-                // advect nonuniform speed damn it!!
+                // Infer the speed field here!!! @TODO
 
-                Roi nextRoi = meanNext
-                        .getRoi(false);
+                Roi nextRoi = meanNext.getRoi(false);
                 imp.setRoi(nextRoi);
 
                 nextRoi.setName("Predicted mean position " + currentSlice);
@@ -226,7 +223,7 @@ public class WaveFrontTracker implements PlugInFilter {
                             prevLS.getMask()));
                     effectiveWeights[i] = 1;// redo the weighting soon
 
-                    positions.get(i).advectUniformSpeed(speed, 1 / this.freq);
+                    positions.get(i).advectUniformSpeed(speed, 1.0);
 
                     Roi pred = positions.get(i).getRoi(true);
 
@@ -274,6 +271,7 @@ public class WaveFrontTracker implements PlugInFilter {
                  * Segment NOW
                  *********************************************************************************/
 
+                float currentMeanSpeed =  (float)this.maxAposteriorSpd.latestSpeed;
 
                 try {
                     gcSegmenter.setNodeWeights(skde, meanNext, likelihood);
@@ -407,25 +405,13 @@ public class WaveFrontTracker implements PlugInFilter {
                 }
 
                 ImplicitShape2D currentPosition = gcSegmenter.getLevelSet();
-
-                // perhaps do some sanity checks
-
                 this.maxAposteriorSpd.addArrival(currentPosition);
-
                 this.maxAposteriorSpd.updateGMRF();
 
-                this.priorSpeedMean = 0.9 * this.maxAposteriorSpd.latestSpeed
-                        + 0.1 * this.priorSpeedMean;
-                if (1 / likelihood.getPosteriorPrecision(false) > likelihood.getPosteriorMean(true)) {
-                    IJ
-                            .log("\t\t Excessive variability in the image detected, may be movement");
-                    this.priorSpeedMean = this.priorSpeedMean * 0.8;
-                }
-                this.priorSpeedSD = this.priorSpeedMean * 0.5; // / 1.25;
+                currentMeanSpeed = (float) this.maxAposteriorSpd.latestSpeed;
 
                 IJ.log("Current average wavespeed is "
-                        + this.maxAposteriorSpd.latestSpeed / 100 * 6
-                        * conversion * freq + " mm/s"); // current wavespeed
+                        + currentMeanSpeed + " pixels per frame"); // current wavespeed
 
             } else {
                 /****************************************************
@@ -529,11 +515,7 @@ public class WaveFrontTracker implements PlugInFilter {
         }
 
         float[][] speeds = this.maxAposteriorSpd.arrivalsToSpeed(arrivalTimes);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                speeds[x][y] = (float) (speeds[x][y] / 100 * 6 * conversion * freq);
-            }
-        }
+
         ImageProcessor speedIP = new FloatProcessor(speeds);
         speedIP.setMinAndMax(this.priorSpeedMean - this.priorSpeedSD / 2, this.priorSpeedMean * 1.5);
         ImagePlus speedImage = new ImagePlus("Speed_field_mm_per_min", speedIP);
@@ -614,12 +596,11 @@ public class WaveFrontTracker implements PlugInFilter {
     protected GenericDialog pluginDialog() {
         GenericDialog gd = new GenericDialog("Segmentation Options", IJ
                 .getInstance());
-        gd.addNumericField("Microns per pixel", 10, 3);
-        gd.addNumericField("Acquisition frequency", 1, 1, 3, "Hz");
+
         gd.addNumericField("Prior mean wave speed", this.priorSpeedMean, 2, 5,
-                "mm per minute");
+                "pixels per frame");
         gd.addNumericField("standard error", this.priorSpeedSD, 2, 5,
-                "mm per minute");
+                "pixels per frame");
         gd.addNumericField("Shape penalty exponent", this.alpha, 0);
         gd.addNumericField("Length penalty", this.lengthPenalty, 0);
         gd.addNumericField("Initial Length penalty", this.initialLengthPenalty,

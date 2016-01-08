@@ -96,7 +96,6 @@ public class ImplicitShape2D {
         double yc = this.inertialCenter[1];
         double q1 = 0;
         double q2 = 0;
-        // double q3=0;
         double q4 = 0;
 
         double[] normGradPhi = new double[] { 0, 0 };

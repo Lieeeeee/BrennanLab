@@ -1,22 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a5bf183d-1396-41ce-991c-2727a9b2c97b" name="Default" comment="JMIV merge fixes">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/Graph.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/GenericLevelSet.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/RoiImageLevelSet.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/tests/fastMarchingTest.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/ImageStats.java" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/waveFrontTracker.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/WaveFrontTracker.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/laggedDifferenceCalculator.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/LaggedDifferenceCalculator.java" />
+    <list default="true" id="a5bf183d-1396-41ce-991c-2727a9b2c97b" name="Default" comment="Some prediction fixes. WaveFrontTracker.java will now implement the full Gaussian prediction model (or will soon).">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCut.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCut.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/SegmentationError.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/SegmentationError.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/WaveFrontTracker.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/WaveFrontTracker.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ImplicitShape2D.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ImplicitShape2D.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ROItoSignedDistance.java" afterPath="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ROItoSignedDistance.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/plugins.config" afterPath="$PROJECT_DIR$/src/main/resources/plugins.config" />
     </list>
     <ignored path="Brennan_Lab.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -48,24 +36,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ImplicitShape2D.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ImplicitShape2D.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ImplicitShape2D.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6621622">
-              <caret line="272" column="7" selection-start-line="272" selection-start-column="7" selection-end-line="272" selection-end-column="7" />
+            <state vertical-scroll-proportion="-10.555555">
+              <caret line="98" column="0" selection-start-line="98" selection-start-column="0" selection-end-line="98" selection-end-column="0" />
               <folding>
                 <element signature="e#940#941#0" expanded="true" />
                 <element signature="e#982#983#0" expanded="true" />
                 <element signature="e#1023#1024#0" expanded="true" />
                 <element signature="e#1056#1057#0" expanded="true" />
-                <element signature="e#14098#14099#0" expanded="true" />
-                <element signature="e#14166#14167#0" expanded="true" />
-                <element signature="e#15203#15204#0" expanded="true" />
-                <element signature="e#15231#15232#0" expanded="true" />
-                <element signature="e#15254#15255#0" expanded="true" />
-                <element signature="e#15283#15284#0" expanded="true" />
-                <element signature="e#20080#20081#0" expanded="true" />
-                <element signature="e#20126#20127#0" expanded="true" />
+                <element signature="e#14074#14075#0" expanded="true" />
+                <element signature="e#14142#14143#0" expanded="true" />
+                <element signature="e#15179#15180#0" expanded="true" />
+                <element signature="e#15207#15208#0" expanded="true" />
+                <element signature="e#15230#15231#0" expanded="true" />
+                <element signature="e#15259#15260#0" expanded="true" />
+                <element signature="e#20056#20057#0" expanded="true" />
+                <element signature="e#20102#20103#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -84,8 +72,8 @@
       <file leaf-file-name="GraphCutSegmenter.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-7.296296">
-              <caret line="98" column="32" selection-start-line="98" selection-start-column="27" selection-end-line="98" selection-end-column="32" />
+            <state vertical-scroll-proportion="-9.518518">
+              <caret line="112" column="9" selection-start-line="112" selection-start-column="9" selection-end-line="112" selection-end-column="9" />
               <folding>
                 <element signature="e#18987#18988#0" expanded="true" />
                 <element signature="e#19024#19025#0" expanded="true" />
@@ -94,11 +82,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="WaveFrontTracker.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="WaveFrontTracker.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/WaveFrontTracker.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-12.851851">
-              <caret line="300" column="0" selection-start-line="300" selection-start-column="0" selection-end-line="300" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.21355931">
+              <caret line="206" column="50" selection-start-line="206" selection-start-column="50" selection-end-line="206" selection-end-column="50" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -106,20 +94,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GraphCut.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCut.java">
+      <file leaf-file-name="SpeedField.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/SpeedField.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-182.22223">
-              <caret line="328" column="18" selection-start-line="328" selection-start-column="18" selection-end-line="328" selection-end-column="18" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#12498#12499#0" expanded="true" />
-                <element signature="e#12540#12541#0" expanded="true" />
-                <element signature="e#12678#12679#0" expanded="true" />
-                <element signature="e#12720#12721#0" expanded="true" />
-                <element signature="e#30478#30479#0" expanded="true" />
-                <element signature="e#30510#30511#0" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="0.0">
+              <caret line="60" column="22" selection-start-line="60" selection-start-column="16" selection-end-line="60" selection-end-column="22" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -176,8 +156,8 @@
         <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/SegmentationError.java" />
         <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/Graph.java" />
         <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCut.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/WaveFrontTracker.java" />
         <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ImplicitShape2D.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/WaveFrontTracker.java" />
       </list>
     </option>
   </component>
@@ -926,15 +906,31 @@
       <option name="project" value="LOCAL" />
       <updated>1452131112005</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Merge upstream fiji graphcuts code">
+      <created>1452198316983</created>
+      <option name="number" value="00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1452198316983</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
+  </component>
+  <component name="TodoView" selected-index="4">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
   </component>
   <component name="ToolWindowManager">
     <frame x="24" y="23" width="1256" height="737" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32868218" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32868218" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -942,18 +938,17 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24958813" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32713178" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24958813" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32868218" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32713178" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32713178" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -971,7 +966,9 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <MESSAGE value="JMIV merge fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="JMIV merge fixes" />
+    <MESSAGE value="Merge upstream fiji graphcuts code" />
+    <MESSAGE value="Some prediction fixes. WaveFrontTracker.java will now implement the full Gaussian prediction model (or will soon)." />
+    <option name="LAST_COMMIT_MESSAGE" value="Some prediction fixes. WaveFrontTracker.java will now implement the full Gaussian prediction model (or will soon)." />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -1082,14 +1079,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/SegmentationError.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="42" column="3" selection-start-line="42" selection-start-column="3" selection-end-line="42" selection-end-column="3" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/Graph.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1098,31 +1087,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/WaveFrontTracker.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-12.851851">
-          <caret line="300" column="0" selection-start-line="300" selection-start-column="0" selection-end-line="300" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.296296">
-          <caret line="98" column="32" selection-start-line="98" selection-start-column="27" selection-end-line="98" selection-end-column="32" />
-          <folding>
-            <element signature="e#18987#18988#0" expanded="true" />
-            <element signature="e#19024#19025#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCut.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-182.22223">
-          <caret line="328" column="18" selection-start-line="328" selection-start-column="18" selection-end-line="328" selection-end-column="18" />
+        <state vertical-scroll-proportion="2.6711864">
+          <caret line="200" column="20" selection-start-line="200" selection-start-column="20" selection-end-line="200" selection-end-column="20" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#12498#12499#0" expanded="true" />
@@ -1137,21 +1105,58 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/levelsets/ImplicitShape2D.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6621622">
-          <caret line="272" column="7" selection-start-line="272" selection-start-column="7" selection-end-line="272" selection-end-column="7" />
+        <state vertical-scroll-proportion="-10.555555">
+          <caret line="98" column="0" selection-start-line="98" selection-start-column="0" selection-end-line="98" selection-end-column="0" />
           <folding>
             <element signature="e#940#941#0" expanded="true" />
             <element signature="e#982#983#0" expanded="true" />
             <element signature="e#1023#1024#0" expanded="true" />
             <element signature="e#1056#1057#0" expanded="true" />
-            <element signature="e#14098#14099#0" expanded="true" />
-            <element signature="e#14166#14167#0" expanded="true" />
-            <element signature="e#15203#15204#0" expanded="true" />
-            <element signature="e#15231#15232#0" expanded="true" />
-            <element signature="e#15254#15255#0" expanded="true" />
-            <element signature="e#15283#15284#0" expanded="true" />
-            <element signature="e#20080#20081#0" expanded="true" />
-            <element signature="e#20126#20127#0" expanded="true" />
+            <element signature="e#14074#14075#0" expanded="true" />
+            <element signature="e#14142#14143#0" expanded="true" />
+            <element signature="e#15179#15180#0" expanded="true" />
+            <element signature="e#15207#15208#0" expanded="true" />
+            <element signature="e#15230#15231#0" expanded="true" />
+            <element signature="e#15259#15260#0" expanded="true" />
+            <element signature="e#20056#20057#0" expanded="true" />
+            <element signature="e#20102#20103#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/SegmentationError.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="42" column="3" selection-start-line="42" selection-start-column="3" selection-end-line="42" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/graphcuts/GraphCutSegmenter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-9.518518">
+          <caret line="112" column="9" selection-start-line="112" selection-start-column="9" selection-end-line="112" selection-end-column="9" />
+          <folding>
+            <element signature="e#18987#18988#0" expanded="true" />
+            <element signature="e#19024#19025#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/util/stochastic/SpeedField.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="60" column="22" selection-start-line="60" selection-start-column="16" selection-end-line="60" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ucla/brennanlab/imagej/csd/WaveFrontTracker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.21355931">
+          <caret line="206" column="50" selection-start-line="206" selection-start-column="50" selection-end-line="206" selection-end-column="50" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
