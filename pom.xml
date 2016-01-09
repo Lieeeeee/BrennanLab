@@ -12,7 +12,7 @@
 		<relativePath />
 	</parent>
 
-	<groupId>sc.fiji</groupId>
+	<groupId>ucla.brennanlab</groupId>
 	<artifactId>Brennan_Lab</artifactId>
 	<version>0.1.1-SNAPSHOT</version>
 
@@ -57,18 +57,6 @@
 			<artifactId>colt</artifactId>
 			<version>1.2.0</version>
 		</dependency>
-
-        <dependency>
-            <groupId>org.ujmp</groupId>
-            <artifactId>ujmp-core</artifactId>
-            <version>0.3.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.ujmp</groupId>
-            <artifactId>ujmp-gui</artifactId>
-            <version>0.3.0</version>
-        </dependency>
 
         <dependency>
             <groupId>org.ujmp</groupId>
