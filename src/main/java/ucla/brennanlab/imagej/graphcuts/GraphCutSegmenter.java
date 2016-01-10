@@ -25,8 +25,6 @@ public class GraphCutSegmenter {
     public float Energy;
     private IntensityModel intensityModel;
     private ShapePrior shapeKernelDensityEstimate;
-
-    public boolean[][] innermask;
     final boolean testLinear=false;
 
     public GraphCutSegmenter(ImageProcessor ip, float mu) {
