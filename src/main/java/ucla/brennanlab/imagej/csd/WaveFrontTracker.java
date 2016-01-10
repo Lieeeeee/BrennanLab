@@ -50,7 +50,7 @@ public class WaveFrontTracker implements PlugInFilter {
     boolean showPredictions = false;
     boolean useManualInitializationPrior = false;
     Roi userDrawnRoi;
-    int speedSamples = 32;
+    int speedSamples = 16;
     double priorSpeedMean = 6.0, priorSpeedSD = 6.0;
     int width;
     int height;
@@ -140,7 +140,7 @@ public class WaveFrontTracker implements PlugInFilter {
          *****************************************************************/
 
         int firstCSDslice = currentSlice;
-        int lastCSDslice = currentSlice + 100 < imp.getStackSize() ? currentSlice + 100
+        int lastCSDslice = currentSlice + 200 < imp.getStackSize() ? currentSlice + 200
                 : imp.getStackSize();
         RandomEngine engine = new cern.jet.random.engine.MersenneTwister(
                 new java.util.Date());
@@ -153,7 +153,7 @@ public class WaveFrontTracker implements PlugInFilter {
             if (IJ.escapePressed()) {
                 IJ.beep();
                 IJ.log("Aborted");
-                return;
+                break;
             }
             WindowManager.setCurrentWindow(iw); // In case the user clicked on
             // another window
@@ -173,7 +173,7 @@ public class WaveFrontTracker implements PlugInFilter {
                  *****************************************************/
 
                 if (this.useManualInitializationPrior) {
-                    this.lengthPenalty = imp.getWidth()/40.0;
+                    this.lengthPenalty = imp.getWidth()/20.0;
 
                     this.userDrawnRoi.setName("User_drawn_template_slice_"
                             + currentSlice);
@@ -225,7 +225,7 @@ public class WaveFrontTracker implements PlugInFilter {
                     IJ.log("Computed maxflow energy of " + gcSegmenter.Energy + " in "
                             + (float) duration / 1000000 + " ms");
                 }
-                // double inner = gcs.getS().innerarea;
+                // double inner = gcs.getIntensityModel().innerarea;
                 if (gcSegmenter.fractionInner() > 0.01) {
                     /**
                      * Provisionally say that the CSD has been initialized, but
@@ -313,6 +313,8 @@ public class WaveFrontTracker implements PlugInFilter {
 
                 /*************************************************************
                  * Kernel density estimation on the shapes to determine prior
+                 *
+                 * Need to multithread here
                  *************************************************************/
 
                 ShapePrior shapePriorDensity = new ShapePrior(
@@ -322,8 +324,8 @@ public class WaveFrontTracker implements PlugInFilter {
                 IJ.log("... computing maxflow for slice " + currentSlice
                         + "...");
                 long startTime = System.nanoTime();
-                float minE;
-                float tempE;
+                float oldEnergy;
+                float newEnergy;
                 long endTime;
 
                 IntensityModel likelihood;
@@ -340,61 +342,62 @@ public class WaveFrontTracker implements PlugInFilter {
                 gcSegmenter.setLengthPenalty((float) this.lengthPenalty);
                 gcSegmenter.setIntensityModel(likelihood);
 
-                /********************************************************************************
-                 * Segment NOW
-                 *********************************************************************************/
+
 
                 float currentMeanSpeed =  (float)this.maxAposteriorSpd.latestSpeed;
 
+                /********************************************************************************
+                 * At this stage we have our shape predictions and the likelihood model
+                 *
+                 * Segment NOW, starting the MM algorithm from the most-probable future prediction
+                 *********************************************************************************/
                 try {
                     gcSegmenter.setNodeWeights(shapePriorDensity, meanNext, likelihood);
                     gcSegmenter.setEdgeWeights(shapePriorDensity, meanNext);
-                    minE = gcSegmenter.relaxEnergy();
+                    oldEnergy = gcSegmenter.relaxEnergy();
                     /**
                      * MM iterations
                      */
                     likelihood.Infer(currentImageProcessor, gcSegmenter
                             .returnMask(),false,this.innerBandWidth);
-                    gcSegmenter.setEdgeWeights(shapePriorDensity, gcSegmenter.getLevelSet());
                     long currentTime;
-                    int i = 1;
-            /*
-		     * Every 5 iterations or so, let's show the progress!!
-		     */
+                    int mmIter = 1;
 
+                    /**
+                     * MM algorithm below
+                     */
                     while (true) {
                         if (IJ.escapePressed()) {
                             IJ.beep();
                             IJ.log("Aborted");
-                            return;
+                            break;
                         }
                         gcSegmenter.gc.reset(); //  Don't remember what this does
 
                         gcSegmenter.setNodeWeights(shapePriorDensity, gcSegmenter.getLevelSet(), likelihood);
                         gcSegmenter.setEdgeWeights(shapePriorDensity, gcSegmenter.getLevelSet());
-                        tempE = gcSegmenter.relaxEnergy();
+                        newEnergy = gcSegmenter.relaxEnergy();
                         currentTime = System.nanoTime();
-                        IJ.log("\t     Iter " + i + " Elapsed time: "
+                        IJ.log("\t     Iter " + mmIter + " Elapsed time: "
                                 + ((float) (currentTime - startTime) / 1000000)
-                                + " ms" + " Energy " + tempE);
-                        if (minE - tempE < 1 && i > 2 || Double.isNaN(minE)
-                                || Double.isInfinite(minE) || i> this.maxiters) {
-                            minE = tempE;
-                            if (Double.isNaN(minE) || Double.isInfinite(minE)) {
+                                + " ms" + " Energy " + newEnergy);
+                        if (Math.abs(oldEnergy - newEnergy) < 1  || Double.isNaN(oldEnergy)
+                                || Double.isInfinite(oldEnergy) || mmIter> this.maxiters) {
+                            oldEnergy = newEnergy;
+                            if (Double.isNaN(oldEnergy) || Double.isInfinite(oldEnergy)) {
                                 IJ.log("Encountered invalid energy");
                             }
 
                             break;
                         }
-                        minE = tempE;
-                        // if (i % 3 == 0) {
+                        oldEnergy = newEnergy;
                         try {
                             Roi currentProgress = (Roi) gcSegmenter.getLevelSet().getRoi(
                                     false).clone();
                             currentProgress.setStrokeColor(roiColor);
 
                             currentProgress.setName("Position_" + currentSlice
-                                    + "_iteration_" + i);
+                                    + "_iteration_" + mmIter);
                             imp.setRoi(currentProgress);
                             roiman.addRoi(currentProgress);
 
@@ -403,9 +406,11 @@ public class WaveFrontTracker implements PlugInFilter {
 
                         }
 
-                        // }
-                        i++;
+                        mmIter++;
                     }
+                    /**
+                     * End MM algorithm
+                     */
 
                 } finally {
                     endTime = System.nanoTime();
@@ -464,13 +469,13 @@ public class WaveFrontTracker implements PlugInFilter {
                 long duration = endTime - startTime;
                 double dist = shapePriorDensity.computeDistance(gcSegmenter.getLevelSet(), meanNext)
                         * shapePriorDensity.beta;
-                IJ.log("Computed maxflow energy of " + minE + " in "
+                IJ.log("Computed maxflow energy of " + oldEnergy + " in "
                         + (float) duration / 1000000 + " ms");
                 IJ
                         .log("Normalized distance between mean prediction and result: "
                                 + dist);
 
-                if (Double.isNaN(minE) || minE == 0 || Double.isNaN(dist)) {
+                if (Double.isNaN(oldEnergy) || oldEnergy == 0 || Double.isNaN(dist)) {
                     lastCSDslice = currentSlice - 1;
                     continue;
                 }
@@ -491,7 +496,11 @@ public class WaveFrontTracker implements PlugInFilter {
         }
 
 
-        // Back-ward step now
+        /**
+         * Backwards step to resolve the beginning of the wave
+         *
+         * @TODO In the future we will backwards step to help improve the segmentation for all of the frames
+         */
 
         IJ.log("Backward stepping to resolve the beginning of the wave");
 
@@ -534,6 +543,11 @@ public class WaveFrontTracker implements PlugInFilter {
 
     }
 
+    /**
+     * Normalize a vector
+     * @param values
+     * @return
+     */
     private double[] normalize(double[] values) {
         double sum = 0;
         for (int i = 0; i < values.length; i++) {
@@ -545,6 +559,12 @@ public class WaveFrontTracker implements PlugInFilter {
         return values;
     }
 
+    /**
+     * Find Chan-Vese segmentation
+     * @param ip            ImageProcessor to perform segmentation on
+     * @param iterations    Number of iterations between graph cutting and likelihood inference
+     * @return
+     */
     public GraphCutSegmenter naivelyFindSegmentation(ImageProcessor ip,
                                                      int iterations) {
 
@@ -616,8 +636,8 @@ public class WaveFrontTracker implements PlugInFilter {
         gd.addNumericField("standard error", this.priorSpeedSD, 2, 5,
                 "pixels per frame");
         gd.addNumericField("Shape penalty exponent", this.alpha, 0);
-        gd.addNumericField("Length penalty", this.lengthPenalty, 0);
-        gd.addNumericField("Initial Length penalty", this.initialLengthPenalty,
+        gd.addNumericField("Length penalty", imp.getWidth()/20.0, 0);
+        gd.addNumericField("Initial Length penalty", imp.getWidth()/20.0,
                 0);
         gd.addNumericField("Number of predictions", this.speedSamples, 0);
         gd.addNumericField("Width of inner region for stats",

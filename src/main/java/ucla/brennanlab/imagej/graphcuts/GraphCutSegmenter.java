@@ -68,6 +68,10 @@ public class GraphCutSegmenter {
 
     }
 
+    /**
+     * Compute percent of area inside
+     * @return
+     */
     public float fractionInner() {
         int inner = 0;
         for (int y = 0; y < height; y++) {
@@ -113,8 +117,12 @@ public class GraphCutSegmenter {
         return (new ImagePlus("", returnMaskProcessor()));
     }
 
-    public void setLengthPenalty(float MU) {
-        this.lengthPenalty = MU;
+    /**
+     * Set the length penalty
+     * @param mu
+     */
+    public void setLengthPenalty(float mu) {
+        this.lengthPenalty = mu;
     }
 
     /**
@@ -122,10 +130,17 @@ public class GraphCutSegmenter {
      * could just set a pointer maybe
      */
 
+    /**
+     * Set Chan-Vese edge weights
+     */
     public void setEdgeWeights(){
         setEdgeWeights(this.lengthPenalty);
     }
 
+    /**
+     * Set Chan-Vese edge weights
+     * @param penalty
+     */
     public void setEdgeWeights(float penalty) {
         gc.resetEdgeNum();
 
@@ -425,6 +440,13 @@ public class GraphCutSegmenter {
 
     }
 
+
+    /**
+     * Get value from ImageProcessor, returning boundary values for coordinates not in domain
+     * @param x
+     * @param y
+     * @return
+     */
     public float ipGetSafeValue(int x, int y) {
         x = x < 0 ? 0 : x;
         x = x >= width ? width - 1 : x;
@@ -457,11 +479,22 @@ public class GraphCutSegmenter {
 
     }
 
+    /**
+     * Relax the energy, not re-using trees
+     *
+     * @return
+     */
     public float relaxEnergy() {
-        this.Energy = gc.computeMaximumFlow(true, null);
+        this.Energy = gc.computeMaximumFlow(false, null);
         return (this.Energy);
     }
 
+    /**
+     * Compute the area of overlap between two masks
+     * @param mask1
+     * @param mask2
+     * @return
+     */
     public float overlap(boolean[][] mask1, boolean[][] mask2) {
         int w1 = mask1.length;
         int w2 = mask2.length;
@@ -488,41 +521,52 @@ public class GraphCutSegmenter {
 
     }
 
-    public float[] normalize(float[] kernelWeights) {
-        if (kernelWeights.length == 1)
+    /**
+     * Normalize weights
+     * @param weights
+     * @return
+     */
+    public float[] normalize(float[] weights) {
+        if (weights.length == 1)
             return new float[] { 1 };
         float sum = 0;
-        float[] num = new float[kernelWeights.length];
-        for (int i = 0; i < kernelWeights.length; i++) {
-            sum += kernelWeights[i];
+        float[] num = new float[weights.length];
+        for (int i = 0; i < weights.length; i++) {
+            sum += weights[i];
         }
-        for (int i = 0; i < kernelWeights.length; i++) {
-            num[i] = sum == 0 ? (float) 1.0 / kernelWeights.length
-                    : kernelWeights[i] / sum;
+        for (int i = 0; i < weights.length; i++) {
+            num[i] = sum == 0 ? (float) 1.0 / weights.length
+                    : weights[i] / sum;
         }
         return num;
     }
 
-    public double[] normalize(double[] kernelWeights) {
-        if (kernelWeights.length == 1)
+    /**
+     * Normalize weights (double)
+     * @param weights
+     * @return
+     */
+    public double[] normalize(double[] weights) {
+        if (weights.length == 1)
             return new double[] { 1 };
         double sum = 0;
-        double[] num = new double[kernelWeights.length];
-        for (int i = 0; i < kernelWeights.length; i++) {
-            sum += kernelWeights[i];
+        double[] num = new double[weights.length];
+        for (int i = 0; i < weights.length; i++) {
+            sum += weights[i];
         }
-        for (int i = 0; i < kernelWeights.length; i++) {
-            num[i] = sum == 0 ? (double) 1.0 / kernelWeights.length
-                    : kernelWeights[i] / sum;
+        for (int i = 0; i < weights.length; i++) {
+            num[i] = sum == 0 ? (double) 1.0 / weights.length
+                    : weights[i] / sum;
         }
         return num;
     }
+
 
     public void setIntensityModel(IntensityModel s) {
         this.intensityModel = s;
     }
 
-    public IntensityModel getS() {
+    public IntensityModel getIntensityModel() {
         return intensityModel;
     }
 
