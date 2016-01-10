@@ -3,6 +3,7 @@ package ucla.brennanlab.imagej.util.stochastic;
 import ij.IJ;
 import ij.ImageStack;
 import ij.process.ImageProcessor;
+import ucla.brennanlab.imagej.util.levelsets.ImplicitShape2D;
 
 public class GaussianMixture implements IntensityModel {
 
@@ -35,14 +36,16 @@ public class GaussianMixture implements IntensityModel {
         this.priorparams = this.originalpriorparams.clone();
     }
 
-
+    public void Infer(ImageProcessor ip, boolean[][] labels, boolean updatePrior){
+        Infer(ip,labels,updatePrior, 1000000);
+    }
     /*
      * Infer by adding data
      * 
      * @see ucla.chou.graphcutshapes.IntensityModel#Infer(double[][],
      * boolean[][])
      */
-    public void Infer(ImageProcessor ip, boolean[][] labels, boolean updatePrior) {
+    public void Infer(ImageProcessor ip, boolean[][] labels, boolean updatePrior, int innerband) {
         double sumin = 0;
         double sum2in = 0;
         long areain = 0;
@@ -54,12 +57,14 @@ public class GaussianMixture implements IntensityModel {
         int w = ip.getWidth();
         int h = ip.getHeight();
 
+        ImplicitShape2D distance = new ImplicitShape2D(labels);
+
         //IJ.log("WTF IS GOING ON???");
         // Compute sufficient statistics for the data
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
                 double pixval = ip.getPixelValue(x, y);
-                if (labels[x][y]) {
+                if (labels[x][y] && Math.abs(distance.get(x,y))<=innerband) {
                     sumin += pixval;
                     sum2in += Math.pow(pixval, 2);
                     areain++;

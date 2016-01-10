@@ -64,7 +64,6 @@ public class fastMarchingSolver {
         this.setInitial(initial);
         this.spd = spd;
         reset();
-
     }
 
     public static int getErrorStop() {

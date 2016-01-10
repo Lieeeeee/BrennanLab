@@ -44,14 +44,14 @@ public class WaveFrontTracker implements PlugInFilter {
     int timesteps;
     int slices;
     int maxiters = 10;
-    double initialLengthPenalty = 1;
-    double lengthPenalty = 1;
+    double initialLengthPenalty = 10.0;
+    double lengthPenalty = 1.0;
     double alpha = 2;
     boolean showPredictions = false;
     boolean useManualInitializationPrior = false;
     Roi userDrawnRoi;
     int speedSamples = 16;
-    double priorSpeedMean = 5, priorSpeedSD = 3;
+    double priorSpeedMean = 5.0, priorSpeedSD = 5.0;
     int width;
     int height;
     int innerBandWidth = 25;
@@ -171,7 +171,88 @@ public class WaveFrontTracker implements PlugInFilter {
                 this.lengthPenalty = imp.getWidth()/40.0;
             }
 
-            if (csdHasStarted) {
+            if (!csdHasStarted)
+             {
+                /****************************************************
+                 * CSD maybe hasn't started yet
+                 *****************************************************/
+
+                if (this.useManualInitializationPrior) {
+                    this.userDrawnRoi.setName("User_drawn_template_slice_"
+                            + currentSlice);
+                    roiman.addRoi(this.userDrawnRoi);
+                    ImplicitShape2D manualLS = (new ImplicitShape2D(
+                            this.userDrawnRoi, width, height));
+                    ArrayList<ImplicitShape2D> userDefinedShapes = new ArrayList<ImplicitShape2D>(
+                            1);
+                    userDefinedShapes.add(manualLS);
+                    double[] weights = new double[1];
+                    weights[0] = 1;
+                    ShapePrior userKDE = new ShapePrior(
+                            userDefinedShapes, weights);
+                    userKDE.setMultiplier(1.0);
+                    userKDE.beta = 1.0;
+
+                    IntensityModel s;
+                    if(this.likelihoodmodel=="Gaussian") {
+                        s = new GaussianMixture();
+                    }else{
+                        s = new LaplaceMixture();
+                    }
+                    s.Infer(currentImageProcessor, manualLS.getMask());
+
+                    gcSegmenter = new GraphCutSegmenter(currentImageProcessor, 1);
+
+                    gcSegmenter.setIntensityModel(s);
+                    gcSegmenter.setEdgeWeights(userKDE, manualLS);
+                    gcSegmenter.setNodeWeights(userKDE, manualLS, s);
+                    double minE = gcSegmenter.relaxEnergy();
+                    IJ.log(minE + " " + gcSegmenter.fractionInner());
+                    s.Infer(currentImageProcessor, gcSegmenter.returnMask(),false,this.innerBandWidth);
+
+                } else {
+                    IJ.log("... computing naive maxflow for slice "
+                            + currentSlice + " ... ");
+                    long startTime = System.nanoTime();
+                    long endTime;
+                    try {
+                        gcSegmenter = this.naivelyFindSegmentation(
+                                currentImageProcessor, 3);
+
+                    } finally {
+                        endTime = System.nanoTime();
+                    }
+
+                    long duration = endTime - startTime;
+
+                    IJ.log("Computed maxflow energy of " + gcSegmenter.Energy + " in "
+                            + (float) duration / 1000000 + " ms");
+                }
+                // double inner = gcs.getS().innerarea;
+                if (gcSegmenter.fractionInner() > 0.01) {
+                    /**
+                     * Provisionally say that the CSD has been initialized, but
+                     * we might get kicked back here again if the subsequent
+                     * frames yield inadmissible wave speed profiles
+                     */
+                    csdHasStarted = true;
+                    IJ.log("Found a " + fmt.format(gcSegmenter.fractionInner() * 100)
+                            + "% blob that might be the start of CSD at slice "
+                            + currentSlice + "...");
+                    Roi initialROI = gcSegmenter.returnRoi();
+                    initialROI.setName("Position_" + currentSlice);
+                    roiman.addRoi(initialROI);
+                    firstCSDslice = currentSlice;
+                    roisOfSegmentations.add((Roi) initialROI.clone());
+                    this.maxAposteriorSpd.addArrival(gcSegmenter.getLevelSet());
+
+                } else {
+                    csdHasStarted = false;
+                    IJ.log("Found no trace of CSD, skipping to next slice\n");
+                }
+
+            }
+            else {
 
                 ImplicitShape2D prevLS = new ImplicitShape2D(gcSegmenter.returnMask());
                 if (gcSegmenter.fractionInner() < 10.0 / width / height) {
@@ -258,7 +339,7 @@ public class WaveFrontTracker implements PlugInFilter {
                 }
 
                 likelihood.Infer(currentImageProcessor, meanNext
-                        .getMask());
+                        .getMask(),false,this.innerBandWidth);
 
                 gcSegmenter = new GraphCutSegmenter(currentImageProcessor);
                 gcSegmenter.setLengthPenalty((float) this.lengthPenalty);
@@ -278,7 +359,7 @@ public class WaveFrontTracker implements PlugInFilter {
                      * MM iterations
                      */
                     likelihood.Infer(currentImageProcessor, gcSegmenter
-                            .returnMask());
+                            .returnMask(),false,this.innerBandWidth);
                     gcSegmenter.setEdgeWeights(shapePriorDensity, gcSegmenter.getLevelSet());
                     long currentTime;
                     int i = 1;
@@ -408,90 +489,15 @@ public class WaveFrontTracker implements PlugInFilter {
                 IJ.log("Current average wavespeed is "
                         + currentMeanSpeed + " pixels per frame"); // current wavespeed
 
-            } else {
-                /****************************************************
-                 * CSD maybe hasn't started yet
-                 *****************************************************/
-
-                if (this.useManualInitializationPrior) {
-                    this.userDrawnRoi.setName("User_drawn_template_slice_"
-                            + currentSlice);
-                    roiman.addRoi(this.userDrawnRoi);
-                    ImplicitShape2D manualLS = (new ImplicitShape2D(
-                            this.userDrawnRoi, width, height));
-                    ArrayList<ImplicitShape2D> userDefinedShapes = new ArrayList<ImplicitShape2D>(
-                            1);
-                    userDefinedShapes.add(manualLS);
-                    double[] weights = new double[1];
-                    weights[0] = 1;
-                    ShapePrior userKDE = new ShapePrior(
-                            userDefinedShapes, weights);
-                    userKDE.setMultiplier(1.0);
-                    userKDE.beta = 1.0;
-
-                    IntensityModel s;
-                    if(this.likelihoodmodel=="Gaussian") {
-                        s = new GaussianMixture();
-                    }else{
-                        s = new LaplaceMixture();
-                    }
-                    s.Infer(currentImageProcessor, manualLS.getMask());
-
-                    gcSegmenter = new GraphCutSegmenter(currentImageProcessor, 1);
-
-                    gcSegmenter.setIntensityModel(s);
-                    gcSegmenter.setEdgeWeights(userKDE, manualLS);
-                    gcSegmenter.setNodeWeights(userKDE, manualLS, s);
-                    double minE = gcSegmenter.relaxEnergy();
-                    IJ.log(minE + " " + gcSegmenter.fractionInner());
-                    s.Infer(currentImageProcessor, gcSegmenter.returnMask());
-
-                } else {
-                    IJ.log("... computing naive maxflow for slice "
-                            + currentSlice + " ... ");
-                    long startTime = System.nanoTime();
-                    long endTime;
-                    try {
-                        gcSegmenter = this.naivelyFindSegmentation(
-                                currentImageProcessor, 3);
-
-                    } finally {
-                        endTime = System.nanoTime();
-                    }
-
-                    long duration = endTime - startTime;
-
-                    IJ.log("Computed maxflow energy of " + gcSegmenter.Energy + " in "
-                            + (float) duration / 1000000 + " ms");
-                }
-                // double inner = gcs.getS().innerarea;
-                if (gcSegmenter.fractionInner() > 0.01) {
-                    /**
-                     * Provisionally say that the CSD has been initialized, but
-                     * we might get kicked back here again if the subsequent
-                     * frames yield inadmissible wave speed profiles
-                     */
-                    csdHasStarted = true;
-                    IJ.log("Found a " + fmt.format(gcSegmenter.fractionInner() * 100)
-                            + "% blob that might be the start of CSD at slice "
-                            + currentSlice + "...");
-                    Roi initialROI = gcSegmenter.returnRoi();
-                    initialROI.setName("Position_" + currentSlice);
-                    roiman.addRoi(initialROI);
-                    firstCSDslice = currentSlice;
-                    roisOfSegmentations.add((Roi) initialROI.clone());
-                    this.maxAposteriorSpd.addArrival(gcSegmenter.getLevelSet());
-
-                } else {
-                    csdHasStarted = false;
-                    IJ.log("Found no trace of CSD, skipping to next slice\n");
-                }
-
             }
 
             currentSlice++;
 
         }
+
+        // Back-ward step now
+
+        IJ.log("Backward stepping to resolve the beginning of the wave");
 
         IJ.setSlice(currentSlice);
 
@@ -576,7 +582,7 @@ public class WaveFrontTracker implements PlugInFilter {
             IJ.log(""+i);
             gcSegmenter.setNodeWeights(likelihood);
             IJ.log("Energy " + gcSegmenter.relaxEnergy());
-            likelihood.Infer(ipCopy, gcSegmenter.returnMask());
+            likelihood.Infer(ipCopy, gcSegmenter.returnMask(),true,this.innerBandWidth);
 
             IJ.log("\\mu_in " + likelihood.getPosteriorMean(true) + " \\mu_out"+ likelihood.getPosteriorMean(false));
             IJ.log("\\s_in " + likelihood.getPosteriorPrecision(true) + " \\s_out" + likelihood.getPosteriorPrecision(false));

@@ -3,6 +3,7 @@ package ucla.brennanlab.imagej.util.stochastic;
 import ij.IJ;
 import ij.ImageStack;
 import ij.process.ImageProcessor;
+import ucla.brennanlab.imagej.util.levelsets.ImplicitShape2D;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -17,26 +18,30 @@ public class LaplaceMixture implements IntensityModel {
 
     }
 
+    public void Infer(ImageProcessor ip, boolean[][] labels, boolean updatePrior){
+        Infer(ip,labels,updatePrior, 1000000);
+    }
     /*
      * Infer by adding data
      *
      * @see ucla.chou.graphcutshapes.IntensityModel#Infer(double[][],
      * boolean[][])
      */
-    public void Infer(ImageProcessor ip, boolean[][] labels, boolean updatePrior) {
+    public void Infer(ImageProcessor ip, boolean[][] labels, boolean updatePrior, int innerband) {
 
         List<Float> inPixels = new ArrayList<Float>();
         List<Float> outPixels = new ArrayList<Float>();
 
         int w = ip.getWidth();
         int h = ip.getHeight();
+        ImplicitShape2D distance = new ImplicitShape2D(labels);
 
         double medin, medout, bin, bout;
 
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
                 float pixval = ip.getPixelValue(x, y);
-                if (labels[x][y]) {
+                if (labels[x][y] && Math.abs(distance.get(x,y))<=innerband) {
                     inPixels.add((float) pixval);
                 } else {
                     outPixels.add(pixval);
