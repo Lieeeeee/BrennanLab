@@ -21,7 +21,7 @@ import ucla.brennanlab.imagej.util.levelsets.ShapePrior;
 import ucla.brennanlab.imagej.util.stochastic.GaussianMixture;
 import ucla.brennanlab.imagej.util.stochastic.IntensityModel;
 import ucla.brennanlab.imagej.util.stochastic.LaplaceMixture;
-import ucla.brennanlab.imagej.util.stochastic.SpeedField;
+import ucla.brennanlab.imagej.util.stochastic.MonotonicFrontSpeedField;
 
 import java.awt.*;
 import java.text.DecimalFormat;
@@ -55,7 +55,7 @@ public class WaveFrontTracker implements PlugInFilter {
     int width;
     int height;
     int innerBandWidth = 25;
-    SpeedField maxAposteriorSpd; // filtered speed field
+    MonotonicFrontSpeedField runningSpeed; // filtered speed field
     ArrayList<Roi> roisOfSegmentations;
     boolean csdHasStarted = false;
     Color roiColor = new Color(255, 105, 180, 255); // Color to draw the ROI
@@ -124,8 +124,6 @@ public class WaveFrontTracker implements PlugInFilter {
         ImagePlus gSegmentImp = imp.createImagePlus();
         gSegmentImp.setTitle(imp.getTitle() + "_segmentation");
 
-        this.maxAposteriorSpd.setPriorMeanSpeed((float) this.priorSpeedMean);
-        this.maxAposteriorSpd.setPriorVarSpeed((float) this.priorSpeedSD);
 
         /*****************************************************************
          * Start processing totalSlices here.
@@ -241,7 +239,7 @@ public class WaveFrontTracker implements PlugInFilter {
                     roiman.addRoi(initialROI);
                     firstCSDslice = currentSlice;
                     roisOfSegmentations.add((Roi) initialROI.clone());
-                    this.maxAposteriorSpd.addArrival(gcSegmenter.getLevelSet());
+                    this.runningSpeed.addArrival(gcSegmenter.getLevelSet(),currentSlice);
 
                 } else {
                     csdHasStarted = false;
@@ -273,7 +271,13 @@ public class WaveFrontTracker implements PlugInFilter {
 
                 ImplicitShape2D meanNext = new ImplicitShape2D(prevLS
                         .getMask());
-                meanNext.advectUniformSpeed(this.priorSpeedMean, 1.0);
+
+
+                /**
+                 * Retrieve the current mean speed from runningSpeed object
+                 * and advect the wave
+                 */
+                meanNext.advect(runningSpeed.currentMean(), 1.0);
 
                 // Infer the speed field here!!! @TODO
 
@@ -284,15 +288,15 @@ public class WaveFrontTracker implements PlugInFilter {
                 roiman.addRoi(nextRoi);
 
                 double[] effectiveWeights = new double[this.speedSamples];
-                double speed;
+                double[][] speed;
                 for (int i = 0; i < this.speedSamples; i++) {
-                    speed = normalRV.nextDouble(priorSpeedMean, priorSpeedSD);
+                    speed = runningSpeed.sample();
 
                     positions.add(new ImplicitShape2D(
                             prevLS.getMask()));
                     effectiveWeights[i] = 1;// redo the weighting soon
 
-                    positions.get(i).advectUniformSpeed(speed, 1.0);
+                    positions.get(i).advect(speed, 1.0);
 
                     Roi pred = positions.get(i).getRoi(true);
 
@@ -335,16 +339,16 @@ public class WaveFrontTracker implements PlugInFilter {
                     likelihood = new LaplaceMixture();
                 }
 
+                /**
+                 * Use the mean prediction as the start state for MM
+                 */
+
                 likelihood.Infer(currentImageProcessor, meanNext
                         .getMask(),false,this.innerBandWidth);
 
                 gcSegmenter = new GraphCutSegmenter(currentImageProcessor);
                 gcSegmenter.setLengthPenalty((float) this.lengthPenalty);
                 gcSegmenter.setIntensityModel(likelihood);
-
-
-
-                float currentMeanSpeed =  (float)this.maxAposteriorSpd.latestSpeed;
 
                 /********************************************************************************
                  * At this stage we have our shape predictions and the likelihood model
@@ -481,13 +485,9 @@ public class WaveFrontTracker implements PlugInFilter {
                 }
 
                 ImplicitShape2D currentPosition = gcSegmenter.getLevelSet();
-                this.maxAposteriorSpd.addArrival(currentPosition);
-                this.maxAposteriorSpd.updateGMRF();
+                this.runningSpeed.addArrival(currentPosition,currentSlice);
+                this.runningSpeed.updateGMRF();
 
-                currentMeanSpeed = (float) this.maxAposteriorSpd.latestSpeed;
-
-                IJ.log("Current average wavespeed is "
-                        + currentMeanSpeed + " pixels per frame"); // current wavespeed
 
             }
 
@@ -513,8 +513,7 @@ public class WaveFrontTracker implements PlugInFilter {
 
         IJ
                 .log("Computing arrival times and speed map for the filtered trajectory...");
-        float[][] arrivalTimes = this.maxAposteriorSpd.getArrivalTimes();
-        //GaussianBlur gb = new GaussianBlur();
+        float[][] arrivalTimes = this.runningSpeed.getArrivalTimes();
 
         ImageProcessor timeIP = new FloatProcessor(arrivalTimes);
 
@@ -526,7 +525,7 @@ public class WaveFrontTracker implements PlugInFilter {
             }
         }
 
-        float[][] speeds = this.maxAposteriorSpd.arrivalsToSpeed(arrivalTimes);
+        float[][] speeds = this.runningSpeed.arrivalsToSpeed(arrivalTimes);
 
         ImageProcessor speedIP = new FloatProcessor(speeds);
         speedIP.setMinAndMax(this.priorSpeedMean - this.priorSpeedSD / 2, this.priorSpeedMean * 1.5);
@@ -621,7 +620,7 @@ public class WaveFrontTracker implements PlugInFilter {
         this.slices = imp.getStackSize();
         this.width = imp.getWidth();
         this.height = imp.getHeight();
-        this.maxAposteriorSpd = new SpeedField(this.width, this.height);
+        this.runningSpeed = new MonotonicFrontSpeedField(this.width, this.height);
         this.userDrawnRoi = imp.getRoi();
 
         return DOES_16 + DOES_8G + DOES_32 + NO_CHANGES;

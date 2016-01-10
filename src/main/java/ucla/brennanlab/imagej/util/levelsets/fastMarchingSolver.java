@@ -30,7 +30,7 @@ public class fastMarchingSolver {
     private static final double EXTREME_GROWTH = 1000;
     private final static int ELEMENT_CACHE_SIZE = 1000;
     // control parameters for fast marching
-    float[][] spd;
+    double[][] spd;
     int width, height;
     private PriorityQueue<BandElement> heap = null;
     private BandElementCache elem_cache = null;
@@ -60,7 +60,7 @@ public class fastMarchingSolver {
      * @param initial
      * @param spd
      */
-    public fastMarchingSolver(ImplicitShape2D initial, float[][] spd) {
+    public fastMarchingSolver(ImplicitShape2D initial, double[][] spd) {
         this.setInitial(initial);
         this.spd = spd;
         reset();
@@ -70,7 +70,7 @@ public class fastMarchingSolver {
         return ERROR_STOP;
     }
 
-    public void setSpd(float[][] spd) {
+    public void setSpd(double[][] spd) {
         this.spd = spd;
     }
 
@@ -268,7 +268,7 @@ public class fastMarchingSolver {
         if (yVal < Double.MAX_VALUE)
             quadCoeff++;
 
-        final float speed = this.spd[x][y];
+        final double speed = this.spd[x][y];
 
 		/*
 		 * If only one spatial direction contributes to the quadratic

@@ -256,7 +256,28 @@ public class ImplicitShape2D {
         return d * Math.pow(this.inertialScale,-this.lambda);
 
     }
-    public void advectUniformSpeed(double speed, double time) {
+
+    /**
+     * Advect the shape through fast marching
+     * @param speed
+     * @param time
+     */
+    public void advect(double[][] speed, double time){
+        fastMarchingSolver fm = new fastMarchingSolver(this, speed);
+        ImplicitShape2D future = fm.solveAndReturnImplicitShape2D(time);
+        this.signedDistance = future.signedDistance;
+        this.inertialAngle = future.inertialAngle;
+        this.inertialOrientation = future.inertialOrientation;
+        this.inertialScale = future.inertialScale;
+
+    }
+
+    /**
+     * Advect front at uniform speed
+     * @param speed
+     * @param time
+     */
+    public void advect(double speed, double time) {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 this.signedDistance[x][y] += speed * time;
@@ -1450,6 +1471,49 @@ public class ImplicitShape2D {
             }
         }
         return new int[] { maxx, maxy };
+    }
+
+    public ImplicitShape2D union(ImplicitShape2D othershape) {
+        assert (this.width == othershape.width && this.height == othershape.height);
+
+
+        return null;
+    }
+
+    /**
+     * Check to see if this shape is a superset of otherShape
+     *
+     * @param otherShape
+     * @return
+     */
+    public boolean isSuperSetOf(ImplicitShape2D otherShape){
+        for(int y=0; y<this.height; y++)
+        {
+            for(int x=0; x<this.width; x++){
+                if(otherShape.in(x,y) && !this.in(x,y)){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check to see if this shape is a superset of otherShape
+     *
+     * @param otherShape
+     * @return
+     */
+    public boolean isSubSetOf(ImplicitShape2D otherShape){
+        for(int y=0; y<this.height; y++)
+        {
+            for(int x=0; x<this.width; x++){
+                if(this.in(x,y) && !otherShape.in(x,y)){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 }

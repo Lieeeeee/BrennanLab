@@ -7,26 +7,19 @@ import ucla.brennanlab.imagej.util.levelsets.ImplicitShape2D;
 import java.util.ArrayList;
 
 /**
- * This class stores a single realization of speed field, and includes methods
- * for interpolation. The speed field calls upon Kriging2D field to interpolate
- * the speeds in a signedDistance. "Regression to the mean" is expected, so
- * speeds far away from observed points are simply assigned mean-speeds for ease
- * of computation (To save time)
+ * This class stores interfaces with the Kriging class to interpolate arrival times
+ * and sample speed fields.
  * <p>
- * Also stores the kriging object and does translation between it and image
- * spatial field. Of note is the fact that the representation of speed here is
- * unitless, it is expected that there is 1 speed unit between each ROI passed
- * in
+ * Fundamentally, we probabilistically solve the eikonal equation |\nabla T| = F, where $T$
+ * are the arrival times.
  *
  * @author Josh Chang
  */
-public class SpeedField {
+public class MonotonicFrontSpeedField {
     public int width, height;
-    public double latestSpeed;
     ArrayList<ImplicitShape2D> wavePositions;
-    Normal standardNormal;
-    private float[][] speedField; // "response" associated with wavePositions
-    private float[][] arrivalTimes; // arrival times of wavePositions
+    ArrayList<Float> times;
+    Normal standardNormal; // use this to generate iid Gaussian variables
     private Kriging2DLattice krigingLattice; // stores actual speeds that we will use
     private float priorMeanSpeed;
     private float priorVarSpeed;
@@ -35,103 +28,56 @@ public class SpeedField {
      * @param width  Width of interpolation signedDistance
      * @param height Width of height signedDistance
      **/
-    public SpeedField(int width, int height) {
+    public MonotonicFrontSpeedField(int width, int height) {
         this(width, height, Float.MIN_VALUE, Float.MAX_VALUE);
     }
 
-    public SpeedField(int width, int height, float priormean, float priorvar) {
+    public MonotonicFrontSpeedField(int width, int height, float priormean, float priorvar) {
         this.width = width;
         this.height = height;
-        this.speedField = new float[width][height];
+        this.times = new ArrayList<Float>();
         this.wavePositions = new ArrayList<ImplicitShape2D>();
         this.priorMeanSpeed = priormean;
-        this.setPriorVarSpeed(priorvar);
+        this.priorVarSpeed = priorvar;
         this.standardNormal = new Normal(
                 0,
                 1,
                 new cern.jet.random.engine.MersenneTwister(new java.util.Date()));
     }
 
+
+    public void addArrival(boolean[][] mask, float time){
+        this.addArrival(new ImplicitShape2D(mask), time);
+
+
+    }
+
     /**
      * Add another ROI and update the kriging object. We don't perform any
      * sanity checking here.
      *
-     * @param thisLevelset The arrival times with null for not-defined
+     * @param incomingShape The arrival times with null for not-defined
      */
-    public void addArrival(ImplicitShape2D thisLevelset) {
+    public void addArrival(ImplicitShape2D incomingShape, float time) {
 
-        if (wavePositions.size() == 0) {
-            wavePositions.add(thisLevelset);
-            /**
-             * This is the first arrival, so just find the center and add it
-             */
-            this.arrivalTimes = interpolateArrivalsFromLevelsets(wavePositions);
-            this.speedField = arrivalsToSpeed(this.arrivalTimes);
+        /**
+         * Check to make sure that:
+         *      1) New front does not cross the other observed fronts inadmissably
+         *      2) ... anything else?
+         */
 
-        } else {
-            ImplicitShape2D prevLevelset = wavePositions.get(wavePositions
-                    .size() - 1);
-
-            double totTime = 0;
-            int n = 0;
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    if (thisLevelset.get(x, y) <= 0
-                            && prevLevelset.get(x, y) > 0) {
-                        // interpolate the arrival times
-                        this.arrivalTimes[x][y] = (float) ((-this.wavePositions.size()
-                                * thisLevelset.get(x, y) + (this.wavePositions
-                                .size() + 1)
-                                * prevLevelset.get(x, y))
-                                / (prevLevelset.get(x, y) - thisLevelset.get(x,
-                                y)));
-                        n++;
-                        totTime += this.arrivalTimes[x][y];
-                    }
-                }
-            }
-
-            IJ.log("Average interpolated arrival time: " + totTime / n);
-
-            double totspeed = 0;
-            n = 0;
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    if (thisLevelset.get(x, y) <= 0
-                            && prevLevelset.get(x, y) > 0) {
-                        // interpolate the upwind finite differences speed!
-                        int upX = Math.min(x + 1, width - 1);
-                        int upY = Math.min(y + 1, height - 1);
-                        int downX = Math.max(x - 1, 0);
-                        int downY = Math.max(y - 1, 0);
-                        double dTx = Math.max(Math.max(this.arrivalTimes[x][y] -
-
-                                this.arrivalTimes[upX][y], this.arrivalTimes[x][y]
-                                - this.arrivalTimes[downX][y]), 0);
-                        double dTy = Math.max(Math.max(this.arrivalTimes[x][y]
-                                        - this.arrivalTimes[x][upY],
-                                this.arrivalTimes[x][y]
-                                        - this.arrivalTimes[x][downY]), 0);
-
-                        // Maybe use second order scheme?
-
-                        this.speedField[x][y] = (float) Math.pow(dTx * dTx
-                                + dTy * dTy, -0.5);
-                        if (x > 5 && y > 5 && x < width - 5
-                                && y < width - 5) {
-                            totspeed += speedField[x][y];
-                            n++;
-                        }
-                    }
-                }
-            }
-            if (!Double.isInfinite(totspeed) && !(n == 0)) {
-                this.latestSpeed = totspeed / n;
-            }
-
-            wavePositions.add(thisLevelset);
-            IJ.log("Average wavespeed " + totspeed / n + " pixels/frame");
+        if(this.times.size()==0){
+            this.times.add(time);
+            this.wavePositions.add(incomingShape);
         }
+
+        // Figure out position to insert into this.times
+
+        /**
+         * For each point on the front of incomingShape, calculate the signed
+         * distance from the previous shape. Use this computation to approximate the
+         * speed
+         */
 
     }
 
@@ -206,13 +152,11 @@ public class SpeedField {
         return speeds;
     }
 
-    public SpeedField clone() {
-        SpeedField s = new SpeedField(width, height);
+    public MonotonicFrontSpeedField clone() {
+        MonotonicFrontSpeedField s = new MonotonicFrontSpeedField(width, height);
         s.setKrigingObject(this.krigingLattice);
-        s.setspeedField(this.speedField.clone());
-        s.setarrivalTimes(this.arrivalTimes.clone());
-        s.setPriorVarSpeed(priorVarSpeed);
-        s.setPriorMeanSpeed(priorMeanSpeed);
+        s.priorVarSpeed = priorVarSpeed;
+        s.priorMeanSpeed = priorMeanSpeed;
 
         return s;
     }
@@ -281,27 +225,6 @@ public class SpeedField {
         return s;
     }
 
-    public float getPriorMeanSpeed() {
-        return priorMeanSpeed;
-    }
-
-    public void setPriorMeanSpeed(float priorMeanSpeed) {
-        this.priorMeanSpeed = priorMeanSpeed;
-    }
-
-    public float getPriorVarSpeed() {
-        return priorVarSpeed;
-    }
-
-    public void setPriorVarSpeed(float priorVarSpeed) {
-        this.priorVarSpeed = priorVarSpeed;
-    }
-
-    public float[][] getspeedField() {
-
-        return this.speedField;
-    }
-
     /**
      * Calculates the arrival time T(x,y) from the sequence of ROIs representing
      * position. This function calculates the arrival times between two ROIs as
@@ -367,31 +290,57 @@ public class SpeedField {
 
     }
 
-    public void setarrivalTimes(float[][] a) {
-        this.arrivalTimes = a;
+
+    /**
+     * Sample a speed field
+     * @return
+     */
+    public double[][] sample(){
+
+
+        return null;
     }
 
     /**
-     * Set the speed field
-     *
-     * @param speedField
+     * Return the current mean estimate for the speed field
+     * @return
      */
-    public void setspeedField(float[][] speedField) {
-        this.speedField = speedField;
+    public double[][] currentMean() {
+        /**
+         * Retrieve \hat\beta from kriging object and fill out missing locations
+         * with the mean speed
+         */
 
+        // Store as this.runningMean
+        return null;
     }
 
     /**
-     *
+     * Return the current variance estimate for the speed field
+     * @return
      */
+    public double[][] currentVariation() {
+        /**
+         * Retrieve \hat\beta from kriging object and fill out missing locations
+         * with the mean speed
+         */
 
-    public float[][] getArrivalTimes() {
-        return this.arrivalTimes;
+        // Store as this.runningVariation
+        return null;
     }
+
 
     public void updateGMRF() {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * Return the interpolated arrival times implied by the probability model
+     * @return
+     */
+    public float[][] getArrivalTimes(){
+        return null;
     }
 
 }

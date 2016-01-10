@@ -176,8 +176,6 @@ public class Kriging2DLattice {
         betaHatCovariance = unscaledCondBetaVariance.times(bw / (n + 2 * a));
 
         residuals = response.minus(this.covariates.mtimes(this.betaHat));
-
-        // residuals = this.covariates.mtimes(this.betaHat).minus(response);
     }
 
     /**
@@ -299,9 +297,7 @@ public class Kriging2DLattice {
                         .mtimes(this.covariates)))).plus(
                 withinPrecision.times(bw / (n + 2 * this.a)));
 
-        // predictionVariance.showGUI();
         this.setPredictionRootVariance(predictionVariance.chol());
-        //this.predictionRootVariance.showGUI();
         //
     }
 
