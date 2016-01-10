@@ -121,6 +121,11 @@ public class GraphCutSegmenter {
      * Set edge priorWeights with no prior information other than length penalty
      * could just set a pointer maybe
      */
+
+    public void setEdgeWeights(){
+        setEdgeWeights(this.lengthPenalty);
+    }
+
     public void setEdgeWeights(float penalty) {
         gc.resetEdgeNum();
 

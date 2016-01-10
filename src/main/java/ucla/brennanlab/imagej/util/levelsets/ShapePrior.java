@@ -31,7 +31,6 @@ public class ShapePrior {
         normalizeWeights();
         updateBeta();
         this.inertialScale = shapes.get(0).inertialScale;
-        IJ.log("Shape prior precision " + this.beta);
 
     }
 
@@ -83,7 +82,6 @@ public class ShapePrior {
                 }
             }
             sigmaS += this.priorWeights[j] * minDistances[j];
-            IJ.log("Sigma " + sigmaS);
         }
 
         this.beta = 1.0 / sigmaS;
@@ -112,5 +110,38 @@ public class ShapePrior {
             priorWeights[i] /= sum;
         }
     }
+
+    /**
+     * Go in and rescale the shapes! What we do here is align the incoming shape
+     * to the shape templates, and not the templates to the new shape. Should be
+     * more stable. Reuse parameters
+     *
+     * @param shape
+     */
+    public void setReferenceFrame(ImplicitShape2D shape) {
+        int i = 0;
+        double alpha = 1;
+        double[] c = new double[2];
+        double omega = 0;
+
+        for (ImplicitShape2D s : shapes) {
+            double[] transParams2 = new double[4];
+            if (i == 0) {
+                transParams2 = s.alignByNewton(shape);
+                alpha = transParams2[0];
+                c[0] = transParams2[1];
+                c[1] = transParams2[2];
+                omega = transParams2[3];
+
+            } else {
+                    transParams2 = s.alignByNewton(shape, alpha, c, omega);
+            }
+            s.affineTransform2(transParams2[0], new double[] { transParams2[1],
+                            transParams2[2] }, transParams2[3], shape.width,
+                    shape.height);
+            i++;
+        }
+    }
+
 
 }

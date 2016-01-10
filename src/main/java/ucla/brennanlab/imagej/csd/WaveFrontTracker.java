@@ -44,14 +44,14 @@ public class WaveFrontTracker implements PlugInFilter {
     int timesteps;
     int slices;
     int maxiters = 10;
-    double initialLengthPenalty = 10.0;
-    double lengthPenalty = 1.0;
+    double initialLengthPenalty = 25.0;
+    double lengthPenalty = 20.0;
     double alpha = 2;
     boolean showPredictions = false;
     boolean useManualInitializationPrior = false;
     Roi userDrawnRoi;
-    int speedSamples = 16;
-    double priorSpeedMean = 5.0, priorSpeedSD = 5.0;
+    int speedSamples = 32;
+    double priorSpeedMean = 6.0, priorSpeedSD = 6.0;
     int width;
     int height;
     int innerBandWidth = 25;
@@ -166,11 +166,6 @@ public class WaveFrontTracker implements PlugInFilter {
              * If we determine that CSD has started, run this conditional
              *************************************************************************************/
 
-            if (this.useManualInitializationPrior) {
-                // Adjust the length penalty perhaps as a function of time?
-                this.lengthPenalty = imp.getWidth()/40.0;
-            }
-
             if (!csdHasStarted)
              {
                 /****************************************************
@@ -178,6 +173,8 @@ public class WaveFrontTracker implements PlugInFilter {
                  *****************************************************/
 
                 if (this.useManualInitializationPrior) {
+                    this.lengthPenalty = imp.getWidth()/40.0;
+
                     this.userDrawnRoi.setName("User_drawn_template_slice_"
                             + currentSlice);
                     roiman.addRoi(this.userDrawnRoi);
@@ -320,8 +317,6 @@ public class WaveFrontTracker implements PlugInFilter {
 
                 ShapePrior shapePriorDensity = new ShapePrior(
                         positions, effectiveWeights);
-
-                IJ.log("Prediction distance variance " + shapePriorDensity.beta);
 
                 IJ.log("... done computing priors");
                 IJ.log("... computing maxflow for slice " + currentSlice
@@ -495,6 +490,7 @@ public class WaveFrontTracker implements PlugInFilter {
 
         }
 
+
         // Back-ward step now
 
         IJ.log("Backward stepping to resolve the beginning of the wave");
@@ -527,6 +523,14 @@ public class WaveFrontTracker implements PlugInFilter {
         speedIP.setMinAndMax(this.priorSpeedMean - this.priorSpeedSD / 2, this.priorSpeedMean * 1.5);
         ImagePlus speedImage = new ImagePlus("Speed_field_pixels_per_slice", speedIP);
         speedImage.show();
+
+    }
+
+    public void segmentThis(ImageProcessor ip){
+
+    }
+
+    public void predictNext(){
 
     }
 
