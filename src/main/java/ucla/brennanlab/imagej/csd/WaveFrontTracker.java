@@ -287,7 +287,7 @@ public class WaveFrontTracker implements PlugInFilter {
                 nextRoi.setName("Predicted mean position " + currentSlice);
                 roiman.addRoi(nextRoi);
 
-                double[] effectiveWeights = new double[this.speedSamples];
+                double[] effectiveWeights = new double[this.speedSamples+1];
                 double[][] speed;
                 for (int i = 0; i < this.speedSamples; i++) {
                     speed = runningSpeed.sample();
@@ -312,6 +312,12 @@ public class WaveFrontTracker implements PlugInFilter {
                     }
 
                 }
+                /**
+                 * Hack to help allow for the possibility that the wave didn't move
+                 */
+                positions.add(new ImplicitShape2D(
+                        prevLS.getMask()));
+                effectiveWeights[this.speedSamples] = 0.5;
 
                 effectiveWeights = normalize(effectiveWeights);
 

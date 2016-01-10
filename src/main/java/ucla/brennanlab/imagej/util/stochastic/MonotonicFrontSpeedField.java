@@ -43,6 +43,7 @@ public class MonotonicFrontSpeedField {
                 0,
                 1,
                 new cern.jet.random.engine.MersenneTwister(new java.util.Date()));
+        krigingLattice = new Kriging2DLattice(priormean,priorvar);
     }
 
 
@@ -69,15 +70,35 @@ public class MonotonicFrontSpeedField {
         if(this.times.size()==0){
             this.times.add(time);
             this.wavePositions.add(incomingShape);
+            return;
         }
 
         // Figure out position to insert into this.times
+
+        // For now assume that we are adding times in order!
+
+
 
         /**
          * For each point on the front of incomingShape, calculate the signed
          * distance from the previous shape. Use this computation to approximate the
          * speed
          */
+
+        int[][] incomingBoundaryCoordinates = incomingShape.getBoundaryCoordinates();
+        float[] incomingBoundarySpeeds = new float[incomingBoundaryCoordinates.length];
+        for(int j=0; j<incomingBoundaryCoordinates.length;j++){
+            incomingBoundarySpeeds[j] = (float)
+                    this.wavePositions
+                            .get(this.wavePositions.size())
+                            .get(incomingBoundaryCoordinates[j][0],incomingBoundaryCoordinates[j][1])/
+                    (time-times.get(this.wavePositions.size()));
+        }
+
+
+
+        this.times.add(time);
+        this.wavePositions.add(incomingShape);
 
     }
 
@@ -161,33 +182,6 @@ public class MonotonicFrontSpeedField {
         return s;
     }
 
-    /**
-     * Calculates the coordinates of the center of an ROI
-     *
-     * @param signedDistance
-     * @return
-     */
-    public float[] getCenter(ImplicitShape2D signedDistance) {
-        if (signedDistance.get(0, 0) > width * height + 1)
-            throw new IllegalArgumentException("ROI is null for some reason");
-        float center[] = new float[2];
-        int tx = 0, ty = 0, n = 0, x = 0, y = 0;
-        while (x < width) {
-            for (y = 0; y < height; y++) {
-                if (signedDistance.get(x, y) < 0) {
-                    tx += x;
-                    ty += y;
-                    n++;
-                }
-
-            }
-            x++;
-        }
-        center[0] = tx / n;
-        center[1] = ty / n;
-        IJ.log("CSD origin at x: " + center[0] + " y: " + center[1]);
-        return (center);
-    }
 
     /**
      *
@@ -247,7 +241,7 @@ public class MonotonicFrontSpeedField {
         // Compute center of first roi, set that value to 1
         // TODO back-interpolate to find true start time based on speed
         ImplicitShape2D rls, rlsNext;
-        float[] center = getCenter(levelsetSignedDistances.get(0));
+        double[] center = levelsetSignedDistances.get(0).inertialCenter;
         rls = levelsetSignedDistances.get(0);
 
         // find the center

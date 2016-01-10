@@ -1,5 +1,6 @@
 package ucla.brennanlab.imagej.util.stochastic;
 
+import org.ujmp.core.DenseMatrix2D;
 import org.ujmp.core.Matrix;
 import org.ujmp.core.doublematrix.SparseDoubleMatrix;
 import ucla.brennanlab.imagej.util.levelsets.ImplicitShape2D;
@@ -15,7 +16,7 @@ import ucla.brennanlab.imagej.util.levelsets.ImplicitShape2D;
 public class Kriging2DLattice {
     double a = 1;
     double b = 2;
-    long n; // dimensions of the kriging signedDistance
+    long n = 0; // number of inputted points
     private Matrix response; // n x 1 matrix
     private Matrix locations; // nx2 matrix, should actually be integer but
     // whatever
@@ -51,49 +52,33 @@ public class Kriging2DLattice {
 
     private Matrix predictionRootVariance; // cholesky decomposition square root
 
-    public Kriging2DLattice(Matrix covariates, Matrix locations,
-                            Matrix response, Matrix betaprior, Matrix betaPrecision) {
-        if (locations.getRowCount() != response.getRowCount())
-            throw new IllegalArgumentException(
-                    "Matrix2D dimensions for locations and response incompatible");
-        if (locations.getRowCount() != covariates.getRowCount())
-            throw new IllegalArgumentException(
-                    "Matrix2D dimensions for covariates and locations incompatible");
-        if (betaPrecision.getRowCount() != betaprior.getRowCount()
-                || covariates.getColumnCount() != betaprior.getColumnCount())
+    public Kriging2DLattice(double betaPrior, double betaPrecision){
+        this.betaPrecision = DenseMatrix2D.Factory.zeros(1,1);
+        this.betaPrecision.setAsDouble(betaPrecision,0,0);
+
+        this.betaPrior = DenseMatrix2D.Factory.zeros(1,1);
+        this.betaPrior.setAsDouble(betaPrior,0,0);
+    }
+
+    public Kriging2DLattice(Matrix betaPrior, Matrix betaPrecision){
+        if (betaPrecision.getRowCount() != betaPrior.getRowCount())
             throw new IllegalArgumentException(
                     "Matrix2D dimensions must be compatible");
         this.betaPrecision = betaPrecision;
-        this.covariates = covariates;
-        this.locations = locations;
-        this.response = response;
-        this.n = response.getRowCount();
+        this.betaPrior = betaPrior;
+    }
 
-        /**
-         * 5x5 GMRF
-         */
-        this.spatialPrecision = SparseDoubleMatrix.Factory
-                .zeros(this.n, this.n);
-        this.betaPrior = betaprior;
-        // Set the correlation matrix
-        for (long row = 0; row < n; row++) {
-            for (long column = 0; column < n; column++) {
-                spatialPrecision.setAsDouble(rueGaussianPrecision(locations
-                                .getAsInt(row, 0), locations.getAsInt(row, 1),
-                        locations.getAsInt(column, 0), locations.getAsInt(
-                                column, 1)), row, column);
-            }
-        }
-        // spatialPrecision.showGUI();
+    public Kriging2DLattice(Matrix locations, Matrix covariates,
+                            Matrix response,Matrix betaPrior, Matrix betaPrecision) {
+        this(betaPrior,betaPrecision);
+
+        addObservations(locations,covariates,response);
 
     }
 
     /**
-     * Approximately!!!
-     * Add observations to estimate a new betaHat. We do this in a way
-     * that is completely wrong, by just assuming independence and piecing together
-     * the results to form the new estimate, but we can fix this later TODO, fix this, but
-     * this won't really change the solution much
+     * Add new observations and update the Kriging model using block matrix
+     * linear algebra
      *
      * @param locations  nx2 matrix of locations
      * @param covariates nxp matrix of covariates
@@ -102,6 +87,42 @@ public class Kriging2DLattice {
     public void addObservations(Matrix locations, Matrix covariates,
                                 Matrix response) {
 
+        if(n==0){
+            if(covariates.getColumnCount() != betaPrior.getColumnCount()){
+                throw new IllegalArgumentException(
+                        "Matrix2D dimensions must be compatible");
+            }
+            if (locations.getRowCount() != response.getRowCount())
+                throw new IllegalArgumentException(
+                        "Matrix2D dimensions for locations and response incompatible");
+            if (locations.getRowCount() != covariates.getRowCount())
+                throw new IllegalArgumentException(
+                        "Matrix2D dimensions for covariates and locations incompatible");
+
+            this.covariates = covariates;
+            this.locations = locations;
+            this.response = response;
+            this.n = response.getRowCount();
+
+            /**
+             * 5x5 GMRF
+             */
+            this.spatialPrecision = SparseDoubleMatrix.Factory
+                    .zeros(this.n, this.n);
+            // Set the correlation matrix
+            for (long row = 0; row < n; row++) {
+                for (long column = 0; column < n; column++) {
+                    spatialPrecision.setAsDouble(rueGaussianPrecision(locations
+                                    .getAsInt(row, 0), locations.getAsInt(row, 1),
+                            locations.getAsInt(column, 0), locations.getAsInt(
+                                    column, 1)), row, column);
+                }
+            }
+        }else{
+            /**
+             * We already have some observations previously defined.
+             */
+        }
 
         Matrix withinPrecision = SparseDoubleMatrix.Factory.zeros(locations
                 .getRowCount(), locations.getRowCount());
@@ -116,31 +137,6 @@ public class Kriging2DLattice {
                                 column, 1)), row, column);
             }
         }
-/*		
-        Matrix partialunscaledCondBetaVarianceInv = quadraticInnerNorm(withinPrecision,
-				covariates).plus(betaPrecision);
-
-		Matrix partialunscaledCondBetaVariance = partialunscaledCondBetaVarianceInv.inv();
-		Matrix partialbetaHat = partialunscaledCondBetaVariance.mtimes(covariates.transpose()
-				.mtimes(withinPrecision).mtimes(response).plus(
-						betaPrecision.mtimes(betaPrior)));
-		
-		double partialbw = (2 * b + response
-				.transpose()
-				.mtimes(withinPrecision)
-				.mtimes(response)
-				.minus(
-						quadraticInnerNorm(partialunscaledCondBetaVarianceInv, partialbetaHat)
-								.plus(
-										quadraticInnerNorm(this.betaPrecision,
-												this.betaPrior))).getAsDouble(
-						0, 0));
-*/
-        //	Matrix partialbetaHatCovariance = partialunscaledCondBetaVariance.times(partialbw / (n + 2 * a));
-
-        //	Matrix partialresiduals = response.minus(covariates.mtimes(partialbetaHat));
-
-        // Now augment the original estimates
 
     }
 

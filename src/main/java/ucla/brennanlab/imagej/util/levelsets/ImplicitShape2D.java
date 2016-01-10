@@ -19,10 +19,10 @@ import java.awt.*;
 public class ImplicitShape2D {
     public float[][] signedDistance;
 
-    double inertialScale;
-    double[] inertialOrientation;
-    double inertialAngle; // inertialAngle of the inertialOrientation
-    double[] inertialCenter;
+    public double inertialScale;
+    public double[] inertialOrientation;
+    public double inertialAngle; // inertialAngle of the inertialOrientation
+    public double[] inertialCenter;
     public double lambda = 1;
     double alighmentlambda = 2; // use this for alignment
     final int d = 2; // Dimension... need to rewrite a few things for 3D
@@ -63,7 +63,7 @@ public class ImplicitShape2D {
     /*
      * Calculate inertialCenter of mass
      */
-    double[] centerofMass() {
+    public double[] centerofMass() {
         int w = signedDistance.length;
         int h = signedDistance[0].length;
         double xc = 0;
@@ -1514,6 +1514,102 @@ public class ImplicitShape2D {
             }
         }
         return true;
+    }
+
+
+    /**
+     * Save evenly spaced X-Y coordinates of the current level set
+     *
+     * @url{http://rsb.info.nih.gov/ij/plugins/download/Path_Writer.java
+     * @return
+     */
+    public int[][] getBoundaryCoordinates() {
+
+        Roi roi = this.getRoi(false);
+        int n = ((PolygonRoi) roi).getNCoordinates();
+        int[] x = ((PolygonRoi) roi).getXCoordinates();
+        int[] y = ((PolygonRoi) roi).getYCoordinates();
+        Rectangle r = roi.getBounds();
+        int xbase = r.x;
+        int ybase = r.y;
+        boolean areaPath = roi.getType() <= Roi.TRACED_ROI;
+        double length = 0.0;
+        double segmentLength;
+        int xdelta, ydelta;
+        double[] segmentLengths = new double[n];
+        int[] dx = new int[n];
+        int[] dy = new int[n];
+        for (int i = 0; i < (n - 1); i++) {
+            xdelta = x[i + 1] - x[i];
+            ydelta = y[i + 1] - y[i];
+            segmentLength = Math.sqrt(xdelta * xdelta + ydelta * ydelta);
+            length += segmentLength;
+            segmentLengths[i] = segmentLength;
+            dx[i] = xdelta;
+            dy[i] = ydelta;
+        }
+        if (areaPath) {
+            xdelta = x[0] - x[n - 1];
+            ydelta = y[0] - y[n - 1];
+            segmentLength = Math.sqrt(xdelta * xdelta + ydelta * ydelta);
+            length += segmentLength;
+            segmentLengths[n - 1] = segmentLength;
+            dx[n - 1] = xdelta;
+            dy[n - 1] = ydelta;
+        }
+
+        int size = (int) (1.1 * length);
+        int pathLength = 0;
+        double[] xpath = new double[size];
+        double[] ypath = new double[size];
+        double leftOver = 1.0;
+        double distance = 0.0;
+        int index = -1;
+        for (int i = 0; i < n; i++) {
+            double len = segmentLengths[i];
+            if (len == 0.0)
+                continue;
+            double xinc = dx[i] / len;
+            double yinc = dy[i] / len;
+            double start = 1.0 - leftOver;
+            double rx = xbase + x[i] + start * xinc;
+            double ry = ybase + y[i] + start * yinc;
+            double len2 = len - start;
+            int n2 = (int) len2;
+
+            for (int j = 0; j <= n2; j++) {
+                index++;
+                if (index < xpath.length) {
+                    xpath[index] = rx;
+                    ypath[index] = ry;
+                    pathLength = index + 1;
+                }
+                rx += xinc;
+                ry += yinc;
+            }
+            distance += len;
+            leftOver = len2 - n2;
+        }
+
+        /**
+         * OK, but we want to also exclude boundary points from our path, so
+         * let's detect where we find boundary points, excise them, and redo the
+         * ordering of the remaining points as needed
+         *
+         */
+
+        int[][] path = new int[pathLength][2];
+
+        for (int i = 0; i < pathLength; i++) {
+
+            int x1 = (int) Math.round(xpath[i]);
+            int y1 = (int) Math.round(ypath[i]);
+            path[i][0] = x1 - 1;
+            path[i][1] = y1 - 1;
+        }
+
+        return (path);
+
     }
 
 }
