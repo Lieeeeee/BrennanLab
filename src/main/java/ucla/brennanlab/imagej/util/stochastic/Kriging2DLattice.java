@@ -25,7 +25,8 @@ public class Kriging2DLattice {
     private Matrix betaPrior;
     private Matrix betaHat;
     private Matrix betaHatCovariance;
-
+    private int xreduction;
+    private int yreduction;
     /**
      * When calculating beta for large lattice
      */
@@ -74,6 +75,33 @@ public class Kriging2DLattice {
 
         addObservations(locations,covariates,response);
 
+    }
+
+    /**
+     * Convenience method for adding observations to the kriging model without
+     * first creating UJMP matrices
+     * @param locations
+     * @param covariates
+     * @param response
+     */
+    public void addObservations(int[][] locations, double[][] covariates, double[] response){
+        Matrix loc = DenseMatrix2D.Factory.zeros(locations.length,2);
+        for(int j=0; j<locations.length;j++){
+            loc.setAsDouble(locations[j][0],j,0);
+            loc.setAsDouble(locations[j][1],j,1);
+        }
+        Matrix cov = DenseMatrix2D.Factory.zeros(covariates.length,covariates[0].length);
+        for(int j=0;j<covariates.length;j++){
+            for(int k=0;k<covariates[0].length;k++){
+                cov.setAsDouble(covariates[j][k],j,k);
+            }
+        }
+        Matrix resp = DenseMatrix2D.Factory.zeros(response.length,1);
+        for(int j=0; j<response.length;j++){
+            resp.setAsDouble(response[j],j,0);
+        }
+
+        addObservations(loc,cov,resp);
     }
 
     /**

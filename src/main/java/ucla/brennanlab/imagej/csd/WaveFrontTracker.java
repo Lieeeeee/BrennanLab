@@ -91,6 +91,7 @@ public class WaveFrontTracker implements PlugInFilter {
         this.likelihoodmodel = gd.getNextChoice();
         this.covariateImage = gd.getNextChoice();
 
+        this.runningSpeed = new MonotonicFrontSpeedField(this.width, this.height,priorSpeedMean,Math.pow(priorSpeedSD,2));
 
         if (userDrawnRoi != null)
             this.useManualInitializationPrior = gd.getNextBoolean();
@@ -626,7 +627,6 @@ public class WaveFrontTracker implements PlugInFilter {
         this.slices = imp.getStackSize();
         this.width = imp.getWidth();
         this.height = imp.getHeight();
-        this.runningSpeed = new MonotonicFrontSpeedField(this.width, this.height);
         this.userDrawnRoi = imp.getRoi();
 
         return DOES_16 + DOES_8G + DOES_32 + NO_CHANGES;

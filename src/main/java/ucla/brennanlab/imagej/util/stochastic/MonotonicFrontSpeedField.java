@@ -21,8 +21,8 @@ public class MonotonicFrontSpeedField {
     ArrayList<Float> times;
     Normal standardNormal; // use this to generate iid Gaussian variables
     private Kriging2DLattice krigingLattice; // stores actual speeds that we will use
-    private float priorMeanSpeed;
-    private float priorVarSpeed;
+    private double priorMeanSpeed;
+    private double priorVarSpeed;
 
     /**
      * @param width  Width of interpolation signedDistance
@@ -32,7 +32,7 @@ public class MonotonicFrontSpeedField {
         this(width, height, Float.MIN_VALUE, Float.MAX_VALUE);
     }
 
-    public MonotonicFrontSpeedField(int width, int height, float priormean, float priorvar) {
+    public MonotonicFrontSpeedField(int width, int height, double priormean, double priorvar) {
         this.width = width;
         this.height = height;
         this.times = new ArrayList<Float>();
@@ -43,7 +43,7 @@ public class MonotonicFrontSpeedField {
                 0,
                 1,
                 new cern.jet.random.engine.MersenneTwister(new java.util.Date()));
-        krigingLattice = new Kriging2DLattice(priormean,priorvar);
+        krigingLattice = new Kriging2DLattice(priormean,1.0/priorvar);
     }
 
 
@@ -86,17 +86,18 @@ public class MonotonicFrontSpeedField {
          */
 
         int[][] incomingBoundaryCoordinates = incomingShape.getBoundaryCoordinates();
-        float[] incomingBoundarySpeeds = new float[incomingBoundaryCoordinates.length];
+        double[] incomingBoundarySpeeds = new double[incomingBoundaryCoordinates.length];
         for(int j=0; j<incomingBoundaryCoordinates.length;j++){
-            incomingBoundarySpeeds[j] = (float)
+            incomingBoundarySpeeds[j] = (float) Math.abs(
                     this.wavePositions
                             .get(this.wavePositions.size())
                             .get(incomingBoundaryCoordinates[j][0],incomingBoundaryCoordinates[j][1])/
-                    (time-times.get(this.wavePositions.size()));
+                    (time-times.get(this.wavePositions.size())));
         }
 
-
-
+        double[][] covariates = new double[1][1];
+        covariates[0][0] = 1;
+        krigingLattice.addObservations(incomingBoundaryCoordinates,covariates,incomingBoundarySpeeds);
         this.times.add(time);
         this.wavePositions.add(incomingShape);
 
@@ -208,7 +209,7 @@ public class MonotonicFrontSpeedField {
 
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
-                    s[x][y] = this.priorMeanSpeed;
+                    s[x][y] = (float) this.priorMeanSpeed;
                 }
             }
 
@@ -336,5 +337,7 @@ public class MonotonicFrontSpeedField {
     public float[][] getArrivalTimes(){
         return null;
     }
+
+
 
 }
