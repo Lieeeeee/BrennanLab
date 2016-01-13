@@ -277,7 +277,7 @@ public class WaveFrontTracker implements PlugInFilter {
                 double[][] currentMean = runningSpeed.getCurrentMean();
                 IJ.log("meanNext" + currentMean[0][0]);
 
-                //meanNext.advect(currentMean, 1.0);
+                meanNext.advect(currentMean, 1.0);
 
                 Roi nextRoi = meanNext.getRoi(true);
                 imp.setRoi(nextRoi);

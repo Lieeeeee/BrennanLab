@@ -102,11 +102,11 @@ public class MonotonicFrontSpeedField {
         double totspeed = 0;
         double totspeed2 = 0;
         for(int j=0; j<incomingBoundaryCoordinates.length;j++){
-            incomingBoundarySpeeds[j] = (float) Math.abs(
+            incomingBoundarySpeeds[j] = (float) Math.sqrt( Math.abs(
                     this.wavePositions
                             .get(this.wavePositions.size()-1)
                             .get(incomingBoundaryCoordinates[j][0],incomingBoundaryCoordinates[j][1])/
-                    (time-times.get(this.wavePositions.size()-1)));
+                    (time-times.get(this.wavePositions.size()-1))));
             totspeed += incomingBoundarySpeeds[j];
             totspeed2 += Math.pow(incomingBoundarySpeeds[j],2);
         }
