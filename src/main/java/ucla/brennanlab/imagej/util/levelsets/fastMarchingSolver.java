@@ -98,7 +98,7 @@ public class fastMarchingSolver {
                     map.set(seed.getX(), seed.getY(), BAND);
                     heap.add(start);
                 }
-                if (initial.get(x, y) < 1) {
+                if (initial.get(x, y) >1) {
                     final Coordinate seed = new Coordinate(x, y);
                     final BandElement start = elem_cache.getRecycledBandElement(seed.getX(), seed.getY(), 0);
                     elementLUT.set(seed.getX(), seed.getY(), start);

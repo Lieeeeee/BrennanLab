@@ -1,7 +1,5 @@
 package ucla.brennanlab.imagej.csd;
 
-import cern.jet.random.Normal;
-import cern.jet.random.engine.RandomEngine;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
@@ -141,11 +139,6 @@ public class WaveFrontTracker implements PlugInFilter {
         int firstCSDslice = currentSlice;
         int lastCSDslice = currentSlice + 200 < imp.getStackSize() ? currentSlice + 200
                 : imp.getStackSize();
-        RandomEngine engine = new cern.jet.random.engine.MersenneTwister(
-                new java.util.Date());
-        final Normal normalRV = new Normal(this.priorSpeedMean,
-                this.priorSpeedSD, engine);
-
         NumberFormat fmt = new DecimalFormat("##");
 
         while (currentSlice <= lastCSDslice) {
@@ -270,6 +263,8 @@ public class WaveFrontTracker implements PlugInFilter {
 
                 }
 
+                prevLS.getRoi(true);
+
                 ImplicitShape2D meanNext = new ImplicitShape2D(prevLS
                         .getMask());
 
@@ -278,24 +273,28 @@ public class WaveFrontTracker implements PlugInFilter {
                  * Retrieve the current mean speed from runningSpeed object
                  * and advect the wave
                  */
-                meanNext.advect(runningSpeed.currentMean(), 1.0);
 
-                // Infer the speed field here!!! @TODO
+                double[][] currentMean = runningSpeed.getCurrentMean();
+                IJ.log("meanNext" + currentMean[0][0]);
 
-                Roi nextRoi = meanNext.getRoi(false);
+                //meanNext.advect(currentMean, 1.0);
+
+                Roi nextRoi = meanNext.getRoi(true);
                 imp.setRoi(nextRoi);
 
-                nextRoi.setName("Predicted mean position " + currentSlice);
+                nextRoi.setName("a-priori mean position for slice " + currentSlice);
                 roiman.addRoi(nextRoi);
 
                 double[] effectiveWeights = new double[this.speedSamples+1];
-                double[][] speed;
+                //double[][] speed;
+                double speed;
                 for (int i = 0; i < this.speedSamples; i++) {
-                    speed = runningSpeed.sample();
+                    //speed = runningSpeed.sample(prevLS,(int) (this.priorSpeedMean+ 2*this.priorSpeedSD));
+                    speed = this.priorSpeedMean+ 1.5*this.priorSpeedSD*(i+1)/this.speedSamples;
 
                     positions.add(new ImplicitShape2D(
                             prevLS.getMask()));
-                    effectiveWeights[i] = 1;// redo the weighting soon
+                    effectiveWeights[i] = 1.0; // redo the weighting soon
 
                     positions.get(i).advect(speed, 1.0);
 
@@ -331,7 +330,6 @@ public class WaveFrontTracker implements PlugInFilter {
                 ShapePrior shapePriorDensity = new ShapePrior(
                         positions, effectiveWeights);
 
-                IJ.log("... done computing priors");
                 IJ.log("... computing maxflow for slice " + currentSlice
                         + "...");
                 long startTime = System.nanoTime();
@@ -493,7 +491,6 @@ public class WaveFrontTracker implements PlugInFilter {
 
                 ImplicitShape2D currentPosition = gcSegmenter.getLevelSet();
                 this.runningSpeed.addArrival(currentPosition,currentSlice);
-                this.runningSpeed.updateGMRF();
 
 
             }
@@ -518,25 +515,18 @@ public class WaveFrontTracker implements PlugInFilter {
 
         IJ.log("Done segmenting, check out the output!");
 
-        IJ
-                .log("Computing arrival times and speed map for the filtered trajectory...");
-        float[][] arrivalTimes = this.runningSpeed.getArrivalTimes();
 
-        ImageProcessor timeIP = new FloatProcessor(arrivalTimes);
-
-        (new ImagePlus("Arrival_times", timeIP)).show();
-        arrivalTimes = new float[width][height];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                arrivalTimes[x][y] = timeIP.getPixelValue(x, y);
+        double[][] speeds = runningSpeed.getCurrentMean();
+        float[][] floatspeeds = new float[speeds.length][speeds[0].length];
+        for(int j=0;j<speeds.length;j++){
+            for(int k=0;k<speeds[0].length;k++){
+                floatspeeds[j][k] = (float) speeds[j][k];
             }
         }
 
-        float[][] speeds = this.runningSpeed.arrivalsToSpeed(arrivalTimes);
-
-        ImageProcessor speedIP = new FloatProcessor(speeds);
-        speedIP.setMinAndMax(this.priorSpeedMean - this.priorSpeedSD / 2, this.priorSpeedMean * 1.5);
-        ImagePlus speedImage = new ImagePlus("Speed_field_pixels_per_slice", speedIP);
+        ImageProcessor speedIP = new FloatProcessor(floatspeeds);
+        speedIP.setMinAndMax(this.priorSpeedMean - this.priorSpeedSD * 2, this.priorSpeedMean + this.priorSpeedSD * 2);
+        ImagePlus speedImage = new ImagePlus("Pixels/slice", speedIP);
         speedImage.show();
 
     }

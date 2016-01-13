@@ -20,11 +20,12 @@ public class Kriging2DLattice {
     private Matrix response; // n x 1 matrix
     private Matrix locations; // nx2 matrix, should actually be integer but
     // whatever
-    private Matrix covariates; // n x p matrix
+    private Matrix X0; // n x p matrix
+    private Matrix R0; // n x n matrix
 
     private Matrix betaPrior;
     private Matrix betaHat;
-    private Matrix betaHatCovariance;
+    private Matrix betaHatCovariance; // P
     private int xreduction;
     private int yreduction;
     /**
@@ -102,6 +103,7 @@ public class Kriging2DLattice {
         }
 
         addObservations(loc,cov,resp);
+        computeBeta();
     }
 
     /**
@@ -109,7 +111,7 @@ public class Kriging2DLattice {
      * linear algebra
      *
      * @param locations  nx2 matrix of locations
-     * @param covariates nxp matrix of covariates
+     * @param covariates nxp matrix of X0
      * @param response   nx1 matrix of response
      */
     public void addObservations(Matrix locations, Matrix covariates,
@@ -125,9 +127,9 @@ public class Kriging2DLattice {
                         "Matrix2D dimensions for locations and response incompatible");
             if (locations.getRowCount() != covariates.getRowCount())
                 throw new IllegalArgumentException(
-                        "Matrix2D dimensions for covariates and locations incompatible");
+                        "Matrix2D dimensions for X0 and locations incompatible");
 
-            this.covariates = covariates;
+            this.X0 = covariates;
             this.locations = locations;
             this.response = response;
             this.n = response.getRowCount();
@@ -147,9 +149,25 @@ public class Kriging2DLattice {
                 }
             }
         }else{
-            /**
-             * We already have some observations previously defined.
-             */
+            int nobs1 = (int) this.response.getRowCount();
+            int nobs2 = (int) response.getRowCount();
+            int nobs =  nobs1 + nobs2;
+            Matrix newresponses = DenseMatrix2D.Factory.zeros(nobs,1);
+            int ncovariates = (int) this.X0.getColumnCount();
+            Matrix newcovariates = DenseMatrix2D.Factory.zeros(nobs,ncovariates);
+
+            for(int j=0;j<nobs1;j++){
+                newresponses.setAsDouble(this.response.getAsDouble(j,0),j,0);
+                for(int k=0;k<ncovariates;k++){
+                    newcovariates.setAsDouble(this.X0.getAsDouble());
+                }
+            }
+            for(int j=0;j<nobs2;j++){
+                newresponses.setAsDouble(response.getAsDouble(nobs1+j,0),j,0);
+
+            }
+
+
         }
 
         Matrix withinPrecision = SparseDoubleMatrix.Factory.zeros(locations
@@ -169,7 +187,7 @@ public class Kriging2DLattice {
     }
 
     public void clean() {
-        this.covariates = null;
+        this.X0 = null;
         this.locations = null;
         this.spatialPrecision = null;
     }
@@ -180,10 +198,10 @@ public class Kriging2DLattice {
     public void computeBeta() {
 
         unscaledCondBetaVarianceInv = quadraticInnerNorm(spatialPrecision,
-                covariates).plus(betaPrecision);
+                X0).plus(betaPrecision);
         unscaledCondBetaVariance = unscaledCondBetaVarianceInv.inv();
 
-        betaHat = unscaledCondBetaVariance.mtimes(covariates.transpose()
+        betaHat = unscaledCondBetaVariance.mtimes(X0.transpose()
                 .mtimes(spatialPrecision).mtimes(response).plus(
                         betaPrecision.mtimes(betaPrior)));
         bw = (2 * b + response
@@ -199,7 +217,7 @@ public class Kriging2DLattice {
 
         betaHatCovariance = unscaledCondBetaVariance.times(bw / (n + 2 * a));
 
-        residuals = response.minus(this.covariates.mtimes(this.betaHat));
+        residuals = response.minus(this.X0.mtimes(this.betaHat));
     }
 
     /**
@@ -296,7 +314,6 @@ public class Kriging2DLattice {
 
             }
         }
-        //partialPrecision.showGUI();
         // compute within correlations
         Matrix withinPrecision = SparseDoubleMatrix.Factory.zeros(locations
                 .getRowCount(), locations.getRowCount());
@@ -318,7 +335,7 @@ public class Kriging2DLattice {
         this.predictionVariance = quadraticOuterNorm(
                 this.betaHatCovariance,
                 covariates.minus(withinPrecision.solve(partialPrecision
-                        .mtimes(this.covariates)))).plus(
+                        .mtimes(this.X0)))).plus(
                 withinPrecision.times(bw / (n + 2 * this.a)));
 
         this.setPredictionRootVariance(predictionVariance.chol());
