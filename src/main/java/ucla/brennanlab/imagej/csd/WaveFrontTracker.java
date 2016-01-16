@@ -361,8 +361,8 @@ public class WaveFrontTracker implements PlugInFilter {
                  * Segment NOW, starting the MM algorithm from the most-probable future prediction
                  *********************************************************************************/
                 try {
-                    gcSegmenter.setNodeWeights(shapePriorDensity, meanNext, likelihood);
-                    gcSegmenter.setEdgeWeights(shapePriorDensity, meanNext);
+                    gcSegmenter.setNodeWeights(shapePriorDensity, prevLS, likelihood);
+                    gcSegmenter.setEdgeWeights(shapePriorDensity, prevLS);
                     oldEnergy = gcSegmenter.relaxEnergy();
                     /**
                      * MM iterations
@@ -434,7 +434,7 @@ public class WaveFrontTracker implements PlugInFilter {
                                 .getStack().getProcessor(firstCSDslice)
                                 .duplicate().convertToRGB());
                         roisOfSegmentations.get(0).setStrokeColor(this.roiColor);
-                        roisOfSegmentations.get(0).setStrokeWidth(3);
+                        roisOfSegmentations.get(0).setStrokeWidth(2);
                         gSegmentStack.getProcessor(1).setColor(this.roiColor);
                         gSegmentStack.getProcessor(1).drawRoi(
                                 roisOfSegmentations.get(0));

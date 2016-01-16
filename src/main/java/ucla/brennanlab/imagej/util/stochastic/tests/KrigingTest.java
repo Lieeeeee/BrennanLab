@@ -121,8 +121,7 @@ public class KrigingTest implements PlugInFilter {
                 }
             }
         }
-        // locations.showGUI();
-        // interpolationLocations.showGUI();
+
 
         Matrix betaprior = DenseMatrix.Factory.zeros(1, 1);
         Matrix V = DenseMatrix.Factory.ones(1, 1);
@@ -131,14 +130,7 @@ public class KrigingTest implements PlugInFilter {
         long startTime = System.nanoTime();
         long endTime;
         Kriging2DLattice krig;
-        krig = new Kriging2DLattice(covariates, locations, response, betaprior,
-                V);
-
-        // covariates = null;
-        // locations = null;
-        // response = null;
-        // betaprior = null;
-        // V = null;
+        krig = new Kriging2DLattice(betaprior, V,3,3);
 
         startTime = System.nanoTime();
         try {
@@ -172,7 +164,6 @@ public class KrigingTest implements PlugInFilter {
         IJ.showStatus("Done interpolating");
 
         Matrix interpolatedMean = krig.getPredicted();
-        // interpolatedMean.showGUI();
         ImageProcessor ip2 = ip.createProcessor(width, height);
 
         // Set values for new processor
