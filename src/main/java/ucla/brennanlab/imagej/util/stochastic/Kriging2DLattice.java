@@ -134,7 +134,7 @@ public class Kriging2DLattice {
      * Add new observations and update the Kriging model using block matrix
      * linear algebra
      *
-     * @param locations  nx2 matrix of locations
+     * @param locations  ArrayList of Point2D
      * @param covariates nxp matrix of X0
      * @param response   nx1 matrix of response
      */
@@ -183,12 +183,14 @@ public class Kriging2DLattice {
             for(int j=0;j<nobs1;j++){
                 newresponses.setAsDouble(this.response.getAsDouble(j,0),j,0);
                 for(int k=0;k<ncovariates;k++){
-                    newcovariates.setAsDouble(this.X0.getAsDouble());
+                    newcovariates.setAsDouble(this.X0.getAsDouble(j,k),j,k);
                 }
             }
             for(int j=0;j<nobs2;j++){
-                newresponses.setAsDouble(response.getAsDouble(nobs1+j,0),j,0);
-
+                newresponses.setAsDouble(response.getAsDouble(j,0),j+nobs1,0);
+                for(int k=0;k<ncovariates;k++){
+                    newcovariates.setAsDouble(covariates.getAsDouble(j,k),j+nobs1,k);
+                }
             }
 
 
@@ -288,6 +290,8 @@ public class Kriging2DLattice {
          * Basically take elements from the band and feed them into
          * interpolate()
          */
+
+
     }
 
     /**
@@ -296,9 +300,9 @@ public class Kriging2DLattice {
      *
      * @param locations
      */
-    public void interpolate(Matrix locations, Matrix covariates) {
+    public void interpolate(ArrayList<Point2D> locations, Matrix covariates) {
 
-        assert (locations.getRowCount() == covariates.getColumnCount());
+        assert (locations.size() == covariates.getColumnCount());
 
         /**
          * First reshape the observations to cull out far-away points. This step
@@ -325,14 +329,14 @@ public class Kriging2DLattice {
 		 */
 
         Matrix partialPrecision = SparseDoubleMatrix.Factory.zeros(locations
-                .getRowCount(), this.locations.size());
+                .size(), this.locations.size());
         long columns = this.locations.size();
-        long rows = locations.getRowCount();
+        long rows = locations.size();
         // Compute cross-correlations
         for (int row = 0; row < rows; row++) {
             for (int column = 0; column < columns; column++) {
                 partialPrecision.setAsDouble(rueGaussianPrecision(locations
-                                .getAsInt(row, 0), locations.getAsInt(row, 1),
+                                .get(row).x, locations.get(row).y,
                         this.locations.get(column).x, this.locations
                                 .get(column).y), row, column);
 
@@ -340,14 +344,14 @@ public class Kriging2DLattice {
         }
         // compute within correlations
         Matrix withinPrecision = SparseDoubleMatrix.Factory.zeros(locations
-                .getRowCount(), locations.getRowCount());
+                .size(), locations.size());
 
         for (int column = 0; column < rows; column++) {
             for (int row = 0; row < rows; row++) {
                 withinPrecision.setAsDouble(rueGaussianPrecision(locations
-                                .getAsInt(row, 0), locations.getAsInt(row, 1),
-                        locations.getAsInt(column, 0), locations.getAsInt(
-                                column, 1)), row, column);
+                                .get(row).x, locations.get(row).y,
+                        locations.get(column).x, locations.get(
+                                column).y), row, column);
             }
         }
 

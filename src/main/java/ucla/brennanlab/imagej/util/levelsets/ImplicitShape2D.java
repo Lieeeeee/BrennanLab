@@ -27,8 +27,8 @@ public class ImplicitShape2D {
     double alighmentlambda = 2; // use this for alignment
     final int d = 2; // Dimension... need to rewrite a few things for 3D
     public double mass;
-    int width;
-    int height;
+    public int width;
+    public int height;
 
     double epsilon = 0.5; // for delta and heaviside function approx
 

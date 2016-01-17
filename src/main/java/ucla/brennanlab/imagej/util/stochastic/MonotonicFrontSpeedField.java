@@ -1,8 +1,8 @@
 package ucla.brennanlab.imagej.util.stochastic;
 
 import cern.jet.random.Normal;
-import ij.IJ;
 import org.ujmp.core.Matrix;
+import ucla.brennanlab.imagej.util.Point2D;
 import ucla.brennanlab.imagej.util.levelsets.ImplicitShape2D;
 
 import java.util.ArrayList;
@@ -24,6 +24,8 @@ public class MonotonicFrontSpeedField {
     private Kriging2DLattice krigingLattice; // stores actual speeds that we will use
     private double priorMeanSpeed;
     private double priorVarSpeed;
+    public double overallMeanSpeed; // Temporary
+    public double overallSDSpeed; // Temporary
     private double[][] currentMean;
     private double[][] currentVariance;
 
@@ -42,10 +44,9 @@ public class MonotonicFrontSpeedField {
         this.wavePositions = new ArrayList<ImplicitShape2D>();
         this.priorMeanSpeed = priormean;
         this.priorVarSpeed = priorvar;
-        this.standardNormal = new Normal(
-                0,
-                1,
-                new cern.jet.random.engine.MersenneTwister(new java.util.Date()));
+        this.standardNormal = new Normal(0, 1,
+                new cern.jet.random.engine.MersenneTwister(new java.util.Date())
+        );
         krigingLattice = new Kriging2DLattice(priormean,1.0/priorvar);
         this.currentMean = new double[width][height];
         this.currentVariance = new double[width][height];
@@ -59,10 +60,13 @@ public class MonotonicFrontSpeedField {
     }
 
 
+    /**
+     * Add an arrival by mask
+     * @param mask
+     * @param time
+     */
     public void addArrival(boolean[][] mask, float time){
         this.addArrival(new ImplicitShape2D(mask), time);
-
-
     }
 
     /**
@@ -118,16 +122,20 @@ public class MonotonicFrontSpeedField {
                 currentVariance[i][j] = totspeed2/incomingBoundaryCoordinates.length-Math.pow(currentMean[i][j],2);
             }
         }
-        IJ.log("boundary speed: "+totspeed/incomingBoundaryCoordinates.length);
 
-        double[][] covariates = new double[1][1];
-        covariates[0][0] = 1;
-        //krigingLattice.addObservations(incomingBoundaryCoordinates,covariates,incomingBoundarySpeeds);
+        this.overallMeanSpeed = totspeed/incomingBoundaryCoordinates.length;
+        this.overallSDSpeed = Math.sqrt(totspeed2/incomingBoundaryCoordinates.length-Math.pow(this.overallMeanSpeed,2));
+
+        double[][] covariates = new double[incomingBoundaryCoordinates.length][1];
+        for(int j=0;j<incomingBoundaryCoordinates.length;j++){
+            covariates[j][0] = 1;
+        }
+
+
+
+        krigingLattice.addObservations(incomingBoundaryCoordinates,covariates,incomingBoundarySpeeds);
         this.times.add(time);
         this.wavePositions.add(incomingShape);
-
-        //computeCurrentMean();
-        //computeCurrentVariance();
 
     }
 
@@ -142,7 +150,8 @@ public class MonotonicFrontSpeedField {
 
 
     /**
-     * Sample a speed field
+     * Sample a speed field within a certain distance from the boundary of the
+     * reference shape
      * @return
      */
     public double[][] sample(ImplicitShape2D reference, int band){
@@ -150,10 +159,21 @@ public class MonotonicFrontSpeedField {
          * Make a list of the coordinates
          */
 
+        ArrayList<Point2D> locations = new ArrayList<Point2D>();
+        width = reference.width;
+        height = reference.height;
+
+
+
+
         /**
          * Assemble V0
          */
 
+        return sample(locations,band);
+    }
+
+    public double[][] sample(ArrayList<Point2D> locations, int band){
         return null;
     }
 

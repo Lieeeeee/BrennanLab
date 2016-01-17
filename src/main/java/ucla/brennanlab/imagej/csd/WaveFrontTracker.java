@@ -275,8 +275,6 @@ public class WaveFrontTracker implements PlugInFilter {
                  */
 
                 double[][] currentMean = runningSpeed.getCurrentMean();
-                IJ.log("meanNext" + currentMean[0][0]);
-
                 meanNext.advect(currentMean, 1.0);
 
                 Roi nextRoi = meanNext.getRoi(true);
@@ -289,8 +287,8 @@ public class WaveFrontTracker implements PlugInFilter {
                 //double[][] speed;
                 double speed;
                 for (int i = 0; i < this.speedSamples; i++) {
-                    //speed = runningSpeed.sample(prevLS,(int) (this.priorSpeedMean+ 2*this.priorSpeedSD));
-                    speed = this.priorSpeedMean+ 1.5*this.priorSpeedSD*(i+1)/this.speedSamples;
+                    speed = this.runningSpeed.overallMeanSpeed+
+                            1.5*this.runningSpeed.overallSDSpeed*(i+1)/this.speedSamples;
 
                     positions.add(new ImplicitShape2D(
                             prevLS.getMask()));

@@ -11,8 +11,12 @@ import ij.plugin.filter.PlugInFilter;
 import ij.process.ImageProcessor;
 import org.ujmp.core.DenseMatrix;
 import org.ujmp.core.Matrix;
+import ucla.brennanlab.imagej.util.Point2D;
 import ucla.brennanlab.imagej.util.levelsets.ImplicitShape2D;
 import ucla.brennanlab.imagej.util.stochastic.Kriging2DLattice;
+
+import java.util.ArrayList;
+
 
 public class KrigingTest implements PlugInFilter {
 
@@ -84,7 +88,7 @@ public class KrigingTest implements PlugInFilter {
         Matrix locations = DenseMatrix.Factory.zeros(inside, 2);
         Matrix response = DenseMatrix.Factory.zeros(inside, 1);
         Matrix covariates = DenseMatrix.Factory.zeros(inside, 1);
-        Matrix interpolationLocations = DenseMatrix.Factory.zeros(outside, 2);
+        ArrayList<Point2D> interpolationLocations = new ArrayList<Point2D>();
         Matrix interpolationCovariates = DenseMatrix.Factory.zeros(outside, 1);
 
         int locationpred = 0;
@@ -114,8 +118,7 @@ public class KrigingTest implements PlugInFilter {
                     locationpred++;
 
                 } else if (interpMask[x][y]) {
-                    interpolationLocations.setAsInt(x, locationinterp, 0);
-                    interpolationLocations.setAsInt(y, locationinterp, 1);
+                    interpolationLocations.add(new Point2D(x,y));
                     interpolationCovariates.setAsInt(1, locationinterp, 0);
                     locationinterp++;
                 }
@@ -191,9 +194,9 @@ public class KrigingTest implements PlugInFilter {
             }
         }
 
-        for (int j = 0; j < interpolationLocations.getRowCount(); j++) {
-            int gridlocx = interpolationLocations.getAsInt(j, 0);
-            int gridlocy = interpolationLocations.getAsInt(j, 1);
+        for (int j = 0; j < interpolationLocations.size(); j++) {
+            int gridlocx = interpolationLocations.get(j).x;
+            int gridlocy = interpolationLocations.get(j).y;
             interpolationMatrix.setAsDouble(interpolatedMean.getAsDouble(j, 0),
                     gridlocx, gridlocy);
         }
