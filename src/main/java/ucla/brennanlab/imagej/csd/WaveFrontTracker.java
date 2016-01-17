@@ -514,6 +514,7 @@ public class WaveFrontTracker implements PlugInFilter {
         IJ.log("Done segmenting, check out the output!");
 
 
+        /*
         double[][] speeds = runningSpeed.getCurrentMean();
         float[][] floatspeeds = new float[speeds.length][speeds[0].length];
         for(int j=0;j<speeds.length;j++){
@@ -521,8 +522,11 @@ public class WaveFrontTracker implements PlugInFilter {
                 floatspeeds[j][k] = (float) speeds[j][k];
             }
         }
+        */
+        float[][] speeds = this.runningSpeed.arrivalsToSpeed(
+                this.runningSpeed.interpolateArrivalsFromLevelsets(this.runningSpeed.wavePositions));
 
-        ImageProcessor speedIP = new FloatProcessor(floatspeeds);
+        ImageProcessor speedIP = new FloatProcessor(speeds);
         speedIP.setMinAndMax(this.priorSpeedMean - this.priorSpeedSD * 2, this.priorSpeedMean + this.priorSpeedSD * 2);
         ImagePlus speedImage = new ImagePlus("Pixels/slice", speedIP);
         speedImage.show();

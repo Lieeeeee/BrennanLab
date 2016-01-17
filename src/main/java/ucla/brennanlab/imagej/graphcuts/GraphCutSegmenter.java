@@ -389,9 +389,6 @@ public class GraphCutSegmenter {
                 sink = 0;
 
                 float pixelval = this.ip.getPixelValue(x, y);
-                if (Float.isNaN(source) || Float.isNaN(sink))
-                    IJ.showMessage("NaN error for n-link at (" + x + "," + y
-                            + ")");
                 source += -likelihood.logpOut(pixelval);
                 sink += -likelihood.logpIn(pixelval);
 
@@ -483,7 +480,7 @@ public class GraphCutSegmenter {
      * @return
      */
     public float relaxEnergy() {
-        this.Energy = gc.computeMaximumFlow(false, null);
+        this.Energy = gc.computeMaximumFlow(true, null);
         return (this.Energy);
     }
 

@@ -1475,8 +1475,6 @@ public class ImplicitShape2D {
 
     public ImplicitShape2D union(ImplicitShape2D othershape) {
         assert (this.width == othershape.width && this.height == othershape.height);
-
-
         return null;
     }
 
