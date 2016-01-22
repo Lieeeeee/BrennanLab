@@ -7,8 +7,8 @@ import ij.ImagePlus;
 import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.plugin.PlugIn;
+import ucla.brennanlab.imagej.util.levelsets.FastMarchingSolver;
 import ucla.brennanlab.imagej.util.levelsets.ImplicitShape2D;
-import ucla.brennanlab.imagej.util.levelsets.fastMarchingSolver;
 
 public class levelsetTest implements PlugIn {
 
@@ -36,10 +36,10 @@ public class levelsetTest implements PlugIn {
         IJ.log("Testing fast marching propagation...");
         long startTime = System.nanoTime();
         long endTime;
-        fastMarchingSolver fm;
+        FastMarchingSolver fm;
         ImplicitShape2D ri;
         try {
-            fm = new fastMarchingSolver(ls, speeds);
+            fm = new FastMarchingSolver(ls, speeds);
             ri = fm.solveAndReturnImplicitShape2D(20);
         } finally {
             endTime = System.nanoTime();

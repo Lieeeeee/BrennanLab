@@ -21,18 +21,20 @@ import java.util.HashSet;
 public class Kriging2DLattice {
     double a = 1;
     double b = 2;
+    int width;
+    int height;
     long n = 0; // number of inputted points
     private Matrix response; // n x 1 matrix
     private ArrayList<Point2D> locations; // nx2 matrix, should actually be integer but
     // whatever
     private Matrix X0; // n x p matrix
-    private Matrix R0; // n x n matrix
 
     private Matrix betaPrior;
     private Matrix betaHat;
     private Matrix betaHatCovariance; // P
     private int xreduction;
     private int yreduction;
+    private int correlationLength = 5;
     /**
      * When calculating beta for large lattice
      */
@@ -106,14 +108,15 @@ public class Kriging2DLattice {
     /**
      * Convenience method for adding observations to the kriging model without
      * first creating UJMP matrices
-     * @param locations
+     * @param locations in the untransformed parameterization
      * @param covariates
      * @param response
      */
     public void addObservations(int[][] locations, double[][] covariates, double[] response){
         ArrayList<Point2D> loc = new ArrayList<Point2D>(locations.length);
         for(int j=0; j<locations.length;j++){
-            loc.add(new Point2D(locations[j]));
+            loc.add(new Point2D(getXcoord(locations[j][0]),getYcoord(locations[j][1]),
+                    locations[j][0],locations[j][1]));
         }
         Matrix cov = DenseMatrix2D.Factory.zeros(covariates.length,covariates[0].length);
         for(int j=0;j<covariates.length;j++){
@@ -458,16 +461,6 @@ public class Kriging2DLattice {
         return A.minus(B);
     }
 
-    /**
-     * Get the x-y coordinates corresponding to (x,y) in the Coarsened grid
-     * @param x
-     * @param y
-     * @return
-     */
-    public Point2D getCoarseCoords(int x, int y){
-        return new Point2D((int) Math.floor(x/this.xreduction),
-                (int)Math.floor(y/this.yreduction));
-    }
 
     public int getXcoord(int x){
         return (int) Math.floor(x/this.xreduction);
@@ -486,7 +479,8 @@ public class Kriging2DLattice {
 
         HashSet<Point2D> uniqueGridLocations = new HashSet<Point2D>();
         for(int i=0;i<locations.length;i++){
-            uniqueGridLocations.add(getCoarseCoords(locations[i][0],locations[i][1]));
+            uniqueGridLocations.add(new Point2D(getXcoord(locations[i][0]),getYcoord(locations[i][1]),
+                    locations[i][0],locations[i][1] ));
         }
 
         // Figure out all of the grid points that are within range of these locations for inference
@@ -495,6 +489,11 @@ public class Kriging2DLattice {
         // Compute \hat\beta for the grid points
 
         return null;
+    }
+
+    public void setDimensions(int width,int height){
+        this.width = this.getXcoord(width);
+        this.height = this.getYcoord(height);
     }
 
 

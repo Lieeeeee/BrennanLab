@@ -46,12 +46,17 @@
 		<main-class>ucla.brennanlab.imagej.csd.WaveFrontTracker</main-class>
 	</properties>
 
+
+
+
+
 	<dependencies>
         <dependency>
             <groupId>sc.fiji</groupId>
             <artifactId>fiji-lib</artifactId>
             <version>2.1.2-SNAPSHOT</version>
         </dependency>
+
 
         <dependency>
 
@@ -76,7 +81,11 @@
             <artifactId>jchart2d</artifactId>
             <version>3.3.2</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.2</version>
+        </dependency>
     </dependencies>
 
 

@@ -26,7 +26,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
-
 /**
  * Boundary segmentation using the kriging speed model
  *
@@ -422,8 +421,13 @@ public class WaveFrontTracker implements PlugInFilter {
                 } finally {
                     endTime = System.nanoTime();
                 }
-                Roi segmentedRoi = gcSegmenter.returnRoi();
-                segmentedRoi.setStrokeColor(roiColor);
+                Roi segmentedRoi = null;
+                try {
+                    segmentedRoi = gcSegmenter.returnRoi();
+                    segmentedRoi.setStrokeColor(roiColor);
+                }catch(NullPointerException e) {
+                    break;
+                }
 
 
                 if (segmentedRoi != null) {
@@ -513,18 +517,7 @@ public class WaveFrontTracker implements PlugInFilter {
 
         IJ.log("Done segmenting, check out the output!");
 
-
-        /*
-        double[][] speeds = runningSpeed.getCurrentMean();
-        float[][] floatspeeds = new float[speeds.length][speeds[0].length];
-        for(int j=0;j<speeds.length;j++){
-            for(int k=0;k<speeds[0].length;k++){
-                floatspeeds[j][k] = (float) speeds[j][k];
-            }
-        }
-        */
-        float[][] speeds = this.runningSpeed.arrivalsToSpeed(
-                this.runningSpeed.interpolateArrivalsFromLevelsets(this.runningSpeed.wavePositions));
+        float[][] speeds = this.runningSpeed.interpolateSpeedFromLevelSets(this.runningSpeed.wavePositions);
 
         ImageProcessor speedIP = new FloatProcessor(speeds);
         speedIP.setMinAndMax(this.priorSpeedMean - this.priorSpeedSD * 2, this.priorSpeedMean + this.priorSpeedSD * 2);

@@ -4,7 +4,7 @@ import ij.IJ;
 
 import java.util.PriorityQueue;
 
-public class fastMarchingSolver {
+public class FastMarchingSolver {
     // computation matrix and vectors for fast marching
 
     /**
@@ -50,7 +50,7 @@ public class fastMarchingSolver {
     private DeferredDoubleArray2D distances = null;
     private DeferredObjectArray2D<BandElement> elementLUT = null;
 
-    public fastMarchingSolver(ImplicitShape2D initial) {
+    public FastMarchingSolver(ImplicitShape2D initial) {
         this.setInitial(initial);
     }
 
@@ -60,10 +60,17 @@ public class fastMarchingSolver {
      * @param initial
      * @param spd
      */
-    public fastMarchingSolver(ImplicitShape2D initial, double[][] spd) {
+    public FastMarchingSolver(ImplicitShape2D initial, double[][] spd) {
         this.setInitial(initial);
         this.spd = spd;
         reset();
+    }
+
+    /**
+     * Specify the speed later
+     */
+    public FastMarchingSolver(){
+
     }
 
     public static int getErrorStop() {

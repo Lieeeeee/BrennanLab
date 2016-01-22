@@ -263,7 +263,7 @@ public class ImplicitShape2D {
      * @param time
      */
     public void advect(double[][] speed, double time){
-        fastMarchingSolver fm = new fastMarchingSolver(this, speed);
+        FastMarchingSolver fm = new FastMarchingSolver(this, speed);
         ImplicitShape2D future = fm.solveAndReturnImplicitShape2D(time);
         this.signedDistance = future.signedDistance;
         this.inertialAngle = future.inertialAngle;

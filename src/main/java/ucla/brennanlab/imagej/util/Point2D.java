@@ -3,7 +3,15 @@ package ucla.brennanlab.imagej.util;
 public class Point2D{
     public int x;
     public int y;
+    public int xOriginal;
+    public int yOriginal;
     public Point2D(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+    public Point2D(int x, int y, int xOriginal, int yOriginal){
+        this.xOriginal = xOriginal;
+        this.yOriginal = yOriginal;
         this.x = x;
         this.y = y;
     }

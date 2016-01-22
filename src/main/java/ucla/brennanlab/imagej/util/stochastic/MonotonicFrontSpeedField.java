@@ -6,6 +6,8 @@ import ucla.brennanlab.imagej.util.Point2D;
 import ucla.brennanlab.imagej.util.levelsets.ImplicitShape2D;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+
 
 /**
  * This class stores interfaces with the Kriging class to interpolate arrival times
@@ -48,6 +50,7 @@ public class MonotonicFrontSpeedField {
                 new cern.jet.random.engine.MersenneTwister(new java.util.Date())
         );
         krigingLattice = new Kriging2DLattice(priormean,1.0/priorvar);
+        krigingLattice.setDimensions(width,height);
         this.currentMean = new double[width][height];
         this.currentVariance = new double[width][height];
         for(int i=0; i<width;i++){
@@ -123,9 +126,6 @@ public class MonotonicFrontSpeedField {
             }
         }
 
-        this.overallMeanSpeed = totspeed/incomingBoundaryCoordinates.length;
-        this.overallSDSpeed = Math.sqrt(totspeed2/incomingBoundaryCoordinates.length-Math.pow(this.overallMeanSpeed,2));
-
         double[][] covariates = new double[incomingBoundaryCoordinates.length][1];
         for(int j=0;j<incomingBoundaryCoordinates.length;j++){
             covariates[j][0] = 1;
@@ -136,6 +136,10 @@ public class MonotonicFrontSpeedField {
         krigingLattice.addObservations(incomingBoundaryCoordinates,covariates,incomingBoundarySpeeds);
         this.times.add(time);
         this.wavePositions.add(incomingShape);
+
+        this.overallMeanSpeed = totspeed/incomingBoundaryCoordinates.length;
+        this.overallSDSpeed = Math.sqrt(totspeed2/incomingBoundaryCoordinates.length-Math.pow(this.overallMeanSpeed,2));
+
 
     }
 
@@ -159,18 +163,22 @@ public class MonotonicFrontSpeedField {
          * Make a list of the coordinates
          */
 
-        ArrayList<Point2D> locations = new ArrayList<Point2D>();
+        HashSet<Point2D> locations = new HashSet<Point2D>();
         width = reference.width;
         height = reference.height;
-
-
-
 
         /**
          * Assemble V0
          */
+        for(int x=0; x<width; x++){
+            for(int y=0; y<height; y++){
+                if(Math.abs(reference.get(x,y))<band){
+                    locations.add(new Point2D(x,y));
+                }
+            }
+        }
 
-        return sample(locations,band);
+        return sample(new ArrayList<Point2D>(locations),band);
     }
 
     public double[][] sample(ArrayList<Point2D> locations, int band){
@@ -259,6 +267,13 @@ public class MonotonicFrontSpeedField {
         return s;
     }
 
+    public float[][] interpolateSpeedFromLevelSets(
+            ArrayList<ImplicitShape2D> levelsetSignedDistances) {
+        float[][] speedgrid = new float[width][height];
+
+
+        return speedgrid;
+    }
 
     /**
      * Calculates the arrival time T(x,y) from the sequence of ROIs representing
@@ -386,8 +401,6 @@ public class MonotonicFrontSpeedField {
                     speeds[x][y] = tot / n;
             }
         }
-
-        // IJ.showMessage("Mean linearly interpolated speed was "+ tot/n);
         return speeds;
     }
 
