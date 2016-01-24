@@ -294,6 +294,14 @@ public class Kriging2DLattice {
          * interpolate()
          */
 
+        for(int x=0; x<width; x++){
+            for(int y=0;y<height;y++){
+                if(signedDistance.get(x,y)<lowerbound && signedDistance.get(x,y)>upperbound ){
+
+                }
+            }
+        }
+
 
     }
 
