@@ -101,8 +101,8 @@ public class LaplaceMixture implements IntensityModel {
     }
 
     public double logpIn(double value) {
-        return -Math.log(2) + Math.log(getPosteriorPrecision(true)  - getPosteriorPrecision(true)
-                * Math.abs(value - getPosteriorMean(true)));
+        return -Math.log(2) + Math.log(getPosteriorPrecision(true))  - getPosteriorPrecision(true)
+                * Math.abs(value - getPosteriorMean(true));
     }
 
     public double pOut(double value) {
@@ -110,8 +110,8 @@ public class LaplaceMixture implements IntensityModel {
     }
 
     public double logpOut(double value) {
-        return -Math.log(2) + Math.log(getPosteriorPrecision(false)  - getPosteriorPrecision(false)
-                * Math.abs(value - getPosteriorMean(false)));
+        return -Math.log(2) + Math.log(getPosteriorPrecision(false))  - getPosteriorPrecision(false)
+                * Math.abs(value - getPosteriorMean(false));
     }
 
     public double tauin() {
