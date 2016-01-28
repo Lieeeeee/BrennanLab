@@ -1,17 +1,17 @@
 package ucla.brennanlab.imagej.util.stochastic;
 
 import cern.jet.random.Normal;
+import org.delaunay.algorithm.Triangulation;
 import org.ujmp.core.Matrix;
-import ucla.brennanlab.imagej.util.Point2D;
+import ucla.brennanlab.DelaunayInterpolator;
 import ucla.brennanlab.imagej.util.levelsets.ImplicitShape2D;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 
 /**
  * This class stores interfaces with the Kriging class to interpolate arrival times
- * and sample speed fields.
+ * and sample speed fields. The kringing lattice is computed on a sublattice
  * <p>
  * Fundamentally, we probabilistically solve the eikonal equation |\nabla T| = F, where $T$
  * are the arrival times.
@@ -30,16 +30,18 @@ public class MonotonicFrontSpeedField {
     public double overallSDSpeed; // Temporary
     private double[][] currentMean;
     private double[][] currentVariance;
+    private int xreduction;
+    private int yreduction;
 
     /**
      * @param width  Width of interpolation signedDistance
      * @param height Width of height signedDistance
      **/
     public MonotonicFrontSpeedField(int width, int height) {
-        this(width, height, Float.MIN_VALUE, Float.MAX_VALUE);
+        this(width, height, Float.MIN_VALUE, Float.MAX_VALUE, 1, 1);
     }
 
-    public MonotonicFrontSpeedField(int width, int height, double priormean, double priorvar) {
+    public MonotonicFrontSpeedField(int width, int height, double priormean, double priorvar ,int xreduction, int yreduction) {
         this.width = width;
         this.height = height;
         this.times = new ArrayList<Float>();
@@ -50,7 +52,6 @@ public class MonotonicFrontSpeedField {
                 new cern.jet.random.engine.MersenneTwister(new java.util.Date())
         );
         krigingLattice = new Kriging2DLattice(priormean,1.0/priorvar);
-        krigingLattice.setDimensions(width,height);
         this.currentMean = new double[width][height];
         this.currentVariance = new double[width][height];
         for(int i=0; i<width;i++){
@@ -59,6 +60,8 @@ public class MonotonicFrontSpeedField {
                 currentVariance[i][j] = priorvar;
             }
         }
+        this.xreduction = xreduction;
+        this.yreduction = yreduction;
 
     }
 
@@ -130,10 +133,7 @@ public class MonotonicFrontSpeedField {
         for(int j=0;j<incomingBoundaryCoordinates.length;j++){
             covariates[j][0] = 1;
         }
-
-
-
-        krigingLattice.addObservations(incomingBoundaryCoordinates,covariates,incomingBoundarySpeeds);
+        addObservations(incomingBoundaryCoordinates,covariates,incomingBoundarySpeeds);
         this.times.add(time);
         this.wavePositions.add(incomingShape);
 
@@ -143,7 +143,23 @@ public class MonotonicFrontSpeedField {
 
     }
 
- public MonotonicFrontSpeedField clone() {
+    /***
+     * Ignore this. stuff and just infer using only the inforamtion given
+     * @param locations
+     * @param covariates
+     * @param speeds
+     * @return
+     */
+    public float[][] locallyInferAndSample(int[][] locations, double[][] covariates, double[] speeds){
+
+        Kriging2DLattice kriger = new Kriging2DLattice(this.priorMeanSpeed,1.0/this.priorVarSpeed);
+        kriger.addObservations(locations,covariates,speeds);
+
+        return null;
+
+    }
+
+    public MonotonicFrontSpeedField clone() {
         MonotonicFrontSpeedField s = new MonotonicFrontSpeedField(width, height);
         s.krigingLattice = this.krigingLattice;
         s.priorVarSpeed = priorVarSpeed;
@@ -152,43 +168,47 @@ public class MonotonicFrontSpeedField {
         return s;
     }
 
+    public void addObservations(int[][] locations, double[][] covariates, double[] speeds){
+        int[][] incomingBoundaryCoordinates = new int[locations.length][locations[0].length];
 
-    /**
-     * Sample a speed field within a certain distance from the boundary of the
-     * reference shape
-     * @return
-     */
-    public double[][] sample(ImplicitShape2D reference, int band){
-        /**
-         * Make a list of the coordinates
-         */
 
-        HashSet<Point2D> locations = new HashSet<Point2D>();
-        width = reference.width;
-        height = reference.height;
 
-        /**
-         * Assemble V0
-         */
-        for(int x=0; x<width; x++){
-            for(int y=0; y<height; y++){
-                if(Math.abs(reference.get(x,y))<band){
-                    locations.add(new Point2D(x,y));
-                }
+        for(int i=0; i<locations.length;i++){
+            incomingBoundaryCoordinates[i][0] = getXcoord(locations[i][0]);
+            incomingBoundaryCoordinates[i][1] = getYcoord(locations[i][1]);
+        }
+        krigingLattice.addObservations(incomingBoundaryCoordinates,covariates,speeds);
+
+    }
+
+    public ArrayList<double[][]> sampleUnscented(double alpha, double beta, double lambda, int L){
+        ArrayList<double[][]> samples = new ArrayList<double[][]>(2*L+1);
+        double[][] mean = computeCurrentMeanField();
+        double[][] variance = computeCurrentVarianceField();
+
+
+        for(int j=1; j<= L; j++){
+
+        }
+        return samples;
+    }
+
+    private double[][] matrixPlus(double[][] a, double[][] b){
+        double[][] out = new double[a.length][a[0].length];
+        for(int i=0;i<a.length;i++){
+            for(int j=0;j<a[0].length;j++){
+                out[i][j] = a[i][j] + b[i][j];
             }
         }
-
-        return sample(new ArrayList<Point2D>(locations),band);
+        return out;
     }
 
-    public double[][] sample(ArrayList<Point2D> locations, int band){
-        return null;
-    }
-
-    public ArrayList<double[][]> sample(int samples,ImplicitShape2D reference, int band){
-        ArrayList<double[][]> out = new ArrayList<double[][]>(samples);
-        for(int j=0;j<samples;j++){
-            out.add(sample(reference,band));
+    private double[][] matrixSqrt(double[][] a){
+        double[][] out = new double[a.length][a[0].length];
+        for(int i=0;i<a.length;i++){
+            for(int j=0;j<a[0].length;j++){
+                out[i][j] = Math.sqrt(a[i][j]);
+            }
         }
         return out;
     }
@@ -197,7 +217,7 @@ public class MonotonicFrontSpeedField {
      * Return the current mean estimate for the speed field
      * @return
      */
-    public double[][] computeCurrentMean() {
+    public double[][] computeCurrentMeanField() {
         /**
          * Retrieve \hat\beta from kriging object and fill out missing locations
          * with the mean speed
@@ -232,15 +252,16 @@ public class MonotonicFrontSpeedField {
         return this.currentMean;
     }
 
-    public double[][] getCurrentVariance(){
+    public double[][] getCurrentVarianceField(){
         return this.currentVariance;
     }
+
 
     /**
      * Return the current variance estimate for the speed field
      * @return
      */
-    public double[][] computeCurrentVariance() {
+    public double[][] computeCurrentVarianceField() {
         /**
          * Retrieve \hat\beta from kriging object and fill out missing locations
          * with the mean speed
@@ -267,14 +288,17 @@ public class MonotonicFrontSpeedField {
         return s;
     }
 
+    public float[][] interpolateSpeedField(){
+        float[][] speedgrid = new float[width][height];
+
+
+        return null;
+    }
+
     public float[][] interpolateSpeedFromLevelSets(
             ArrayList<ImplicitShape2D> levelsetSignedDistances) {
-        float[][] speedgrid = new float[width][height];
-        for(int x=0;x<width;x++){
-            for(int y=0; y<height;y++){
-                speedgrid[x][y] = 0;
-            }
-        }
+        DelaunayInterpolator t = new DelaunayInterpolator();
+        float[][] speedgrid;
 
         for(int j=1; j<levelsetSignedDistances.size();j++){
             int[][] boundaryCoordinates = levelsetSignedDistances.get(j).getBoundaryCoordinates();
@@ -284,13 +308,25 @@ public class MonotonicFrontSpeedField {
                 int y = boundaryCoordinates[k][1];
                 boundarySpeeds[k] = (float)
                         Math.abs((levelsetSignedDistances.get(j-1).get(x,y)));
-                speedgrid[x][y] = boundarySpeeds[k];
+                t.addVertex((double) x,(double) y,(double) boundarySpeeds[k]);
             }
         }
-
+        try {
+            t.triangulate();
+        } catch (Triangulation.InvalidVertexException e) {
+            e.printStackTrace();
+        }
+        speedgrid = t.getInterpolation(width,height);
         return speedgrid;
     }
 
 
 
+    public int getXcoord(int x){
+        return (int) Math.floor(x/this.xreduction);
+    }
+
+    public int getYcoord(int y){
+        return (int)Math.floor(y/this.yreduction);
+    }
 }

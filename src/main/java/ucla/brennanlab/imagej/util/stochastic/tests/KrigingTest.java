@@ -133,7 +133,7 @@ public class KrigingTest implements PlugInFilter {
         long startTime = System.nanoTime();
         long endTime;
         Kriging2DLattice krig;
-        krig = new Kriging2DLattice(betaprior, V,3,3);
+        krig = new Kriging2DLattice(betaprior, V);
 
         startTime = System.nanoTime();
         try {
@@ -158,7 +158,7 @@ public class KrigingTest implements PlugInFilter {
         try {
 
             IJ.showStatus("interpolation...");
-            krig.interpolate(interpolationLocations, interpolationCovariates);
+            //krig.interpolate(interpolationLocations, interpolationCovariates);
         } finally {
             endTime = System.nanoTime();
             IJ.log("Finished interpolating in " + (float) (endTime - startTime)

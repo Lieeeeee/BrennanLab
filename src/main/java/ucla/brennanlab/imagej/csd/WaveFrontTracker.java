@@ -48,7 +48,11 @@ public class WaveFrontTracker implements PlugInFilter {
     boolean useManualInitializationPrior = false;
     Roi userDrawnRoi;
     int speedSamples = 16;
-    double priorSpeedMean = 6.0, priorSpeedSD = 6.0;
+    double priorSpeedMean = 10.0, priorSpeedSD = 10.0;
+    double ALPHA = 1e-3;
+    double KAPPA = 0.0;
+    double BETA = 2.0; // unscented filter
+    double L = 8;
     int width;
     int height;
     int innerBandWidth = 25;
@@ -88,7 +92,13 @@ public class WaveFrontTracker implements PlugInFilter {
         this.likelihoodmodel = gd.getNextChoice();
         this.covariateImage = gd.getNextChoice();
 
-        this.runningSpeed = new MonotonicFrontSpeedField(this.width, this.height,priorSpeedMean,Math.pow(priorSpeedSD,2));
+        /**
+         * Instantiate a kriging field interpolated on a sparse grid of lattice spacing
+         * 4x4 relative to the original grid
+         */
+        this.runningSpeed = new MonotonicFrontSpeedField(this.width,
+                this.height,priorSpeedMean,Math.pow(priorSpeedSD,2),4,4
+        );
 
         if (userDrawnRoi != null)
             this.useManualInitializationPrior = gd.getNextBoolean();
@@ -283,15 +293,18 @@ public class WaveFrontTracker implements PlugInFilter {
                 roiman.addRoi(nextRoi);
 
                 double[] effectiveWeights = new double[this.speedSamples+1];
-                //double[][] speed;
                 double speed;
+                // speed = runningSpeed.sampleSigma(l,L); // unscented sample
+
                 for (int i = 0; i < this.speedSamples; i++) {
+                    //speed = runningSpeed.sample();
                     speed = this.runningSpeed.overallMeanSpeed+
                             1.5*this.runningSpeed.overallSDSpeed*(i+1)/this.speedSamples;
 
                     positions.add(new ImplicitShape2D(
                             prevLS.getMask()));
                     effectiveWeights[i] = 1.0; // redo the weighting soon
+                    // effectiveWeights[i] =
 
                     positions.get(i).advect(speed, 1.0);
 
@@ -368,6 +381,11 @@ public class WaveFrontTracker implements PlugInFilter {
                             .returnMask(),false,this.innerBandWidth);
                     long currentTime;
                     int mmIter = 1;
+
+                    /**
+                     * Inner for the previous should remain inner
+                     */
+                    gcSegmenter.freezeInnerRegion(prevLS);
 
                     /**
                      * MM algorithm below
@@ -492,7 +510,10 @@ public class WaveFrontTracker implements PlugInFilter {
                 }
 
                 ImplicitShape2D currentPosition = gcSegmenter.getLevelSet();
-                this.runningSpeed.addArrival(currentPosition,currentSlice);
+                //runningSpeed.addArrival(currentPosition,currentSlice);
+
+
+                //runningSpeed.locallyInferAndSample(currentPosition,currentSlice);
 
 
             }
@@ -526,13 +547,6 @@ public class WaveFrontTracker implements PlugInFilter {
 
     }
 
-    public void segmentThis(ImageProcessor ip){
-
-    }
-
-    public void predictNext(){
-
-    }
 
     /**
      * Normalize a vector

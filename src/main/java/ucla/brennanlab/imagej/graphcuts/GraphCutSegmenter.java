@@ -516,6 +516,19 @@ public class GraphCutSegmenter {
 
     }
 
+    /***
+     * Freeze this particular region's inner region to in for the segmentation
+     * @param shape
+     */
+    public void freezeInnerRegion(ImplicitShape2D shape){
+        for(int x=0; x<shape.width;x++){
+            for(int y=0; y<shape.height;y++){
+                if(shape.in(x,y)){
+
+                }
+            }
+        }
+    }
     /**
      * Normalize weights
      * @param weights

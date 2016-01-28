@@ -185,7 +185,7 @@ public class GraphCut {
     /**
      * Performs the actual max-flow/min-cut computation.
      *
-     * @param reuseTrees   reuse trees of a previos call
+     * @param reuseTrees   reuse trees of a previous call
      * @param changedNodes list of nodes that potentially changed their
      *                     segmentation compared to a previous call, can be set
      *                     to <tt>null</tt>
@@ -325,6 +325,8 @@ public class GraphCut {
 
         return totalFlow;
     }
+
+
 
     /**
      * Get the segmentation, i.e., the terminal node that is connected to the
