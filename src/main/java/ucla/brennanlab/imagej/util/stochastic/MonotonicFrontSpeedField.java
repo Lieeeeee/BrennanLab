@@ -133,7 +133,7 @@ public class MonotonicFrontSpeedField {
         for(int j=0;j<incomingBoundaryCoordinates.length;j++){
             covariates[j][0] = 1;
         }
-        addObservations(incomingBoundaryCoordinates,covariates,incomingBoundarySpeeds);
+        //addObservations(incomingBoundaryCoordinates,covariates,incomingBoundarySpeeds);
         this.times.add(time);
         this.wavePositions.add(incomingShape);
 
@@ -288,6 +288,8 @@ public class MonotonicFrontSpeedField {
         return s;
     }
 
+
+
     public float[][] interpolateSpeedField(){
         float[][] speedgrid = new float[width][height];
 
@@ -307,7 +309,7 @@ public class MonotonicFrontSpeedField {
                 int x = boundaryCoordinates[k][0];
                 int y = boundaryCoordinates[k][1];
                 boundarySpeeds[k] = (float)
-                        Math.abs((levelsetSignedDistances.get(j-1).get(x,y)));
+                        Math.sqrt(Math.abs((levelsetSignedDistances.get(j-1).get(x,y))));
                 t.addVertex((double) x,(double) y,(double) boundarySpeeds[k]);
             }
         }
@@ -318,6 +320,36 @@ public class MonotonicFrontSpeedField {
         }
         speedgrid = t.getInterpolation(width,height);
         return speedgrid;
+    }
+
+    public float[][] listBoundarySpeedsFromLevelSets(ArrayList<ImplicitShape2D> levelsetSignedDistances){
+        ArrayList<Integer> xcoords = new ArrayList<Integer>();
+        ArrayList<Integer> ycoords = new ArrayList<Integer>();
+        ArrayList<Double> speed = new ArrayList<Double>();
+        ArrayList<Double> times = new ArrayList<Double>();
+        for(int j=1; j<levelsetSignedDistances.size();j++){
+            int[][] boundaryCoordinates = levelsetSignedDistances.get(j).getBoundaryCoordinates();
+            float[] boundarySpeeds = new float[boundaryCoordinates.length];
+            for(int k=0; k<boundaryCoordinates.length;k++){
+                int x = boundaryCoordinates[k][0];
+                xcoords.add(x);
+                int y = boundaryCoordinates[k][1];
+                ycoords.add(y);
+                boundarySpeeds[k] = (float)
+                        Math.sqrt(Math.abs((levelsetSignedDistances.get(j-1).get(x,y))));
+                speed.add((double)boundarySpeeds[k]);
+                times.add((double)this.times.get(j));
+            }
+        }
+        float[][] out = new float[xcoords.size()][4];
+        for(int i=0;i<xcoords.size();i++){
+            out[i][0] = xcoords.get(i);
+            out[i][1] = ycoords.get(i);
+            out[i][2] = speed.get(i).floatValue();
+            out[i][3] = times.get(i).floatValue();
+        }
+        return out;
+
     }
 
 

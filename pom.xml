@@ -83,9 +83,11 @@
             <version>3.2</version>
         </dependency>
 		<dependency>
-			<groupId>delaunay-triangulation</groupId>
-			<artifactId>delaunay-triangulation</artifactId>
-			<version>1.0.0</version>
+			<groupId>delaunay</groupId>
+			<artifactId>org.delaunay</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/resources/delaunay.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>

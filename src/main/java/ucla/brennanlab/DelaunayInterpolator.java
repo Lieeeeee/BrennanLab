@@ -1,9 +1,8 @@
 package ucla.brennanlab;
 
 import com.google.common.collect.Sets;
-import org.delaunay.algorithm.Triangulation.InvalidVertexException;
-import org.delaunay.dtfe.DtfeTriangulationMap;
-import org.delaunay.dtfe.interpolation.InterpolationStrategies;
+import org.delaunay.algorithm.Triangulation;
+import org.delaunay.model.Triangle;
 import org.delaunay.model.Vector;
 import org.delaunay.model.Vertex;
 
@@ -11,7 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 
 
-public class DelaunayInterpolator extends DtfeTriangulationMap{
+public class DelaunayInterpolator extends Triangulation{
     private LinkedHashSet<Vertex> inputVertices = Sets.newLinkedHashSet();
 
     private HashMap<Vertex,Double> values = new HashMap<Vertex,Double>();
@@ -29,11 +28,18 @@ public class DelaunayInterpolator extends DtfeTriangulationMap{
 
     public float[][] getInterpolation(int width, int height){
         float[][] speeds = new float[width][height];
-        InterpolationStrategies.createNaturalNeighbor();
         for(int x=0; x<width; x++){
             for(int y=0; y<height; y++){
-                speeds[x][y] = (float)this.getInterpolatedDensity(new Vector(x,y),
-                        InterpolationStrategies.createNaturalNeighbor());
+                Triangle T = this.locate(new Vector(x,y));
+                if(T==null){
+                    speeds[x][y] = 0;
+                }else {
+                    // Inverse distance weighting??
+                    float aval = (this.values.get(T.a)).floatValue();
+                    float bval = (this.values.get(T.b)).floatValue();
+                    float cval = (this.values.get(T.c)).floatValue();
+                    speeds[x][y] = (this.values.get(T.a)).floatValue();
+                }
             }
         }
 

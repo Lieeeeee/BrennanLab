@@ -7,6 +7,7 @@ import ij.WindowManager;
 import ij.gui.GenericDialog;
 import ij.gui.ImageWindow;
 import ij.gui.Roi;
+import ij.measure.ResultsTable;
 import ij.plugin.filter.GaussianBlur;
 import ij.plugin.filter.PlugInFilter;
 import ij.plugin.frame.RoiManager;
@@ -25,6 +26,7 @@ import java.awt.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+
 
 /**
  * Boundary segmentation using the kriging speed model
@@ -289,8 +291,8 @@ public class WaveFrontTracker implements PlugInFilter {
                 Roi nextRoi = meanNext.getRoi(true);
                 imp.setRoi(nextRoi);
 
-                nextRoi.setName("a-priori mean position for slice " + currentSlice);
-                roiman.addRoi(nextRoi);
+                //nextRoi.setName("a-priori mean position for slice " + currentSlice);
+                //roiman.addRoi(nextRoi);
 
                 double[] effectiveWeights = new double[this.speedSamples+1];
                 double speed;
@@ -299,7 +301,7 @@ public class WaveFrontTracker implements PlugInFilter {
                 for (int i = 0; i < this.speedSamples; i++) {
                     //speed = runningSpeed.sample();
                     speed = this.runningSpeed.overallMeanSpeed+
-                            1.5*this.runningSpeed.overallSDSpeed*(i+1)/this.speedSamples;
+                            2*this.runningSpeed.overallSDSpeed*(i-4)/this.speedSamples;
 
                     positions.add(new ImplicitShape2D(
                             prevLS.getMask()));
@@ -423,7 +425,7 @@ public class WaveFrontTracker implements PlugInFilter {
                             currentProgress.setName("Position_" + currentSlice
                                     + "_iteration_" + mmIter);
                             imp.setRoi(currentProgress);
-                            roiman.addRoi(currentProgress);
+                            // roiman.addRoi(currentProgress);
 
                         } catch (NullPointerException e) {
                             csdHasStarted = false;
@@ -510,10 +512,9 @@ public class WaveFrontTracker implements PlugInFilter {
                 }
 
                 ImplicitShape2D currentPosition = gcSegmenter.getLevelSet();
-                //runningSpeed.addArrival(currentPosition,currentSlice);
+                runningSpeed.addArrival(currentPosition,currentSlice);
 
 
-                //runningSpeed.locallyInferAndSample(currentPosition,currentSlice);
 
 
             }
@@ -539,11 +540,24 @@ public class WaveFrontTracker implements PlugInFilter {
         IJ.log("Done segmenting, check out the output!");
 
         float[][] speeds = this.runningSpeed.interpolateSpeedFromLevelSets(this.runningSpeed.wavePositions);
+        float[][] speedlist = this.runningSpeed.listBoundarySpeedsFromLevelSets(this.runningSpeed.wavePositions);
 
         ImageProcessor speedIP = new FloatProcessor(speeds);
         speedIP.setMinAndMax(this.priorSpeedMean - this.priorSpeedSD * 2, this.priorSpeedMean + this.priorSpeedSD * 2);
         ImagePlus speedImage = new ImagePlus("Pixels/slice", speedIP);
         speedImage.show();
+
+        ResultsTable rt = new ResultsTable();
+        for(int i=0; i<speedlist.length;i++){
+            rt.incrementCounter();
+            rt.addValue("X",speedlist[i][0]);
+            rt.addValue("Y",speedlist[i][1]);
+            rt.addValue("speed",speedlist[i][2]);
+            rt.addValue("time",speedlist[i][3]);
+        }
+        rt.show("FrontSpeeds");
+
+
 
     }
 
