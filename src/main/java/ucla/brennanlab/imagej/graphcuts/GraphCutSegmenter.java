@@ -190,16 +190,6 @@ public class GraphCutSegmenter {
         int j;
         double[] cj = getShapeWeights(skde, priorShape); // Eq 9 from arXiv:1208.4384
 
-        if(testLinear){
-            for( j =0; j<skde.shapes.size();j++){
-                cj[j]=(double) 1.0/skde.shapes.size();
-            }
-        }
-        else {
-/*            for (j = 0; j < skde.shapes.size(); j++) {
-                IJ.log("Shape  " + j + " weight " + cj[j]);
-            }*/
-                }
 
         ImplicitShape2D currentshape;
         // priorWeights are length penalty + shape penalty
@@ -338,12 +328,13 @@ public class GraphCutSegmenter {
             if (Double.isNaN(kernelWeights[j])) {
                 distances[j] = Double.MAX_VALUE;
             }
+            if(distances[j] < mindistance) mindistance = distances[j];
         }
 
 
         for(int j=0; j<skde.shapes.size();j++){
             weights[j]+=kernelWeights[j]* Math.sqrt(skde.getBeta(true))
-                    *Math.exp(-skde.getBeta(true)*distances[j]);
+                    *Math.exp(-skde.getBeta(true)*(distances[j]-mindistance));
             if(Double.isNaN(weights[j])){
                 weights[j] = 0;
             }
@@ -480,7 +471,7 @@ public class GraphCutSegmenter {
      * @return
      */
     public float relaxEnergy() {
-        this.Energy = gc.computeMaximumFlow(true, null);
+        this.Energy = gc.computeMaximumFlow(false, null);
         return (this.Energy);
     }
 

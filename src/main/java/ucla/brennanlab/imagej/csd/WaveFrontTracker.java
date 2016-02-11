@@ -45,11 +45,11 @@ public class WaveFrontTracker implements PlugInFilter {
     int maxiters = 10;
     double initialLengthPenalty = 25.0;
     double lengthPenalty = 20.0;
-    double alpha = 2;
+    double alpha = 1;
     boolean showPredictions = false;
     boolean useManualInitializationPrior = false;
     Roi userDrawnRoi;
-    int speedSamples = 16;
+    int speedSamples = 24;
     double priorSpeedMean = 10.0, priorSpeedSD = 10.0;
     double ALPHA = 1e-3;
     double KAPPA = 0.0;
@@ -294,19 +294,18 @@ public class WaveFrontTracker implements PlugInFilter {
                 //nextRoi.setName("a-priori mean position for slice " + currentSlice);
                 //roiman.addRoi(nextRoi);
 
-                double[] effectiveWeights = new double[this.speedSamples+1];
+                double[] effectiveWeights = new double[this.speedSamples];
                 double speed;
                 // speed = runningSpeed.sampleSigma(l,L); // unscented sample
 
                 for (int i = 0; i < this.speedSamples; i++) {
                     //speed = runningSpeed.sample();
                     speed = this.runningSpeed.overallMeanSpeed+
-                            2*this.runningSpeed.overallSDSpeed*(i-4)/this.speedSamples;
+                            4*this.runningSpeed.overallSDSpeed*(i-12)/this.speedSamples;
 
                     positions.add(new ImplicitShape2D(
                             prevLS.getMask()));
-                    effectiveWeights[i] = 1.0; // redo the weighting soon
-                    // effectiveWeights[i] =
+                    effectiveWeights[i] =  1; // Math.exp(-Math.abs(i-1)/2.0); // redo the weighting soon
 
                     positions.get(i).advect(speed, 1.0);
 
@@ -324,12 +323,6 @@ public class WaveFrontTracker implements PlugInFilter {
                     }
 
                 }
-                /**
-                 * Hack to help allow for the possibility that the wave didn't move
-                 */
-                positions.add(new ImplicitShape2D(
-                        prevLS.getMask()));
-                effectiveWeights[this.speedSamples] = 0.5;
 
                 effectiveWeights = normalize(effectiveWeights);
 
@@ -360,8 +353,7 @@ public class WaveFrontTracker implements PlugInFilter {
                  * Use the mean prediction as the start state for MM
                  */
 
-                likelihood.Infer(currentImageProcessor, meanNext
-                        .getMask(),false,this.innerBandWidth);
+                likelihood.Infer(currentImageProcessor, meanNext.getMask(),false,this.innerBandWidth);
 
                 gcSegmenter = new GraphCutSegmenter(currentImageProcessor);
                 gcSegmenter.setLengthPenalty((float) this.lengthPenalty);
@@ -398,20 +390,24 @@ public class WaveFrontTracker implements PlugInFilter {
                             IJ.log("Aborted");
                             break;
                         }
+                        ImplicitShape2D currentLevelSet = gcSegmenter.getLevelSet();
+                        likelihood.Infer(currentImageProcessor, currentLevelSet
+                                .getMask(),false,this.innerBandWidth);
+
                         gcSegmenter.gc.reset(); //  Don't remember what this does
 
-                        gcSegmenter.setNodeWeights(shapePriorDensity, gcSegmenter.getLevelSet(), likelihood);
-                        gcSegmenter.setEdgeWeights(shapePriorDensity, gcSegmenter.getLevelSet());
+                        gcSegmenter.setNodeWeights(shapePriorDensity, currentLevelSet, likelihood);
+                        gcSegmenter.setEdgeWeights(shapePriorDensity, currentLevelSet);
                         newEnergy = gcSegmenter.relaxEnergy();
                         currentTime = System.nanoTime();
                         IJ.log("\t     Iter " + mmIter + " Elapsed time: "
                                 + ((float) (currentTime - startTime) / 1000000)
-                                + " ms" + " Energy " + newEnergy);
-                        if (Math.abs(oldEnergy - newEnergy) < 1  || Double.isNaN(oldEnergy)
+                                + " ms" + " Flow " + newEnergy);
+                        if ( (Math.abs(oldEnergy - newEnergy) < 1 && mmIter>3  )  || Double.isNaN(oldEnergy)
                                 || Double.isInfinite(oldEnergy) || mmIter> this.maxiters) {
                             oldEnergy = newEnergy;
                             if (Double.isNaN(oldEnergy) || Double.isInfinite(oldEnergy)) {
-                                IJ.log("Encountered invalid energy");
+                                IJ.log("Encountered invalid flow");
                             }
 
                             break;
