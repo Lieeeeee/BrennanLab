@@ -4,6 +4,7 @@ import ij.ImagePlus;
 import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.plugin.filter.PlugInFilter;
+import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 
 public class ROItoSignedDistance implements PlugInFilter {
@@ -23,15 +24,16 @@ public class ROItoSignedDistance implements PlugInFilter {
         Roi r = imp.getRoi();
         imp.unlock();
         ImplicitShape2D rp;
-        rp = new ImplicitShape2D(r, imp.getWidth(),imp.getHeight());
+        rp = new ImplicitShape2D(r, ip.getWidth(),ip.getHeight());
 
         ImagePlus impresult = rp.getLSImagePlus();
-
+        FloatProcessor ip3 = rp.getLSFloatProcessor();
         if (r != null) {
             Overlay ov = new Overlay(r);
             impresult.setOverlay(ov);
 
         }
+        impresult.updateAndDraw();
         impresult.show();
     }
 

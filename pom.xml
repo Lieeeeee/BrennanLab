@@ -66,7 +66,14 @@
 			<version>1.2.0</version>
 		</dependency>
 
-        <dependency>
+		<dependency>
+			<groupId>org.ojalgo</groupId>
+			<artifactId>ojalgo</artifactId>
+			<version>39.0</version>
+		</dependency>
+
+
+		<dependency>
             <groupId>org.ujmp</groupId>
             <artifactId>ujmp-complete</artifactId>
             <version>0.3.0</version>

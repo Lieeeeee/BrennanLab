@@ -2,13 +2,16 @@ package ucla.brennanlab.imagej.util.stochastic;
 
 import org.ujmp.core.DenseMatrix2D;
 import org.ujmp.core.Matrix;
+import org.ujmp.core.doublematrix.DenseDoubleMatrix;
 import org.ujmp.core.doublematrix.SparseDoubleMatrix;
+import org.ujmp.core.util.MathUtil;
 
 import java.util.ArrayList;
 
 /**
  * This is a collection of methods for performing Bayesian universal kriging
- * over a 2D lattice, with GMRF,
+ * over a 2D lattice, with GMRF. This is kind of a dumb library. Please perform
+ * checks outside of this library.
  *
  * @author Josh Chang
  */
@@ -17,347 +20,204 @@ import java.util.ArrayList;
 public class Kriging2DLattice {
     double a = 1;
     double b = 2;
-    long n = 0; // number of inputted points
+    int width;
+    int height;
+    double priorMean, priorPrecision;
+    ArrayList<int[]> points;
+    ArrayList<Double> measurements;
 
+    int correlationLength = 2;
 
-    private int correlationLength = 5;
-    /**
-     * When calculating beta for large lattice
-     */
+    public Kriging2DLattice(double priorMean, double priorPrecision, int width, int height){
+        this.priorMean = priorMean;
+        this.priorPrecision = priorPrecision;
+        this.width = width;
+        this.height = height;
+        this.points = new ArrayList<int[]>();
+        this.measurements = new ArrayList<Double>();
+    }
 
-    private Matrix V0; // n x 1 matrix
-    private ArrayList<int[]> locations; // nx2 matrix, should actually be integer but
-    // whatever
-    private Matrix X0; // n x p matrix
-    // F - Xbeta
-    private Matrix residuals;
-    private Matrix beta0;
-    private Matrix betaHat;
-    private Matrix betaHatCovariance;
-    /**
-     * Some intermediate computation that we will use
-     */
+    public ArrayList<int[]> getPoints(){
+        return this.points;
+    }
 
-    private Matrix X0R0X0;
-
-    // X_0^tR_0X_0+V^{-1} pxp
-    private Matrix X0R0X0plusVinv;
-
-    // (X_0^tR_0X_0+V^{-1})^{-1}
-    private Matrix invX0R0X0plusVinv;
-
-    private Matrix R0;
-    private Matrix P; // P
-    //	private SparseMatrix withinPrecision;
-    private Matrix predicted;
-    private Matrix predictionVariance;
-    private double bw;
-    private Matrix predictionRootVariance; // cholesky decomposition square root
-
-    /**
-     *
-     * @param beta0
-     * @param P
-     */
-    public Kriging2DLattice(double beta0, double P){
-        this.P = DenseMatrix2D.Factory.zeros(1,1);
-        this.P.setAsDouble(P,0,0);
-
-        this.beta0 = DenseMatrix2D.Factory.zeros(1,1);
-        this.beta0.setAsDouble(beta0,0,0);
+    public ArrayList<Double> getMeasurements(){
+        return this.measurements;
     }
 
     /**
-     *
-     * @param beta0
-     * @param P
+     * Perform inference using the points in mask. Returns the values
+     * and the covariance matrix
+     * @param mask
+     * @return some matrices: fitted (\hat\beta Eq 6), A_\beta from Eq 7
      */
-    public Kriging2DLattice(Matrix beta0, Matrix P){
-        if (P.getRowCount() != beta0.getRowCount())
-            throw new IllegalArgumentException(
-                    "Matrix2D dimensions must be compatible");
-        this.P = P;
-        this.beta0 = beta0;
-    }
-
-    public void addObservations(int[][] locations, double[][] X, double[] V){
-        ArrayList<int[] > loc = new ArrayList<int[]>(locations.length);
-        Matrix X1 = DenseMatrix2D.Factory.zeros(X.length,X[0].length);
-        Matrix V1 = DenseMatrix2D.Factory.zeros(V.length,1);
-
-        for(int i=0;i<locations.length; i++){
-            loc.add(new int[]{locations[i][0], locations[i][1]});
-            V1.setAsDouble(V[i],i,0);
-            for(int j=0;j<X[0].length;j++){
-                X1.setAsDouble(X[i][j],i,j);
+    public ArrayList<double[][]> infer(boolean[] mask){
+        assert(mask.length == this.points.size());
+        ArrayList<int[]> points = new ArrayList<int[]>();
+        ArrayList<Double> measurements = new ArrayList<Double>();
+        int npoints = 0;
+        for(int i = 0; i<this.points.size();i++){
+            if(mask[i]){
+                npoints++;
+                points.add(this.points.get(i));
+                measurements.add(this.measurements.get(i));
             }
         }
+        // populate the precision matrix
+        Matrix R0 = SparseDoubleMatrix.Factory.zeros(npoints,npoints);
+        double R0sum = 0; // 1^t R0 1
+        double[] R0colsums = new double[npoints];
+        double tmp;
+        double V0R0V0 = 0;
 
-        for(int i=0; i<V.length; i++)
+        for (int column = 0; column < npoints; column++) {
+            R0colsums[column] = 0;
+            for (int row = 0; row < npoints; row++) {
 
-        this.addObservations(loc,X1,V1);
-    }
-
-    /**
-     * Add new observations and update the Kriging model using block matrix
-     * linear algebra
-     *
-     * @param locations  ArrayList of Point2D
-     * @param X nxp matrix of X0
-     * @param V   nx1 matrix of V0
-     */
-    public void addObservations(ArrayList<int[]> locations, Matrix X,
-                                Matrix V) {
-
-        if(n==0){
-            if(X.getColumnCount() != beta0.getColumnCount()){
-                throw new IllegalArgumentException(
-                        "Matrix2D dimensions must be compatible");
+                tmp = rueGaussianPrecision(points
+                                .get(row)[0], points.get(row)[1],
+                        points.get(column)[0], points.get(
+                                column)[1]);
+                R0.setAsDouble(tmp, row, column);
+                R0sum+= tmp;
+                R0colsums[column] += tmp;
             }
-            if (locations.size() != V.getRowCount())
-                throw new IllegalArgumentException(
-                        "Matrix2D dimensions for locations and V0 incompatible");
-            if (locations.size() != X.getRowCount())
-                throw new IllegalArgumentException(
-                        "Matrix2D dimensions for X0 and locations incompatible");
+        }
+        double[][] betahat = new double[npoints][1];
+        double[][] residuals = new double[npoints][1];
+        double betahatprefactor = Math.pow(R0sum+this.priorPrecision,-1);
 
-            this.X0 = X;
-            this.locations = locations;
-            this.V0 = V;
-            this.n = V.getRowCount();
-
-            /**
-             * 5x5 GMRF
-             */
-            this.R0 = SparseDoubleMatrix.Factory
-                    .zeros(this.n, this.n);
-            // Set the correlation matrix
-            for (int row = 0; row < n; row++) {
-                for (int column = 0; column < n; column++) {
-                    R0.setAsDouble(rueGaussianPrecision(locations.get(row)[0], locations.get(row)[1],
-                            locations.get(column)[0], locations.get(
-                                    column)[1]), row, column);
-                }
-            }
-        }else{
-            int nobs1 = (int) this.V0.getRowCount();
-            int nobs2 = (int) V.getRowCount();
-            int nobs =  nobs1 + nobs2;
-            Matrix newresponses = DenseMatrix2D.Factory.zeros(nobs,1);
-            int ncovariates = (int) this.X0.getColumnCount();
-            Matrix newcovariates = DenseMatrix2D.Factory.zeros(nobs,ncovariates);
-
-            for(int j=0;j<nobs1;j++){
-                newresponses.setAsDouble(this.V0.getAsDouble(j,0),j,0);
-                for(int k=0;k<ncovariates;k++){
-                    newcovariates.setAsDouble(this.X0.getAsDouble(j,k),j,k);
-                }
-            }
-            for(int j=0;j<nobs2;j++){
-                newresponses.setAsDouble(V.getAsDouble(j,0),j+nobs1,0);
-                for(int k=0;k<ncovariates;k++){
-                    newcovariates.setAsDouble(X.getAsDouble(j,k),j+nobs1,k);
-                }
-            }
-
-            this.V0 = V;
-            this.X0 = newcovariates;
-            Matrix withinPrecision = SparseDoubleMatrix.Factory.zeros(locations
-                    .size(), locations.size());
-
-            for(int j=0; j<locations.size();j++){
-                this.locations.add(locations.get(j));
-            }
-
-            for (int column = 0; column < nobs; column++) {
-                for (int row = 0; row < nobs; row++) {
-                    withinPrecision.setAsDouble(rueGaussianPrecision(this.locations
-                                    .get(row)[0], this.locations.get(row)[1],
-                            this.locations.get(column)[0], this.locations.get(
-                                    column)[1]), row, column);
-                }
-            }
-            this.R0 = withinPrecision;
+        double betahatsum2 = 0;
+        for(int i=0; i<npoints; i++ ){
+            betahat[i][0] = betahatprefactor*(R0colsums[i]*measurements.get(i)+this.priorPrecision*this.priorMean);
+            betahatsum2+= betahat[i][0]*betahat[i][0];
+            residuals[i][0] = measurements.get(i) - betahat[i][0];
         }
 
 
+        double[][] Abeta = new double[1][1];
+        Abeta[0][0] = betahatprefactor/(this.a+npoints)*
+                (2*this.b+this.priorPrecision*this.priorMean*this.priorMean + V0R0V0 - betahatsum2/betahatprefactor
+                );
 
+        ArrayList<double[][]> output = new ArrayList<double[][]>();
+        output.add(betahat);
+        output.add(Abeta);
+        output.add(residuals);
 
-        computeBeta();
+        double arraypoints[][] = new double[npoints][2];
+        for(int i=0;i<npoints;i++) {
+            arraypoints[i][0] = points.get(i)[0];
+            arraypoints[i][1] = points.get(i)[1];
+        }
 
-    }
-
-    public void clean() {
-        this.X0 = null;
-        this.locations = null;
-        this.R0 = null; // R_0
+        output.add(arraypoints);
+        return output;
     }
 
     /**
-     * Compute beta and its covariance matrix
-     */
-    public void computeBeta() {
-
-        X0R0X0plusVinv = quadraticInnerNorm(R0,
-                X0).plus(P);
-        invX0R0X0plusVinv = X0R0X0plusVinv.inv();
-
-        betaHat = invX0R0X0plusVinv.mtimes(X0.transpose()
-                .mtimes(R0).mtimes(V0).plus(
-                        P.mtimes(beta0)));
-
-        bw = (2 * b + V0
-                .transpose()
-                .mtimes(R0)
-                .mtimes(V0)
-                .minus(
-                        quadraticInnerNorm(X0R0X0plusVinv, betaHat)
-                                .plus(
-                                        quadraticInnerNorm(this.P,
-                                                this.beta0))).getAsDouble(
-                        0, 0));
-
-        betaHatCovariance = invX0R0X0plusVinv.times(bw / (n + 2 * a));
-
-        residuals = V0.minus(this.X0.mtimes(this.betaHat));
-    }
-
-
-
-    /**
+     *
      * @return
      */
-    public Matrix getBeta() {
-        return this.betaHat;
-    }
-
-    /**
-     * @return
-     */
-    public Matrix getBetaVariance() {
-        return this.betaHatCovariance;
-    }
-
-    public Matrix getPredicted() {
-        return predicted;
-    }
-
-    public void setPredicted(Matrix predicted) {
-        this.predicted = predicted;
-    }
-
-    public Matrix getPredictionRootVariance() {
-        return predictionRootVariance;
-    }
-
-    public void setPredictionRootVariance(Matrix predictionRootVariance) {
-        this.predictionRootVariance = predictionRootVariance;
-    }
-
-    /**
-     * Interpolate the field at these points, and give covariance matrix while
-     * at it (Normal approximation)
-     *
-     * @param locations
-     */
-    public void interpolate(ArrayList<int[]> locations, Matrix covariates) {
-
-        assert (locations.size() == covariates.getColumnCount());
-
-        /**
-         * First reshape the observations to cull out far-away points. This step
-         * improves efficiency, and also improves numerical stability because we
-         * remove a lot of (close to zero) eigenvalues that can screw up a
-         * Cholesky decomposition. We do this in a pretty stupid and lazy way
-         * however using signed distance functions, just out of laziness
-         */
-
-        // Compare this.locations and locations
-		/*
-		 * Matrix culledLocations; Matrix culledResiduals; Matrix
-		 * culledCovariates;
-		 *
-		 * // Maximum X and Y in lattice double maxX, maxY; // Minimum X and Y
-		 * in a lattice double minX,minY; int Xrange = (int) (maxX-minX); int
-		 * Yrange = (int) (maxY-minY);
-		 *
-		 *
-		 *
-		 * for(int i=0; i<this.locations.getRowCount();i++){
-		 *
-		 * }
-		 */
-
-        Matrix partialPrecision = SparseDoubleMatrix.Factory.zeros(locations
-                .size(), this.locations.size());
-        long columns = this.locations.size();
-        long rows = locations.size();
-        // Compute cross-correlations
-        for (int row = 0; row < rows; row++) {
-            for (int column = 0; column < columns; column++) {
-                partialPrecision.setAsDouble(rueGaussianPrecision(locations
-                                .get(row)[0], locations.get(row)[1],
-                        this.locations.get(column)[0], this.locations
-                                .get(column)[1]), row, column);
-
-            }
+    public ArrayList<double[][]> infer(){
+        boolean[] mask = new boolean[this.measurements.size()];
+        for(int i = 0; i<this.measurements.size();i++){
+            mask[i] = true;
         }
-        // compute within correlations
-        Matrix withinPrecision = SparseDoubleMatrix.Factory.zeros(locations
-                .size(), locations.size());
+        return this.infer(mask);
+    }
 
-        for (int column = 0; column < rows; column++) {
-            for (int row = 0; row < rows; row++) {
-                withinPrecision.setAsDouble(rueGaussianPrecision(locations
-                                .get(row)[0], locations.get(row)[1],
-                        locations.get(column)[0], locations.get(
-                                column)[1]), row, column);
-            }
+    /**
+     * Solve for Eq 8, 9 - the prediction and the variance matrix
+     * @param inferred
+     * @param newpoints
+     * @return Eq 8, 9
+     */
+    public ArrayList<double[][]> predict(ArrayList<double[][]> inferred, ArrayList<int[]> newpoints){
+        ArrayList<double[][]> prediction = new ArrayList<double[][]>();
+
+        double[][] betahat = inferred.get(0);
+        double[][] Abeta = inferred.get(1);
+        double[][] residuals = inferred.get(2);
+        double[][] originalpoints = inferred.get(3);
+
+        double[][] Vhat = new double[newpoints.size()][1];
+
+        int n = originalpoints.length;
+        int m = newpoints.size();
+
+        double[][] newpointsarray = new double[newpoints.size()][2];
+        for(int i=0;i<m;i++){
+            newpointsarray[i][0] = newpoints.get(i)[0];
+            newpointsarray[i][1] = newpoints.get(i)[1];
         }
 
-        // Use linear algebra solver
-        Matrix newResiduals = withinPrecision.solve(
-                partialPrecision.mtimes(residuals)).times(-1);
-        this.setPredicted(newResiduals.plus(covariates.mtimes(this.betaHat)));
+        Matrix U = makePrecisionMatrix(newpointsarray,originalpoints);
+        Matrix R = makePrecisionMatrix(newpointsarray);
 
-        this.predictionVariance = quadraticOuterNorm(
-                this.betaHatCovariance,
-                covariates.minus(withinPrecision.solve(partialPrecision
-                        .mtimes(this.X0)))).plus(
-                withinPrecision.times(bw / (n + 2 * this.a)));
+        Matrix residualMatrix = DenseDoubleMatrix.Factory.zeros(n,1);
+        for(int i=0;i<n;i++){
+            residualMatrix.setAsDouble(residuals[i][0],i,0);
+        }
+        Matrix perturbation = R.solve(U.times(residualMatrix));
 
-        this.setPredictionRootVariance(predictionVariance.chol());
-        //
+        for(int i=0;i<m;i++){
+            Vhat[i][0] = betahat[0][0] - perturbation.getAsDouble(i,0); // the mean
+        }
+
+        Matrix X0 = DenseDoubleMatrix.Factory.zeros(n,1);
+        for(int i=0;i<n;i++){
+            X0.setAsDouble(1,i,0);
+        }
+        Matrix X = DenseDoubleMatrix.Factory.zeros(m);
+        for(int i=0;i<m;i++){
+            X.setAsDouble(1,i,0);
+        }
+
+        Matrix tmp1 = R.solve(U.times(X0)).plus(X);
+        Matrix Amatrix =
+                tmp1.times(Abeta[0][0]).times(tmp1.transpose())
+                        .plus(R.inv().times(Abeta[0][0]));
+
+        double[][] A = Amatrix.toDoubleArray();
+
+        prediction.add(Vhat);
+        prediction.add(A);
+        return prediction;
     }
 
-    /**
-     * Return B^t A B
-     *
-     * @param A square matrix of dimension nxn
-     * @param B matrix of dimension nxm
-     * @return B^tAB
-     */
-    public Matrix quadraticInnerNorm(Matrix A, Matrix B) {
-        if (A.getRowCount() != A.getColumnCount())
-            throw new IllegalArgumentException("A must be square");
-        if (A.getRowCount() != B.getRowCount())
-            throw new IllegalArgumentException("B and A are not compatible");
-        return B.transpose().mtimes(A.mtimes(B));
-    }
+    public ArrayList<double[][]> sample(ArrayList<double[][]> prediction,int numsamples){
+        double[][] estimate = prediction.get(0);
+        double[][] A = prediction.get(1);
+        long Npoints = estimate.length;
 
-    /**
-     * Return B A B^t
-     *
-     * @param A
-     * @param B
-     * @return BAB^t
-     */
-    public Matrix quadraticOuterNorm(Matrix A, Matrix B) {
-        if (A.getRowCount() != A.getColumnCount())
-            throw new IllegalArgumentException("A must be square");
-        if (A.getRowCount() != B.getColumnCount())
-            throw new IllegalArgumentException("B and A are not compatible");
-        return B.mtimes(A).mtimes(B.transpose());
+        Matrix P = DenseMatrix2D.Factory.zeros(estimate.length,estimate.length);
+        for(long i=0;i<Npoints;i++){
+            for(long j=0;j<Npoints;j++){
+                P.setAsDouble(A[(int)i][(int)j],i,j);
+            }
+        }
+        Matrix L = P.chol(); // estimate.length x estimate.length
+
+        // create a random Gaussian matrix of white noise
+        Matrix Z = DenseMatrix2D.Factory.zeros(estimate.length,numsamples); // estimate.length x numsamples
+        for(int j=0;j<numsamples;j++){
+            for(int i=0;i<estimate.length;i++){
+                Z.setAsDouble(MathUtil.nextGaussian(),i,j);
+            }
+        }
+        Matrix LZ = L.times(Z); // estimate.length x numsamples
+
+        ArrayList<double[][]> samples = new ArrayList<double[][]>(numsamples);
+
+        for(int i=0;i<numsamples;i++){
+            double[][] sample = new double[estimate.length][1];
+            for(int j = 0; j<estimate.length;j++){
+                sample[j][0] = estimate[j][0] + LZ.getAsDouble(j,i);
+            }
+            samples.add(sample);
+        }
+        return samples;
     }
 
     /**
@@ -402,23 +262,31 @@ public class Kriging2DLattice {
             return 0;
     }
 
-    /**
-     * Subtract two matrices
-     *
-     * @param A
-     * @param B
-     * @return The difference A-B
-     */
-    public Matrix subtractMatrices(Matrix A, Matrix B) {
-        if (A.getRowCount() != B.getRowCount())
-            throw new IllegalArgumentException("Matrix2D dimensions must agree");
-        if (A.getColumnCount() != B.getColumnCount())
-            throw new IllegalArgumentException("Matrix2D dimensions must agree");
 
-        return A.minus(B);
+    private Matrix makePrecisionMatrix(double[][] points1, double points2[][]){
+        Matrix out = SparseDoubleMatrix.Factory.zeros(points1.length,points2.length);
+        double x1, y1, x2, y2;
+        for(int j = 0;j<points2.length; j++){
+            for(int i=0;i<points1.length; i++){
+                x1 = points1[i][0];
+                y1 = points1[i][1];
+                x2 = points2[j][0];
+                y2 = points2[j][1];
+                if(Math.abs(x1-x2)<=2 && Math.abs(y2-y1)<=2){
+                    out.setAsDouble(rueGaussianPrecision((int) x1, (int) y1, (int) x2, (int) y2));
+                }
+            }
+        }
+        return out;
     }
 
+    private Matrix makePrecisionMatrix(double[][] points1){
+        return makePrecisionMatrix(points1,points1);
+    }
 
-
+    public void addObservation(int x, int y, double value){
+        this.points.add(new int[]{x,y});
+        this.measurements.add(value);
+    }
 
 }

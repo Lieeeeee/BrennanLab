@@ -42,6 +42,8 @@ public class ImplicitShape2D {
 
     public ImplicitShape2D(Roi r, int width, int height) {
         boolean[][] mask = new boolean[width][height];
+        this.width = width;
+        this.height = height;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 mask[x][y] = r.contains(x, y);

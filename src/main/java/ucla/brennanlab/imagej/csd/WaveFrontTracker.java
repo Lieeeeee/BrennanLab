@@ -11,7 +11,6 @@ import ij.measure.ResultsTable;
 import ij.plugin.filter.GaussianBlur;
 import ij.plugin.filter.PlugInFilter;
 import ij.plugin.frame.RoiManager;
-import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
 import ucla.brennanlab.imagej.graphcuts.GraphCutSegmenter;
@@ -49,22 +48,18 @@ public class WaveFrontTracker implements PlugInFilter {
     boolean showPredictions = false;
     boolean useManualInitializationPrior = false;
     Roi userDrawnRoi;
-    int speedSamples = 24;
-    double priorSpeedMean = 10.0, priorSpeedSD = 10.0;
-    double ALPHA = 1e-3;
-    double KAPPA = 0.0;
-    double BETA = 2.0; // unscented filter
-    double L = 8;
+    int numSpeedSamples = 24;
+    double priorSpeedMean = 8.0, priorSpeedSD = 8.0;
     int width;
     int height;
     int innerBandWidth = 25;
-    MonotonicFrontSpeedField runningSpeed; // filtered speed field
+    MonotonicFrontSpeedField runningSpeed; // Used to compute/predict the wave speed
     ArrayList<Roi> roisOfSegmentations;
     boolean csdHasStarted = false;
     Color roiColor = new Color(255, 105, 180, 255); // Color to draw the ROI
     final String[] likelihoodmodels = {"Gaussian", "Laplacian"};
     String likelihoodmodel;
-    String covariateImage;
+    // String covariateImage;
 
     public void run(ImageProcessor ip) {
 
@@ -88,11 +83,11 @@ public class WaveFrontTracker implements PlugInFilter {
         initialLengthPenalty = gd.getNextNumber();
         priorSpeedMean = inputspeed;
         priorSpeedSD = inputstder;
-        this.speedSamples = (int) gd.getNextNumber();
+        this.numSpeedSamples = (int) gd.getNextNumber();
         this.innerBandWidth = (int) gd.getNextNumber();
         this.showPredictions = gd.getNextBoolean();
         this.likelihoodmodel = gd.getNextChoice();
-        this.covariateImage = gd.getNextChoice();
+        // this.covariateImage = gd.getNextChoice();
 
         /**
          * Instantiate a kriging field interpolated on a sparse grid of lattice spacing
@@ -267,7 +262,7 @@ public class WaveFrontTracker implements PlugInFilter {
                  ***************************************************************/
 
                 ArrayList<ImplicitShape2D> positions = new ArrayList<ImplicitShape2D>(
-                        speedSamples);
+                        this.numSpeedSamples);
                 Roi[] prevPos = new Roi[roisOfSegmentations.size()];
                 for (int p = 0; p < prevPos.length; p++) {
                     prevPos[p] = (Roi) roisOfSegmentations.get(p).clone();
@@ -291,24 +286,17 @@ public class WaveFrontTracker implements PlugInFilter {
                 Roi nextRoi = meanNext.getRoi(true);
                 imp.setRoi(nextRoi);
 
-                //nextRoi.setName("a-priori mean position for slice " + currentSlice);
-                //roiman.addRoi(nextRoi);
+                double[] effectiveWeights = new double[this.numSpeedSamples];
+                ArrayList<double[][]> speedFieldSamples;
+                speedFieldSamples = runningSpeed.sampleSpeedFields(this.numSpeedSamples,
+                        prevLS,runningSpeed.overallMeanSpeed*2.5); // Sample from the speed field
 
-                double[] effectiveWeights = new double[this.speedSamples];
-                double speed;
-                // speed = runningSpeed.sampleSigma(l,L); // unscented sample
-
-                for (int i = 0; i < this.speedSamples; i++) {
-                    //speed = runningSpeed.sample();
-                    speed = this.runningSpeed.overallMeanSpeed+
-                            4*this.runningSpeed.overallSDSpeed*(i-12)/this.speedSamples;
-
+                //  @TODO parallelize
+                for (int i = 0; i < this.numSpeedSamples; i++) {
                     positions.add(new ImplicitShape2D(
                             prevLS.getMask()));
-                    effectiveWeights[i] =  1; // Math.exp(-Math.abs(i-1)/2.0); // redo the weighting soon
-
-                    positions.get(i).advect(speed, 1.0);
-
+                    effectiveWeights[i] =  1;
+                    positions.get(i).advect(speedFieldSamples.get(i), 1.0);
                     Roi pred = positions.get(i).getRoi(true);
 
                     if (pred == null)
@@ -535,13 +523,8 @@ public class WaveFrontTracker implements PlugInFilter {
 
         IJ.log("Done segmenting, check out the output!");
 
-        float[][] speeds = this.runningSpeed.interpolateSpeedFromLevelSets(this.runningSpeed.wavePositions);
+        // float[][] speeds = this.runningSpeed.interpolateSpeedFromLevelSets(this.runningSpeed.wavePositions);
         float[][] speedlist = this.runningSpeed.listBoundarySpeedsFromLevelSets(this.runningSpeed.wavePositions);
-
-        ImageProcessor speedIP = new FloatProcessor(speeds);
-        speedIP.setMinAndMax(this.priorSpeedMean - this.priorSpeedSD * 2, this.priorSpeedMean + this.priorSpeedSD * 2);
-        ImagePlus speedImage = new ImagePlus("Pixels/slice", speedIP);
-        speedImage.show();
 
         ResultsTable rt = new ResultsTable();
         for(int i=0; i<speedlist.length;i++){
@@ -653,7 +636,7 @@ public class WaveFrontTracker implements PlugInFilter {
         gd.addNumericField("Length penalty", imp.getWidth()/20.0, 0);
         gd.addNumericField("Initial Length penalty", imp.getWidth()/20.0,
                 0);
-        gd.addNumericField("Number of predictions", this.speedSamples, 0);
+        gd.addNumericField("Number of sigma points for prediction", this.numSpeedSamples, 0);
         gd.addNumericField("Width of inner region for stats",
                 this.innerBandWidth, 0);
         gd.addCheckbox("Show predicted positions", false);
@@ -666,7 +649,7 @@ public class WaveFrontTracker implements PlugInFilter {
         }
         gd.addChoice("Likelihood model", likelihoodmodels, likelihoodmodels[0]);
 
-        int[] wList = WindowManager.getIDList();
+        /*int[] wList = WindowManager.getIDList();
         String[] titles = new String[wList.length + 1];
         titles[0] = "No covariates";
         for (int i = 0; i < wList.length; i++) {
@@ -675,8 +658,8 @@ public class WaveFrontTracker implements PlugInFilter {
                 titles[i + 1] = (imp).getTitle();
             else
                 titles[i + 1] = "";
-        }
-        gd.addChoice("Covariate image", titles, titles[0]);
+        }*/
+        // gd.addChoice("Covariate image", titles, titles[0]);
 
 
         return gd;
