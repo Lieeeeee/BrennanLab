@@ -23,8 +23,8 @@ public class MonotonicFrontSpeedField {
     private Kriging2DLattice krigingLattice; // stores actual speeds that we will use
     private double priorMeanSpeed;
     private double priorVarSpeed;
-    public double overallMeanSpeed; // Temporary
-    public double overallSDSpeed; // Temporary
+    public double betahat; // Temporary
+    public double Abeta; // Temporary
     private double[][] currentMean;
     private double[][] currentVariance;
     private int xreduction;
@@ -45,6 +45,7 @@ public class MonotonicFrontSpeedField {
         this.wavePositions = new ArrayList<ImplicitShape2D>();
         this.priorMeanSpeed = priormean;
         this.priorVarSpeed = priorvar;
+        this.betahat = priormean;
         this.standardNormal = new Normal(0, 1,
                 new cern.jet.random.engine.MersenneTwister(new java.util.Date())
         );
@@ -132,26 +133,59 @@ public class MonotonicFrontSpeedField {
         this.times.add(position,time);
         this.wavePositions.add(position,incomingShape);
 
-        this.overallMeanSpeed = totspeed/incomingBoundaryCoordinates.length;
-        this.overallSDSpeed = Math.sqrt(totspeed2/incomingBoundaryCoordinates.length-Math.pow(this.overallMeanSpeed,2));
-
-
     }
 
     public void addObservations(int[][] coordinates, double[] speeds){
         // First condense the observations into coarse grid
         // @TODO Use finite differencing interpolation (bilinear interpolation)
-
         assert(coordinates.length==speeds.length);
-        for(int j=0;j<coordinates.length;j++){
-            int x = coordinates[j][0];
-            int y = coordinates[j][1];
-            double speed = speeds[j];
-            int newx = getXcoord(x);
-            int newy = getYcoord(y);
-            this.krigingLattice.addObservation(newx,newy,speed);
-        }
 
+        /**
+         * aggregate coordinates, grouping by coarsened coordinate
+         */
+
+        ArrayList<int[]> existingpoints = krigingLattice.getPoints();
+
+        ArrayList<Integer> counts = new ArrayList<Integer>();
+        ArrayList<int[]> aggregatedpoints = new ArrayList<int[]>();
+        ArrayList<Double> aggregatedspeeds = new ArrayList<Double>();
+
+        for(int j =0; j<coordinates.length;j++){
+            int[] point = coordinates[j];
+            int x = getXcoord(point[0]);
+            int y = getYcoord(point[1]);
+            /**
+             * add to aggregatedpoints if not there
+             */
+            boolean already = false;
+            int loc = -1;
+            while(!already && loc<aggregatedpoints.size()){
+                // check if the point exists already
+                loc++;
+                int[] xy = aggregatedpoints.get(loc);
+                if(xy[0]==x && xy[1] == y){
+                    already = true;
+                }
+
+            }
+
+            if(!already){
+                aggregatedpoints.add(point);
+                aggregatedspeeds.add(speeds[j]);
+                counts.add(1);
+            }else{
+                double count = (double) counts.get(loc);
+                aggregatedspeeds.set(loc, speeds[j]/(count+1)+aggregatedspeeds.get(loc)*count/(count+1));
+                counts.set(loc,counts.get(loc)+1 );
+
+            }
+        }
+        for(int j=0;j<aggregatedpoints.size();j++){
+            int x = aggregatedpoints.get(j)[0];
+            int y = aggregatedpoints.get(j)[1];
+            double val = aggregatedspeeds.get(j);
+            krigingLattice.addObservation(x,y,val);
+        }
     }
 
 
@@ -197,11 +231,39 @@ public class MonotonicFrontSpeedField {
 
     public ArrayList<double[][]> sampleSpeedFields(int numSamples, ImplicitShape2D shape, double bandwidth){
         ArrayList<int[]> datapoints = krigingLattice.getPoints();
+
+        if(datapoints.size()==0){
+            ArrayList<double[][]> out = new ArrayList<double[][]>(numSamples);
+            // sample from the prior
+            // priormean + LIZ  (Z is random vector)
+            for(int i=0;i<numSamples;i++){
+                // solve for convolution
+                double[][] speed = new double[width][height];
+                for(int y=0;y<height;y++){
+                    for(int x=0; x<width; x++){
+                        speed[x][y] = Math.abs(this.priorMeanSpeed + Normal.staticNextDouble(0,Math.sqrt(this.priorVarSpeed)));
+                    }
+                }
+                out.add(speed);
+            }
+            return out;
+        }
+
         boolean[] mask = new boolean[datapoints.size()];
 
         /**
          * Figure out which lattice points are within our desired region within shape +- bandwidth
          */
+
+        for(int i=0;i<mask.length;i++){
+            int[] xy = datapoints.get(i);
+            if(Math.sqrt(Math.abs(shape.get(invertXcoord(xy[0]),invertYcoord(xy[1]))))<bandwidth){
+                mask[i] = true;
+            }else mask[i] = false;
+        }
+        ArrayList<double[][]> inferred = krigingLattice.infer(mask);
+
+        ArrayList<int[]> newpoints = new ArrayList<int[]>();
 
         /**
          * Figure out which of the data points we will use
@@ -214,8 +276,7 @@ public class MonotonicFrontSpeedField {
          */
 
 
-        ArrayList<double[][]> inferred = krigingLattice.infer(mask);
-        ArrayList<double[][]> predicted = krigingLattice.predict(inferred,null);
+        ArrayList<double[][]> predicted = krigingLattice.predict(inferred,newpoints);
         ArrayList<double[][]> krigingsamples = krigingLattice.sample(predicted,numSamples);
 
         ArrayList<double[][]> samples = new ArrayList<double[][]>(numSamples);
@@ -226,7 +287,7 @@ public class MonotonicFrontSpeedField {
             for(int x=0; x<width; x++){
                 for(int y=0; y<height; y++){
                     if(shape.get(x,y)>bandwidth*bandwidth){
-                        samples.get(i)[x][y] = this.overallMeanSpeed;
+                        samples.get(i)[x][y] = this.betahat;
                     }
                     else{
                         // interpolate
@@ -246,7 +307,11 @@ public class MonotonicFrontSpeedField {
         return (int) Math.floor(x/this.xreduction);
     }
 
+    public int invertXcoord(int x){ return (int) x*this.xreduction; }
+
     public int getYcoord(int y){
         return (int)Math.floor(y/this.yreduction);
     }
+
+    public int invertYcoord(int y){ return (int) y*this.yreduction;}
 }

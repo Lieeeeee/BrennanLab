@@ -289,7 +289,7 @@ public class WaveFrontTracker implements PlugInFilter {
                 double[] effectiveWeights = new double[this.numSpeedSamples];
                 ArrayList<double[][]> speedFieldSamples;
                 speedFieldSamples = runningSpeed.sampleSpeedFields(this.numSpeedSamples,
-                        prevLS,runningSpeed.overallMeanSpeed*2.5); // Sample from the speed field
+                        prevLS,runningSpeed.betahat*2.5); // Sample from the speed field
 
                 //  @TODO parallelize
                 for (int i = 0; i < this.numSpeedSamples; i++) {
