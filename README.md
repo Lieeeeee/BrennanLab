@@ -13,8 +13,23 @@ External dependencies
 Plugins
 -------
 * Bright CSD Tracker from differences - CSD wavefront segmentation based on inter-frame difference image
-* Utils/Differences - compute interframe differences
-* Utils/Filtered Differences - compute interframe differences with some saturation of outliers
+* Utils
+  * Differences - compute interframe differences
+  * Filtered Differences - compute interframe differences with some saturation of outliers
+  * Interactive Z Axis Profile - Z Axis profile sensitive to changes in the ROI selection
+  * Open a substack of a Tiff - for selecting a particular range (and loading into memory) of a multipage tiff
+  * Open multiple subsequences from a Tiff
+  * Changes from baseline - Various forms of baseline subtraction
+  * Tresholded changes from baseline - Take the changes, smooth, threshold
+  * Blue and threshold versus baseline
+  * Sign of differences - Sign of interframe differences
+  * Cumulative sum - pixelwise cumulative sum function
+* CSD
+  * Peak Isolator - Isolate pixelwise peak in the image intensity
+  * Montage CSDs from file - Make a montage based on the Peak Isolator
+  * Levelset Method
+    * Reconstruct Wave from Speed - Soft eikonal equation with a given intial condition
+    * Signed distance to ROI - Get 0-level set
 
 CSD Tracker
 ===========
