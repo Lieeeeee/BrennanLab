@@ -1,6 +1,5 @@
 package ucla.brennanlab.imagej.graphcuts;
 
-import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.Roi;
 import ij.process.ByteProcessor;
@@ -322,8 +321,6 @@ public class GraphCutSegmenter {
         double[] weights = new double[skde.shapes.size()]; // Eq 9 from arXiv:1208.4384
         double mindistance = Double.MAX_VALUE;
         double[] kernelWeights = skde.priorWeights;
-
-        IJ.log("Recomputing the MM shape weights");
         // distances stores the distance between the priorShape and each shape within skde
         for (int j = 0; j < skde.shapes.size(); j++) {
             distances[j] = skde.computeDistance(priorShape, skde.shapes.get(j));

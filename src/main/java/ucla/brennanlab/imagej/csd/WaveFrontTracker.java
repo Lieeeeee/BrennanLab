@@ -261,12 +261,10 @@ public class WaveFrontTracker implements PlugInFilter {
                  * density estimation, does multithreaded soooon :)
                  ***************************************************************/
 
-                ArrayList<ImplicitShape2D> positions = new ArrayList<ImplicitShape2D>(
-                        this.numSpeedSamples);
+                ArrayList<ImplicitShape2D> positions = new ArrayList<ImplicitShape2D>();
                 Roi[] prevPos = new Roi[roisOfSegmentations.size()];
                 for (int p = 0; p < prevPos.length; p++) {
                     prevPos[p] = (Roi) roisOfSegmentations.get(p).clone();
-
                 }
 
                 prevLS.getRoi(true);
@@ -280,19 +278,20 @@ public class WaveFrontTracker implements PlugInFilter {
                  * and advect the wave
                  */
 
-                double[][] currentMean = runningSpeed.getCurrentMean();
-                meanNext.advect(currentMean, 1.0);
+
+
+                ArrayList<double[][]> speedFieldSamples;
+                speedFieldSamples = runningSpeed.sampleSpeedFields(this.numSpeedSamples,
+                        prevLS,runningSpeed.betahat*2.5); // Sample from the speed field
+                double[] effectiveWeights = new double[speedFieldSamples.size()];
+
+                meanNext.advect(runningSpeed.getCurrentMean(), 1.0);
 
                 Roi nextRoi = meanNext.getRoi(true);
                 imp.setRoi(nextRoi);
 
-                double[] effectiveWeights = new double[this.numSpeedSamples];
-                ArrayList<double[][]> speedFieldSamples;
-                speedFieldSamples = runningSpeed.sampleSpeedFields(this.numSpeedSamples,
-                        prevLS,runningSpeed.betahat*2.5); // Sample from the speed field
-
                 //  @TODO parallelize
-                for (int i = 0; i < this.numSpeedSamples; i++) {
+                for (int i = 0; i < speedFieldSamples.size(); i++) {
                     positions.add(new ImplicitShape2D(
                             prevLS.getMask()));
                     effectiveWeights[i] =  1;

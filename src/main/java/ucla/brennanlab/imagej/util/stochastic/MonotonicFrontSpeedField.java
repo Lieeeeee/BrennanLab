@@ -26,7 +26,7 @@ public class MonotonicFrontSpeedField {
     public double betahat; // Temporary
     public double Abeta; // Temporary
     private double[][] currentMean;
-    private double[][] currentVariance;
+    private double[][] coarseMean;
     private int xreduction;
     private int yreduction;
 
@@ -50,12 +50,11 @@ public class MonotonicFrontSpeedField {
                 new cern.jet.random.engine.MersenneTwister(new java.util.Date())
         );
         krigingLattice = new Kriging2DLattice(priormean,1.0/priorvar,width/xreduction,height/yreduction);
+        this.coarseMean = new double[(int)width/xreduction][(int) height/yreduction];
         this.currentMean = new double[width][height];
-        this.currentVariance = new double[width][height];
-        for(int i=0; i<width;i++){
-            for(int j=0;j<height;j++){
-                currentMean[i][j] = priormean;
-                currentVariance[i][j] = priorvar;
+        for(int y=0;y<height;y++){
+            for(int x=0; x<width;x++){
+                currentMean[x][y] = priorMeanSpeed;
             }
         }
         this.xreduction = xreduction;
@@ -108,7 +107,6 @@ public class MonotonicFrontSpeedField {
          */
 
         int[][] incomingBoundaryCoordinates = incomingShape.getBoundaryCoordinates();
-        double[] incomingBoundarySpeeds = new double[incomingBoundaryCoordinates.length];
 
         ArrayList<int[]> coords = new ArrayList<int[]>();
         ArrayList<Double> spd = new ArrayList<Double>();
@@ -314,9 +312,9 @@ public class MonotonicFrontSpeedField {
 
         ArrayList<double[][]> predicted = krigingLattice.predict(inferred,newpoints);
         ArrayList<double[][]> krigingsamples = krigingLattice.sample(predicted,numSamples);
-        ArrayList<double[][]> samples = new ArrayList<double[][]>(numSamples-4);
+        ArrayList<double[][]> samples = new ArrayList<double[][]>(numSamples);
 
-        for(int i=0; i<numSamples-4; i++){
+        for(int i=0; i<numSamples; i++){
 
             samples.add(new double[width][height]);
             int ptcount = 0;
@@ -332,7 +330,7 @@ public class MonotonicFrontSpeedField {
                 }
             }
         }
-        for(int i=0;i<4;i++){
+        for(int i=0;i<8;i++){
             // solve for convolution
             double[][] speed = new double[width][height];
             for(int y=0;y<height;y++){
