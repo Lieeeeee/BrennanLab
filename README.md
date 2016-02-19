@@ -4,9 +4,9 @@ These are ImageJ plugins developed for the Brennan Lab's use in analyzing optica
 
 External dependencies
 ---------------------
-* Cern colt 1.2.0
+* Cern Colt 1.2.0
 * UJMP 0.3.0
-* Jchart2D 3.3.2
+* JChart2D 3.3.2
 * Apache commons math 3.2
 * ImageJ >=1.49
 
@@ -32,3 +32,20 @@ The CSD tracker is based on regularized Chan-Vese segmentation where inference i
   publisher={IEEE}
 }
 ```
+
+The shape priors are also normalized now using the method from my paper in JMIV
+
+```
+@article{chang2014iterative,
+  title={Iterative graph cuts for image segmentation with a nonlinear statistical shape prior},
+  author={Chang, Joshua C and Chou, Tom},
+  journal={Journal of mathematical imaging and vision},
+  volume={49},
+  number={1},
+  pages={87--97},
+  year={2014},
+  publisher={Springer}
+}
+```
+
+If you find this plugin useful, please cite these papers in your work. Thanks!
