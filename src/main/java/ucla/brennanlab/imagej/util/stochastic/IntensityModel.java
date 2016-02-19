@@ -18,8 +18,8 @@ public interface IntensityModel {
     double logpOut(double pixelval);
 
     double logpIn(double pixelval);
-    public double getPosteriorMean(boolean in);
-    public double getPosteriorPrecision(boolean in);
+    double getPosteriorMean(boolean in);
+    double getPosteriorPrecision(boolean in);
 
     void Infer(ImageStack stack, boolean[][][] mask, boolean updatePrior);
     void multiplyPrecision(double d);

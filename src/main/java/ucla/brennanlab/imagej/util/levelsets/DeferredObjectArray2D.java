@@ -87,7 +87,7 @@ public class DeferredObjectArray2D<T> {
         final int offset = x_tile + y_tile * xtiles;
 
         final Object tile = tiles[offset];
-        if (tile == null && create == true) {
+        if (tile == null && create) {
             tiles[offset] = createTile(tilesize);
             return tiles[offset];
         }

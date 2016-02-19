@@ -413,7 +413,6 @@ public class GraphCutSegmenter {
                                 skde.shapes.get(0).lambda) / 2
                                 * skde.getBeta(true) * Math.PI * 2
                                 * (1 + 2 * Math.pow(2, -0.5)) / 8;
-                        ;
 
                     }
                 }

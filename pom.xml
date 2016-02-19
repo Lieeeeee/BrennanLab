@@ -67,15 +67,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.ojalgo</groupId>
-			<artifactId>ojalgo</artifactId>
-			<version>39.0</version>
-		</dependency>
-
-
-		<dependency>
             <groupId>org.ujmp</groupId>
-            <artifactId>ujmp-complete</artifactId>
+            <artifactId>ujmp-gui</artifactId>
             <version>0.3.0</version>
         </dependency>
 
@@ -89,18 +82,7 @@
             <artifactId>commons-math3</artifactId>
             <version>3.2</version>
         </dependency>
-		<dependency>
-			<groupId>delaunay</groupId>
-			<artifactId>org.delaunay</artifactId>
-			<version>1.0</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/delaunay.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>16.0.1</version>
-		</dependency>
+
 
 	</dependencies>
 

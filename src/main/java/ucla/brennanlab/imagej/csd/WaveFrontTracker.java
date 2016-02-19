@@ -523,7 +523,6 @@ public class WaveFrontTracker implements PlugInFilter {
 
         IJ.log("Done segmenting, check out the output!");
 
-        // float[][] speeds = this.runningSpeed.interpolateSpeedFromLevelSets(this.runningSpeed.wavePositions);
         float[][] speedlist = this.runningSpeed.listBoundarySpeedsFromLevelSets(this.runningSpeed.wavePositions);
 
         ResultsTable rt = new ResultsTable();

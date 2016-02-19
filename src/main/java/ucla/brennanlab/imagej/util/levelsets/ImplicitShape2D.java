@@ -206,7 +206,6 @@ public class ImplicitShape2D {
         for (int x = 0; x < this.signedDistance.length; x++) {
             for (int y = 0; y < this.signedDistance[0].length; y++) {
                 sum += rho(x, y);
-                ;
             }
         }
         return Math.pow(sum, 1.0 / (d + lambda));
@@ -291,7 +290,7 @@ public class ImplicitShape2D {
      * Distance between this shape and other shape computes first the transform
      *
      * @param Lambda
-     * @return
+     * @return double distance
      */
     double distance(ImplicitShape2D Lambda) {
         // First step is to get the transform coords for the other shape
@@ -355,7 +354,7 @@ public class ImplicitShape2D {
      * Exact distance transformation in 1D taken from the Fiji project
      *
      * @param f
-     * @return
+     * @return squared distance
      */
     public static float[] EDTTransform1D(float[] f) {
         float d[] = new float[f.length];
@@ -422,8 +421,6 @@ public class ImplicitShape2D {
 
             d[q] = f[q] < 0 ? -(q - yNeg[iNeg]) * (q - yNeg[iNeg]) + fNeg[iNeg]
                     : (q - yPos[iPos]) * (q - yPos[iPos]) + fPos[iPos];
-            // d[q] = d[q]<0? 0.5f - (float)Math.sqrt(-d[q]): -0.5f + (float)
-            // Math.sqrt(d[q]);
         }
 
         return d;
@@ -436,7 +433,7 @@ public class ImplicitShape2D {
      * @param grid
      * @return
      */
-    public static float[][] ExactDistanceTransform(float[][] grid) {
+    public float[][] ExactDistanceTransform(float[][] grid) {
         // Restore the signed distance
 
         float[][] newgrid = new float[grid.length][grid[0].length];
@@ -484,7 +481,7 @@ public class ImplicitShape2D {
      *
      * @param x
      * @param y
-     * @return
+     * @return value
      */
     public double get(double x, double y) {
         int x1 = (int) Math.floor(x);
@@ -568,7 +565,7 @@ public class ImplicitShape2D {
      *
      * @param reset
      *            Reset the signed distance function after obtaining the ROI
-     * @return
+     * @return Polygon Roi of the boundary
      */
     public PolygonRoi getRoi(boolean reset) {
         // Returns the ROI corresponding to the zero level set
@@ -1333,7 +1330,7 @@ public class ImplicitShape2D {
      * @param alpha
      * @param c
      * @param omega
-     * @return
+     * @return Hessian double[][]
      */
     public double[][] getInverseTransformHessian(ImplicitShape2D Lambda,
                                                  double alpha, double[] c, double omega) {
@@ -1521,7 +1518,7 @@ public class ImplicitShape2D {
      * Save evenly spaced X-Y coordinates of the current level set
      *
      * @url{http://rsb.info.nih.gov/ij/plugins/download/Path_Writer.java
-     * @return
+     * @return list of boundary coordinates
      */
     public int[][] getBoundaryCoordinates() {
 

@@ -109,29 +109,32 @@ public class MonotonicFrontSpeedField {
 
         int[][] incomingBoundaryCoordinates = incomingShape.getBoundaryCoordinates();
         double[] incomingBoundarySpeeds = new double[incomingBoundaryCoordinates.length];
-        double totspeed = 0;
-        double totspeed2 = 0;
+
+        ArrayList<int[]> coords = new ArrayList<int[]>();
+        ArrayList<Double> spd = new ArrayList<Double>();
+
         for(int j=0; j<incomingBoundaryCoordinates.length;j++){
-            incomingBoundarySpeeds[j] = (float) Math.sqrt( Math.abs(
-                    this.wavePositions
-                            .get(this.wavePositions.size()-1)
-                            .get(incomingBoundaryCoordinates[j][0],incomingBoundaryCoordinates[j][1])/
-                    (time-times.get(this.wavePositions.size()-1))));
-            totspeed += incomingBoundarySpeeds[j];
-            totspeed2 += Math.pow(incomingBoundarySpeeds[j],2);
-        }
-        this.currentMean = new double[width][height];
-        this.currentVariance = new double[width][height];
-        for(int i=0; i<width;i++){
-            for(int j=0;j<height;j++){
-                currentMean[i][j] = totspeed/incomingBoundaryCoordinates.length;
-                currentVariance[i][j] = totspeed2/incomingBoundaryCoordinates.length-Math.pow(currentMean[i][j],2);
-            }
+            int x = incomingBoundaryCoordinates[j][0];
+            int y = incomingBoundaryCoordinates[j][1];
+            if(x<=1 || y<=1 || x>=width-2 || y>=height-2) continue;
+            coords.add(new int[]{x,y});
+            spd.add( Math.abs(
+                    wavePositions.get(wavePositions.size()-1)
+                            .get(x,y)));
+
         }
 
-        addObservations(incomingBoundaryCoordinates,incomingBoundarySpeeds);
-        this.times.add(position,time);
-        this.wavePositions.add(position,incomingShape);
+        int[][] coords2 = new int[coords.size()][2];
+        double[] speeds = new double[coords.size()];
+        for(int i=0;i<coords.size();i++){
+            coords2[i][0] = coords.get(i)[0];
+            coords2[i][1] = coords.get(i)[1];
+            speeds[i] = spd.get(i);
+        }
+
+        addObservations(coords2,speeds);
+        times.add(position,time);
+        wavePositions.add(position,incomingShape);
 
     }
 
@@ -159,7 +162,7 @@ public class MonotonicFrontSpeedField {
              */
             boolean already = false;
             int loc = -1;
-            while(!already && loc<aggregatedpoints.size()){
+            while(!already && loc<aggregatedpoints.size()-1){
                 // check if the point exists already
                 loc++;
                 int[] xy = aggregatedpoints.get(loc);
@@ -170,7 +173,7 @@ public class MonotonicFrontSpeedField {
             }
 
             if(!already){
-                aggregatedpoints.add(point);
+                aggregatedpoints.add(new int[]{x,y});
                 aggregatedspeeds.add(speeds[j]);
                 counts.add(1);
             }else{
@@ -206,15 +209,14 @@ public class MonotonicFrontSpeedField {
         ArrayList<Double> times = new ArrayList<Double>();
         for(int j=1; j<levelsetSignedDistances.size();j++){
             int[][] boundaryCoordinates = levelsetSignedDistances.get(j).getBoundaryCoordinates();
-            float[] boundarySpeeds = new float[boundaryCoordinates.length];
             for(int k=0; k<boundaryCoordinates.length;k++){
-                int x = boundaryCoordinates[k][0];
-                xcoords.add(x);
                 int y = boundaryCoordinates[k][1];
+                int x = boundaryCoordinates[k][0];
+                if(x<=1||y<=1 || x>= width-2 || y>= height-2) continue;
                 ycoords.add(y);
-                boundarySpeeds[k] = (float)
-                        Math.sqrt(Math.abs((levelsetSignedDistances.get(j-1).get(x,y))));
-                speed.add((double)boundarySpeeds[k]);
+                xcoords.add(x);
+
+                speed.add(-(levelsetSignedDistances.get(j-1).get(x,y)));
                 times.add((double)this.times.get(j));
             }
         }
@@ -232,7 +234,63 @@ public class MonotonicFrontSpeedField {
     public ArrayList<double[][]> sampleSpeedFields(int numSamples, ImplicitShape2D shape, double bandwidth){
         ArrayList<int[]> datapoints = krigingLattice.getPoints();
 
-        if(datapoints.size()==0){
+        boolean[] mask = new boolean[datapoints.size()];
+
+        /**
+         * Figure out which lattice points are within our desired region within shape +- bandwidth
+         */
+
+        for(int i=0;i<mask.length;i++){
+            int[] xy = datapoints.get(i);
+            if(Math.abs(shape.get(invertXcoord(xy[0]),invertYcoord(xy[1])))<bandwidth){
+                mask[i] = true;
+            }else mask[i] = false;
+        }
+        ArrayList<double[][]> inferred = krigingLattice.infer(mask);
+
+        ArrayList<int[]> newpoints = new ArrayList<int[]>();
+        ArrayList<Integer> whichpoint = new ArrayList<Integer>(); // which point in newpoints does this x,y location correspond to?
+
+        int num_new_points = 0;
+        for(int y=0;y<height;y++){
+            for(int x=0;x<width;x++){
+                if(shape.get(x,y)>-bandwidth && shape.get(x,y)<0){
+                    // check first to make sure that this point is not already in newpoints
+                    int x2 = getXcoord(x);
+                    int y2 = getYcoord(y);
+                    /**
+                     * add to newpoints if not there
+                     */
+                    boolean already = false;
+                    int loc = -1;
+                    while(!already && loc<newpoints.size()-1){
+                        // check if the point exists already
+                        loc++;
+                        int[] xy = newpoints.get(loc);
+                        if(xy[0]==x2 && xy[1] == y2){
+                            already = true;
+                        }
+
+                    }
+                    if(already) {
+                        // point is already in
+                        whichpoint.add(loc);
+
+                    }else{
+                        whichpoint.add(num_new_points);
+                        newpoints.add(new int[]{x2,y2});
+                        num_new_points++;
+                    }
+
+                }
+            }
+        }
+
+        /**
+         * Figure out which of the data points we will use
+         */
+
+        if(datapoints.size()==0 || newpoints.size()==0){
             ArrayList<double[][]> out = new ArrayList<double[][]>(numSamples);
             // sample from the prior
             // priormean + LIZ  (Z is random vector)
@@ -249,28 +307,6 @@ public class MonotonicFrontSpeedField {
             return out;
         }
 
-        boolean[] mask = new boolean[datapoints.size()];
-
-        /**
-         * Figure out which lattice points are within our desired region within shape +- bandwidth
-         */
-
-        for(int i=0;i<mask.length;i++){
-            int[] xy = datapoints.get(i);
-            if(Math.sqrt(Math.abs(shape.get(invertXcoord(xy[0]),invertYcoord(xy[1]))))<bandwidth){
-                mask[i] = true;
-            }else mask[i] = false;
-        }
-        ArrayList<double[][]> inferred = krigingLattice.infer(mask);
-
-        ArrayList<int[]> newpoints = new ArrayList<int[]>();
-
-        /**
-         * Figure out which of the data points we will use
-         */
-
-
-
         /**
          * Pull samples out of this.krigingLattice, and convert those samples to speed fields
          */
@@ -278,20 +314,20 @@ public class MonotonicFrontSpeedField {
 
         ArrayList<double[][]> predicted = krigingLattice.predict(inferred,newpoints);
         ArrayList<double[][]> krigingsamples = krigingLattice.sample(predicted,numSamples);
-
         ArrayList<double[][]> samples = new ArrayList<double[][]>(numSamples);
 
         for(int i=0; i<numSamples; i++){
 
             samples.add(new double[width][height]);
-            for(int x=0; x<width; x++){
-                for(int y=0; y<height; y++){
-                    if(shape.get(x,y)>bandwidth*bandwidth){
-                        samples.get(i)[x][y] = this.betahat;
+            int ptcount = 0;
+            for(int y=0; y<height; y++){
+                for(int x=0; x<width; x++){
+                    if(shape.get(x,y)>-bandwidth && shape.get(x,y)<0){
+                        samples.get(i)[x][y] = krigingsamples.get(i)[whichpoint.get(ptcount)][0];
+                        ptcount++;
                     }
                     else{
-                        // interpolate
-
+                        samples.get(i)[x][y] = inferred.get(0)[0][0]+ Normal.staticNextDouble(0,Math.sqrt(inferred.get(1)[0][0]));
                     }
                 }
             }

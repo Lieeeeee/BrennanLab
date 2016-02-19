@@ -47,7 +47,7 @@ import java.util.List;
 enum Terminal {
 
     FOREGROUND, // a.k.a. the source
-    BACKGROUND; // a.k.a. the sink
+    BACKGROUND // a.k.a. the sink
 }
 
 

@@ -243,7 +243,6 @@ public class ZoomableChartWithPointSelection extends ZoomableChart {
             return;
 
         ITracePoint2D nearestpt = this.getNearestPointManhattan(e);
-        ;
         if (selectedTrace.isEmpty()) { // add the first point
             selectedTrace.setVisible(true);
             selectedTrace.addPoint(nearestpt);

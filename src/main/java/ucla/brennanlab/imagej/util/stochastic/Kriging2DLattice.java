@@ -2,6 +2,7 @@ package ucla.brennanlab.imagej.util.stochastic;
 
 import org.ujmp.core.DenseMatrix2D;
 import org.ujmp.core.Matrix;
+import org.ujmp.core.SparseMatrix;
 import org.ujmp.core.doublematrix.DenseDoubleMatrix;
 import org.ujmp.core.doublematrix.SparseDoubleMatrix;
 import org.ujmp.core.util.MathUtil;
@@ -74,24 +75,30 @@ public class Kriging2DLattice {
             R0colsums[column] = 0;
             for (int row = 0; row < npoints; row++) {
 
-                tmp = rueGaussianPrecision(points
-                                .get(row)[0], points.get(row)[1],
-                        points.get(column)[0], points.get(
-                                column)[1]);
-                R0.setAsDouble(tmp, row, column);
-                R0sum+= tmp;
-                R0colsums[column] += tmp;
+                int x1 = points.get(row)[0];
+                int y1 = points.get(row)[1];
+                int x2 = points.get(column)[0];
+                int y2 = points.get(column)[1];
+                if(Math.abs(x1-x2)<=2 && Math.abs(y1-y2)<=1) {
+                    tmp = rueGaussianPrecision(x1, y1,x2, y2);
+                    R0.setAsDouble(tmp, row, column);
+                    R0sum += tmp;
+                    R0colsums[column] += tmp;
+                    V0R0V0 += tmp * measurements.get(row) * measurements.get(column);
+                }
             }
         }
-        double[][] betahat = new double[npoints][1];
+        double[][] betahat = new double[][]{{0.0}};
         double[][] residuals = new double[npoints][1];
         double betahatprefactor = Math.pow(R0sum+this.priorPrecision,-1);
 
         double betahatsum2 = 0;
+        double tmp2;
         for(int i=0; i<npoints; i++ ){
-            betahat[i][0] = betahatprefactor*(R0colsums[i]*measurements.get(i)+this.priorPrecision*this.priorMean);
-            betahatsum2+= betahat[i][0]*betahat[i][0];
-            residuals[i][0] = measurements.get(i) - betahat[i][0];
+            tmp2 = betahatprefactor*(R0colsums[i]*measurements.get(i)+this.priorPrecision*this.priorMean);
+            betahat[0][0] += tmp2;
+            betahatsum2+= tmp2*tmp2;
+            residuals[i][0] = measurements.get(i) - betahat[0][0];
         }
 
 
@@ -152,33 +159,28 @@ public class Kriging2DLattice {
             newpointsarray[i][1] = newpoints.get(i)[1];
         }
 
-        Matrix U = makePrecisionMatrix(newpointsarray,originalpoints);
-        Matrix R = makePrecisionMatrix(newpointsarray);
+        SparseMatrix U = makePrecisionMatrix(newpointsarray,originalpoints);
+        SparseMatrix R = makePrecisionMatrix(newpointsarray);
 
         Matrix residualMatrix = DenseDoubleMatrix.Factory.zeros(n,1);
         for(int i=0;i<n;i++){
             residualMatrix.setAsDouble(residuals[i][0],i,0);
         }
-        Matrix perturbation = R.solve(U.times(residualMatrix));
+        Matrix perturbation = R.solve(U.mtimes(residualMatrix));
 
         for(int i=0;i<m;i++){
             Vhat[i][0] = betahat[0][0] - perturbation.getAsDouble(i,0); // the mean
         }
 
-        Matrix X0 = DenseDoubleMatrix.Factory.zeros(n,1);
-        for(int i=0;i<n;i++){
-            X0.setAsDouble(1,i,0);
-        }
-        Matrix X = DenseDoubleMatrix.Factory.zeros(m);
-        for(int i=0;i<m;i++){
-            X.setAsDouble(1,i,0);
-        }
+        Matrix X0 = DenseDoubleMatrix.Factory.zeros(n,1).plus(1);
+        Matrix X = DenseDoubleMatrix.Factory.zeros(m,1).plus(1);
 
-        Matrix tmp1 = R.solve(U.times(X0)).plus(X);
+        Matrix tmp1 = R.solve(U.mtimes(X0)).plus(X);
         Matrix Amatrix =
-                tmp1.times(Abeta[0][0]).times(tmp1.transpose())
+                tmp1.times(Abeta[0][0]).mtimes(tmp1.transpose())
                         .plus(R.inv().times(Abeta[0][0]));
 
+        // Amatrix.showGUI();
         double[][] A = Amatrix.toDoubleArray();
 
         prediction.add(Vhat);
@@ -206,14 +208,14 @@ public class Kriging2DLattice {
                 Z.setAsDouble(MathUtil.nextGaussian(),i,j);
             }
         }
-        Matrix LZ = L.times(Z); // estimate.length x numsamples
+        Matrix LZ = L.mtimes(Z); // estimate.length x numsamples
 
         ArrayList<double[][]> samples = new ArrayList<double[][]>(numsamples);
 
         for(int i=0;i<numsamples;i++){
             double[][] sample = new double[estimate.length][1];
             for(int j = 0; j<estimate.length;j++){
-                sample[j][0] = estimate[j][0] + LZ.getAsDouble(j,i);
+                sample[j][0] = Math.max(estimate[j][0] + LZ.getAsDouble(j,i),0.01);
             }
             samples.add(sample);
         }
@@ -263,24 +265,26 @@ public class Kriging2DLattice {
     }
 
 
-    private Matrix makePrecisionMatrix(double[][] points1, double points2[][]){
-        Matrix out = SparseDoubleMatrix.Factory.zeros(points1.length,points2.length);
+    private SparseMatrix makePrecisionMatrix(double[][] points1, double points2[][]){
+        int n = points1.length;
+        int m = points2.length;
+        SparseMatrix out = SparseDoubleMatrix.Factory.zeros(n,m);
         double x1, y1, x2, y2;
-        for(int j = 0;j<points2.length; j++){
-            for(int i=0;i<points1.length; i++){
+        for(int j = 0;j<m; j++){
+            for(int i=0;i<n; i++){
                 x1 = points1[i][0];
                 y1 = points1[i][1];
                 x2 = points2[j][0];
                 y2 = points2[j][1];
                 if(Math.abs(x1-x2)<=2 && Math.abs(y2-y1)<=2){
-                    out.setAsDouble(rueGaussianPrecision((int) x1, (int) y1, (int) x2, (int) y2));
+                    out.setAsDouble(rueGaussianPrecision((int) x1, (int) y1, (int) x2, (int) y2),i,j);
                 }
             }
         }
         return out;
     }
 
-    private Matrix makePrecisionMatrix(double[][] points1){
+    private SparseMatrix makePrecisionMatrix(double[][] points1){
         return makePrecisionMatrix(points1,points1);
     }
 
