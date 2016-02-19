@@ -19,11 +19,7 @@ Plugins
 CSD Tracker
 ===========
 
-.. figure:: joshchang.github.io/_static/images/csd.gif
-   :scale: 100%
-   :alt: CSD wave segmentation
-   :align: center
-
+![Segmented moving CSD wavefront](http://joshchang.github.io/_static/images/csd.gif)
 
 The CSD tracker is based on regularized Chan-Vese segmentation (of a bright expanding foreground region) where inference is performed using graph cuts. The regularization comes from a running prediction of future front positions based on previous front positions by estimating a spatially-correlated wavespeed field. The paper in IEEE describes the overall method (and is completely reproducible as I fortunately discovered recently when rewriting this plugin!):
 
