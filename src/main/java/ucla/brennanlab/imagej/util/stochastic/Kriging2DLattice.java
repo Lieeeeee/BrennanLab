@@ -161,6 +161,7 @@ public class Kriging2DLattice {
 
         SparseMatrix U = makePrecisionMatrix(newpointsarray,originalpoints);
         SparseMatrix R = makePrecisionMatrix(newpointsarray);
+        SparseMatrix R0 = makePrecisionMatrix(originalpoints);
 
         Matrix residualMatrix = DenseDoubleMatrix.Factory.zeros(n,1);
         for(int i=0;i<n;i++){
@@ -176,9 +177,12 @@ public class Kriging2DLattice {
         Matrix X = DenseDoubleMatrix.Factory.zeros(m,1).plus(1);
 
         Matrix tmp1 = R.solve(U.mtimes(X0)).plus(X);
+
+        Matrix adjustment = X0.transpose().mtimes(R0).mtimes(X0).plus(this.priorPrecision);
+
         Matrix Amatrix =
                 tmp1.times(Abeta[0][0]).mtimes(tmp1.transpose())
-                        .plus(R.inv().times(Abeta[0][0]));
+                        .plus(R.inv().times(adjustment.getAsDouble(0,0)).times(Abeta[0][0]));
 
         // Amatrix.showGUI();
         double[][] A = Amatrix.toDoubleArray();

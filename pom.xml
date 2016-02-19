@@ -14,7 +14,7 @@
 
 	<groupId>ucla.brennanlab</groupId>
 	<artifactId>Brennan_Lab</artifactId>
-	<version>0.1.1-SNAPSHOT</version>
+	<version>1.0</version>
 
 	<name>plugins/Brennan_Lab.jar</name>
 	<description>Brennan Lab Misc ImageJ plugins</description>

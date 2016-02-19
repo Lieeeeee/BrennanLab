@@ -26,6 +26,8 @@ public class GraphCutSegmenter {
     private IntensityModel intensityModel;
     private ShapePrior shapeKernelDensityEstimate;
     final boolean testLinear=false;
+    boolean freezeInner = false;
+    ImplicitShape2D frozenInnerShape;
 
     public GraphCutSegmenter(ImageProcessor ip, float mu) {
         this(ip);
@@ -87,6 +89,9 @@ public class GraphCutSegmenter {
             for (int x = 0; x < width; x++) {
                 mask[x][y] = this.gc.getTerminal(y * width + x) == Terminal.FOREGROUND ? true
                         : false;
+                if(this.freezeInner && this.frozenInnerShape!=null){
+                    if(frozenInnerShape.in(x,y)) mask[x][y] = true;
+                }
             }
         }
         return mask;
@@ -390,6 +395,12 @@ public class GraphCutSegmenter {
                     sink = Float.MAX_VALUE;
                 }
 
+                if(freezeInner && frozenInnerShape!=null){
+                    if(frozenInnerShape.in(x,y)){
+                        source += Float.MAX_VALUE;
+                    }
+                }
+
                 for (int j = 0; j < skde.shapes.size(); j++) {
                     if (skde.shapes.get(j).in(x, y)) {
                         source += weights[j]
@@ -511,13 +522,8 @@ public class GraphCutSegmenter {
      * @param shape
      */
     public void freezeInnerRegion(ImplicitShape2D shape){
-        for(int x=0; x<shape.width;x++){
-            for(int y=0; y<shape.height;y++){
-                if(shape.in(x,y)){
-
-                }
-            }
-        }
+        this.frozenInnerShape = shape;
+        this.freezeInner = true;
     }
     /**
      * Normalize weights

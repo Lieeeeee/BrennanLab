@@ -314,9 +314,9 @@ public class MonotonicFrontSpeedField {
 
         ArrayList<double[][]> predicted = krigingLattice.predict(inferred,newpoints);
         ArrayList<double[][]> krigingsamples = krigingLattice.sample(predicted,numSamples);
-        ArrayList<double[][]> samples = new ArrayList<double[][]>(numSamples);
+        ArrayList<double[][]> samples = new ArrayList<double[][]>(numSamples-4);
 
-        for(int i=0; i<numSamples; i++){
+        for(int i=0; i<numSamples-4; i++){
 
             samples.add(new double[width][height]);
             int ptcount = 0;
@@ -331,6 +331,16 @@ public class MonotonicFrontSpeedField {
                     }
                 }
             }
+        }
+        for(int i=0;i<4;i++){
+            // solve for convolution
+            double[][] speed = new double[width][height];
+            for(int y=0;y<height;y++){
+                for(int x=0; x<width; x++){
+                    speed[x][y] = Math.abs(this.priorMeanSpeed + Normal.staticNextDouble(0,Math.sqrt(this.priorVarSpeed)));
+                }
+            }
+            samples.add(speed);
         }
 
 
