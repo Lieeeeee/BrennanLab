@@ -353,6 +353,8 @@ public class WaveFrontTracker implements PlugInFilter {
                  * Segment NOW, starting the MM algorithm from the most-probable future prediction
                  *********************************************************************************/
                 try {
+                    gcSegmenter.freezeInnerRegion(prevLS);
+
                     gcSegmenter.setNodeWeights(shapePriorDensity, prevLS, likelihood);
                     gcSegmenter.setEdgeWeights(shapePriorDensity, prevLS);
                     oldEnergy = gcSegmenter.relaxEnergy();
@@ -367,7 +369,6 @@ public class WaveFrontTracker implements PlugInFilter {
                     /**
                      * Inner for the previous should remain inner
                      */
-                    gcSegmenter.freezeInnerRegion(prevLS);
 
                     /**
                      * MM algorithm below
@@ -528,6 +529,7 @@ public class WaveFrontTracker implements PlugInFilter {
         FloatProcessor spfp = new FloatProcessor(speedgrid);
         ImagePlus speedImage = new ImagePlus("Speed image",spfp);
         speedImage.updateAndDraw();
+
         speedImage.show();
 
         ResultsTable rt = new ResultsTable();

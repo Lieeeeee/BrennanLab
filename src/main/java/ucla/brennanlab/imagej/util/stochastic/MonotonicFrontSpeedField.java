@@ -4,8 +4,8 @@ import cern.jet.random.Normal;
 import ij.ImagePlus;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
-import org.apache.commons.math3.analysis.interpolation.BicubicInterpolatingFunction;
-import org.apache.commons.math3.analysis.interpolation.BicubicInterpolator;
+import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolatingFunction;
+import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolator;
 import org.apache.commons.math3.exception.OutOfRangeException;
 import ucla.brennanlab.imagej.util.levelsets.ImplicitShape2D;
 
@@ -235,12 +235,12 @@ public class MonotonicFrontSpeedField {
         boolean[] mask = new boolean[datapoints.size()];
 
 
-        for(int i = 0; i<wavePositions.size();i++){
+        for(int position = 0; position<wavePositions.size();position++){
             for(int j=0; j<mask.length;j++){
                 int[] xy = datapoints.get(j);
-                if(Math.abs(wavePositions.get(i).get(invertXcoord(xy[0]),invertYcoord(xy[1])))<bandwidth){
-                    mask[i] = true;
-                }else mask[i] = false;
+                if(Math.abs(wavePositions.get(position).get(invertXcoord(xy[0]),invertYcoord(xy[1])))<bandwidth){
+                    mask[j] = true;
+                }else mask[j] = false;
             }
             ArrayList<double[][]> inferred = krigingLattice.infer(mask);
             ArrayList<int[]> newpoints = new ArrayList<int[]>();
@@ -248,9 +248,8 @@ public class MonotonicFrontSpeedField {
                 for(int x=0;x<width1;x++){
                     if(!decided[x][y]){
                         // check that we want to use this point
-                        if(wavePositions.get(i).in(invertXcoord(x),invertYcoord(y))){
+                        if(wavePositions.get(position).in(invertXcoord(x),invertYcoord(y))){
                             newpoints.add(new int[]{x,y});
-                            decided[x][y] = true;
                         }
                     }
                 }
@@ -260,8 +259,12 @@ public class MonotonicFrontSpeedField {
                 double[][] predictions = predicted.get(0);
                 for(int j=0; j<predictions.length;j++){
                     int[] xy = newpoints.get(j);
-                    coarsefield[xy[0]][xy[1]] = predictions[j][0];
-                    flcoarsefield[xy[0]][xy[1]] = (float)predictions[j][0];
+                    if(!decided[xy[0]][xy[1]]) {
+                        coarsefield[xy[0]][xy[1]] = predictions[j][0];
+                        flcoarsefield[xy[0]][xy[1]] = (float) predictions[j][0];
+                        decided[xy[0]][xy[1]] = true;
+
+                    }
                 }
             }
 
@@ -280,8 +283,8 @@ public class MonotonicFrontSpeedField {
         int J = wavePositions.size();
 
 
-        BicubicInterpolator interpolator = new BicubicInterpolator();
-        BicubicInterpolatingFunction poly = interpolator.interpolate(xvals,yvals,coarsefield);
+        PiecewiseBicubicSplineInterpolator interpolator = new PiecewiseBicubicSplineInterpolator();
+        PiecewiseBicubicSplineInterpolatingFunction	 poly = interpolator.interpolate(xvals,yvals,coarsefield);
 
         float[][] fullfield = new float[width][height];
         for(int y=0; y<height; y++){
