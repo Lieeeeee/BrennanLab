@@ -4,21 +4,39 @@ These are ImageJ plugins developed for the Brennan Lab's use in analyzing optica
 
 External dependencies
 ---------------------
-* Cern Colt 1.2.0
-* UJMP 0.3.0
-* JChart2D 3.3.2
-* Apache commons math 3.2
-* ImageJ >=1.49
+* [Cern Colt 1.2.0](https://dst.lbl.gov/ACSSoftware/colt/)
+* [UJMP 0.3.0](https://ujmp.org/)
+* [JChart2D 3.3.2](http://jchart2d.sourceforge.net/)
+* [Apache Commons Math3 3.4](https://commons.apache.org/proper/commons-math/)
+* [FIJI](http://fiji.sc/Fiji) is just [ImageJ >=1.49](http://imagej.nih.gov/ij/)
 
 Plugins
 -------
 * Bright CSD Tracker from differences - CSD wavefront segmentation based on inter-frame difference image
-* Utils/Differences - compute interframe differences
-* Utils/Filtered Differences - compute interframe differences with some saturation of outliers
+* Utils
+  * Differences - compute interframe differences
+  * Filtered Differences - compute interframe differences with some saturation of outliers
+  * Interactive Z Axis Profile - Z Axis profile sensitive to changes in the ROI selection
+  * Open a substack of a Tiff - for selecting a particular range (and loading into memory) of a multipage tiff
+  * Open multiple subsequences from a Tiff
+  * Changes from baseline - Various forms of baseline subtraction
+  * Tresholded changes from baseline - Take the changes, smooth, threshold
+  * Blue and threshold versus baseline
+  * Sign of differences - Sign of interframe differences
+  * Cumulative sum - pixelwise cumulative sum function
+* CSD
+  * Peak Isolator - Isolate pixelwise peak in the image intensity
+  * Montage CSDs from file - Make a montage based on the Peak Isolator
+  * Levelset Method
+    * Reconstruct Wave from Speed - Soft eikonal equation with a given intial condition
+    * Signed distance to ROI - Get 0-level set
 
 CSD Tracker
 ===========
-The CSD tracker is based on regularized Chan-Vese segmentation where inference is performed using graph cuts. The regularization comes from a running prediction of future front positions based on previous front positions by estimating a spatially-correlated wavespeed field. The paper in IEEE describes the overall method (and is completely reproducible as I fortunately discovered recently when rewriting this plugin!):
+
+![Segmented moving CSD wavefront](http://joshchang.github.io/_static/images/csd.gif)
+
+The CSD tracker is based on regularized Chan-Vese segmentation (of a bright expanding foreground region) where inference is performed using graph cuts. The regularization comes from a running prediction of future front positions based on previous front positions by estimating a spatially-correlated wavespeed field. The paper in IEEE describes the overall method (and is completely reproducible as I fortunately discovered recently when rewriting this plugin!):
 
 ```
 @article{chang2012tracking,
