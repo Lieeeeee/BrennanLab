@@ -4,11 +4,11 @@ These are ImageJ plugins developed for the Brennan Lab's use in analyzing optica
 
 External dependencies
 ---------------------
-* Cern Colt 1.2.0
-* UJMP 0.3.0
-* JChart2D 3.3.2
-* Apache commons math 3.2
-* ImageJ >=1.49
+* [Cern Colt 1.2.0](https://dst.lbl.gov/ACSSoftware/colt/)
+* [UJMP 0.3.0](https://ujmp.org/)
+* [JChart2D 3.3.2](http://jchart2d.sourceforge.net/)
+* [Apache Commons Math3 3.4](https://commons.apache.org/proper/commons-math/)
+* [FIJI](http://fiji.sc/Fiji) is just [ImageJ >=1.49](http://imagej.nih.gov/ij/)
 
 Plugins
 -------
