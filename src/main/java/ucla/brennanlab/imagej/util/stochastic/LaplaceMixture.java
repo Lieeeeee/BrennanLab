@@ -132,10 +132,9 @@ public class LaplaceMixture implements IntensityModel {
 
     /**
      *
-     * @param is
-     * @param labels
-     *            [slice][x][y]
-     * @param updatePrior
+     * @param is   The image stack containing image processors
+     * @param labels  boolean labeling for the stack to foreground (true)
+     * @param updatePrior  Should I update the priors or not?
      */
     public void Infer(ImageStack is, boolean[][][] labels, boolean updatePrior) {
         int slices = is.getSize();

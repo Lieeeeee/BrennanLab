@@ -49,7 +49,7 @@ public class Kriging2DLattice {
     /**
      * Perform inference using the points in mask. Returns the values
      * and the covariance matrix
-     * @param mask
+     * @param mask   mask for which of the points we want to use
      * @return some matrices: fitted (\hat\beta Eq 6), A_\beta from Eq 7
      */
     public ArrayList<double[][]> infer(boolean[] mask){
@@ -123,8 +123,8 @@ public class Kriging2DLattice {
     }
 
     /**
-     *
-     * @return
+     * Infer based on all of the current points available
+     * @return  ArrayList of estimate, variance, points
      */
     public ArrayList<double[][]> infer(){
         boolean[] mask = new boolean[this.measurements.size()];
@@ -136,8 +136,8 @@ public class Kriging2DLattice {
 
     /**
      * Solve for Eq 8, 9 - the prediction and the variance matrix
-     * @param inferred
-     * @param newpoints
+     * @param inferred   The inferred values from calling this.infer()
+     * @param newpoints  The new points at which to predict based on the inferred values
      * @return Eq 8, 9
      */
     public ArrayList<double[][]> predict(ArrayList<double[][]> inferred, ArrayList<int[]> newpoints){

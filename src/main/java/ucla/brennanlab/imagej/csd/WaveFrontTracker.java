@@ -11,6 +11,7 @@ import ij.measure.ResultsTable;
 import ij.plugin.filter.GaussianBlur;
 import ij.plugin.filter.PlugInFilter;
 import ij.plugin.frame.RoiManager;
+import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
 import ucla.brennanlab.imagej.graphcuts.GraphCutSegmenter;
@@ -48,7 +49,7 @@ public class WaveFrontTracker implements PlugInFilter {
     boolean showPredictions = false;
     boolean useManualInitializationPrior = false;
     Roi userDrawnRoi;
-    int numSpeedSamples = 24;
+    int numSpeedSamples = 8;
     double priorSpeedMean = 8.0, priorSpeedSD = 8.0;
     int width;
     int height;
@@ -523,6 +524,11 @@ public class WaveFrontTracker implements PlugInFilter {
         IJ.log("Done segmenting, check out the output!");
 
         float[][] speedlist = this.runningSpeed.listBoundarySpeedsFromLevelSets(this.runningSpeed.wavePositions);
+        float[][] speedgrid = runningSpeed.inferFullField();
+        FloatProcessor spfp = new FloatProcessor(speedgrid);
+        ImagePlus speedImage = new ImagePlus("Speed image",spfp);
+        speedImage.updateAndDraw();
+        speedImage.show();
 
         ResultsTable rt = new ResultsTable();
         for(int i=0; i<speedlist.length;i++){

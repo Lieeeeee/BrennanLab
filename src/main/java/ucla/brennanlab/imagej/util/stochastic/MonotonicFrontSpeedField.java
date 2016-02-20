@@ -1,6 +1,12 @@
 package ucla.brennanlab.imagej.util.stochastic;
 
 import cern.jet.random.Normal;
+import ij.ImagePlus;
+import ij.process.FloatProcessor;
+import ij.process.ImageProcessor;
+import org.apache.commons.math3.analysis.interpolation.BicubicInterpolatingFunction;
+import org.apache.commons.math3.analysis.interpolation.BicubicInterpolator;
+import org.apache.commons.math3.exception.OutOfRangeException;
 import ucla.brennanlab.imagej.util.levelsets.ImplicitShape2D;
 
 import java.util.ArrayList;
@@ -38,6 +44,15 @@ public class MonotonicFrontSpeedField {
         this(width, height, Float.MIN_VALUE, Float.MAX_VALUE, 1, 1);
     }
 
+    /**
+     *
+     * @param width      width of field
+     * @param height     height of field
+     * @param priormean  mean speed guess
+     * @param priorvar   variance of guess
+     * @param xreduction for reducing the grid in the x direction
+     * @param yreduction reduction in the y direction
+     */
     public MonotonicFrontSpeedField(int width, int height, double priormean, double priorvar ,int xreduction, int yreduction) {
         this.width = width;
         this.height = height;
@@ -49,8 +64,8 @@ public class MonotonicFrontSpeedField {
         this.standardNormal = new Normal(0, 1,
                 new cern.jet.random.engine.MersenneTwister(new java.util.Date())
         );
-        krigingLattice = new Kriging2DLattice(priormean,1.0/priorvar,width/xreduction,height/yreduction);
-        this.coarseMean = new double[(int)width/xreduction][(int) height/yreduction];
+        krigingLattice = new Kriging2DLattice(priormean,1.0/priorvar,(int)Math.ceil(width/xreduction),(int)Math.ceil(height/yreduction));
+        this.coarseMean = new double[(int)Math.ceil(width/xreduction)][(int)Math.ceil(height/yreduction)];
         this.currentMean = new double[width][height];
         for(int y=0;y<height;y++){
             for(int x=0; x<width;x++){
@@ -65,8 +80,8 @@ public class MonotonicFrontSpeedField {
 
     /**
      * Add an arrival by mask
-     * @param mask
-     * @param time
+     * @param mask  boolean mask describing the shap
+     * @param time  arrival time
      */
     public void addArrival(boolean[][] mask, float time){
         this.addArrival(new ImplicitShape2D(mask), time);
@@ -76,7 +91,8 @@ public class MonotonicFrontSpeedField {
      * Add another ROI and update the kriging object. We don't perform any
      * sanity checking here.
      *
-     * @param incomingShape The arrival times with null for not-defined
+     * @param incomingShape The shape that has arrived
+     * @param time The time these arrivals have arrive
      */
     public void addArrival(ImplicitShape2D incomingShape, float time) {
 
@@ -146,7 +162,6 @@ public class MonotonicFrontSpeedField {
          */
 
         ArrayList<int[]> existingpoints = krigingLattice.getPoints();
-
         ArrayList<Integer> counts = new ArrayList<Integer>();
         ArrayList<int[]> aggregatedpoints = new ArrayList<int[]>();
         ArrayList<Double> aggregatedspeeds = new ArrayList<Double>();
@@ -191,11 +206,95 @@ public class MonotonicFrontSpeedField {
 
 
     /**
-     *
-     * @return
+     *  Current mean field
+     * @return double 2d array
      */
     public double[][] getCurrentMean(){
         return this.currentMean;
+    }
+
+    /**
+     * Infer the speed everywhere by running predict()
+     * @return speed array using interpolation
+     */
+    public float[][] inferFullField(){
+        int width1 = (int) Math.ceil(width/xreduction)+1;
+        int height1 = (int) Math.ceil(height/yreduction)+1;
+        double[][] coarsefield = new double[width1][height1];
+        float[][] flcoarsefield = new float[width1][height1];
+        boolean[][] decided = new boolean[width1][height1];
+
+        for(int y=0;y<height1;y++){
+            for(int x=0;x<width1;x++){
+                coarsefield[x][y] = priorMeanSpeed;
+                decided[x][y] = false;
+            }
+        }
+        int bandwidth = 40;
+        ArrayList<int[]> datapoints = krigingLattice.getPoints();
+        boolean[] mask = new boolean[datapoints.size()];
+
+
+        for(int i = 0; i<wavePositions.size();i++){
+            for(int j=0; j<mask.length;j++){
+                int[] xy = datapoints.get(j);
+                if(Math.abs(wavePositions.get(i).get(invertXcoord(xy[0]),invertYcoord(xy[1])))<bandwidth){
+                    mask[i] = true;
+                }else mask[i] = false;
+            }
+            ArrayList<double[][]> inferred = krigingLattice.infer(mask);
+            ArrayList<int[]> newpoints = new ArrayList<int[]>();
+            for(int y=0;y<height1;y++){
+                for(int x=0;x<width1;x++){
+                    if(!decided[x][y]){
+                        // check that we want to use this point
+                        if(wavePositions.get(i).in(invertXcoord(x),invertYcoord(y))){
+                            newpoints.add(new int[]{x,y});
+                            decided[x][y] = true;
+                        }
+                    }
+                }
+            }
+            if(newpoints.size()>0){
+                ArrayList<double[][]> predicted = krigingLattice.predict(inferred,newpoints);
+                double[][] predictions = predicted.get(0);
+                for(int j=0; j<predictions.length;j++){
+                    int[] xy = newpoints.get(j);
+                    coarsefield[xy[0]][xy[1]] = predictions[j][0];
+                    flcoarsefield[xy[0]][xy[1]] = (float)predictions[j][0];
+                }
+            }
+
+        }
+
+        ImageProcessor flcoarse = new FloatProcessor(flcoarsefield);
+        ImagePlus flimage = new ImagePlus("",flcoarse);
+        flimage.show();
+        flimage.updateAndDraw();
+
+
+        double[] xvals = new double[width1];
+        double[] yvals = new double[height1];
+        for(int x=0;x<width1;x++){xvals[x] = x*xreduction;}
+        for(int y=0;y<height1;y++){yvals[y] = y*yreduction;}
+        int J = wavePositions.size();
+
+
+        BicubicInterpolator interpolator = new BicubicInterpolator();
+        BicubicInterpolatingFunction poly = interpolator.interpolate(xvals,yvals,coarsefield);
+
+        float[][] fullfield = new float[width][height];
+        for(int y=0; y<height; y++){
+            for(int x=0;x<width; x++){
+                try {
+                    fullfield[x][y] = (float) poly.value(x, y);
+                }catch (OutOfRangeException e){
+                    fullfield[x][y] = (float) priorMeanSpeed;
+                }
+            }
+        }
+
+        return fullfield;
     }
 
 
@@ -312,7 +411,7 @@ public class MonotonicFrontSpeedField {
 
         ArrayList<double[][]> predicted = krigingLattice.predict(inferred,newpoints);
         ArrayList<double[][]> krigingsamples = krigingLattice.sample(predicted,numSamples);
-        ArrayList<double[][]> samples = new ArrayList<double[][]>(numSamples);
+        ArrayList<double[][]> samples = new ArrayList<double[][]>(numSamples+8);
 
         for(int i=0; i<numSamples; i++){
 
@@ -348,13 +447,13 @@ public class MonotonicFrontSpeedField {
 
 
     public int getXcoord(int x){
-        return (int) Math.floor(x/this.xreduction);
+        return (int) Math.round(x/this.xreduction);
     }
 
     public int invertXcoord(int x){ return (int) x*this.xreduction; }
 
     public int getYcoord(int y){
-        return (int)Math.floor(y/this.yreduction);
+        return (int)Math.round(y/this.yreduction);
     }
 
     public int invertYcoord(int y){ return (int) y*this.yreduction;}
